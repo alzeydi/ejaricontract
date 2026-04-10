@@ -1,0 +1,7 @@
+flask
+flask-cors
+reportlab
+pypdf
+anthropic
+requests
+gunicorn
