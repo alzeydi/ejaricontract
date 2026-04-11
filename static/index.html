@@ -653,7 +653,7 @@ async function doPay(){
     const resp = await fetch(PAY_URL, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({test: true}) // set test:false for production
+      body: JSON.stringify({})
     });
     const data = await resp.json();
     if(!data.ok) throw new Error(data.error||'Payment creation failed');

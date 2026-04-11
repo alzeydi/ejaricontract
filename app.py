@@ -275,9 +275,6 @@ used_intents = set()  # intent_ids that have already been used for extraction
 def create_payment():
     """Create a Ziina Payment Intent and return redirect_url to frontend."""
     try:
-        body = request.json or {}
-        test_mode = body.get('test', True)  # default test=True for local dev
-
         base_url = request.host_url.rstrip('/')
         payload = {
             'amount': 3000,          # 30 AED in fils
@@ -286,7 +283,6 @@ def create_payment():
             'success_url': f'{base_url}/?paid=1',
             'cancel_url':  f'{base_url}/?cancelled=1',
             'failure_url': f'{base_url}/?failed=1',
-            'test': test_mode,
             'allow_tips': False,
             'operation_id': str(uuid.uuid4()),
         }
