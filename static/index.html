@@ -132,13 +132,17 @@ main{max-width:780px;margin:0 auto;padding:36px 24px 80px}
 .ext-head{padding:12px 16px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
 .ext-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
 .ext-count{font-size:11px;font-weight:500;color:var(--accent);background:var(--accent-bg);padding:2px 8px;border-radius:4px}
+.ext-warn{padding:9px 16px;background:#fffbea;border-bottom:1px solid #f0e08a;font-size:12px;color:#7a6100;display:flex;align-items:center;gap:7px}
 .ext-grid{display:grid;grid-template-columns:1fr 1fr}
-.ei{padding:10px 16px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.ei{padding:8px 16px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
 .ei:nth-child(even){border-right:none}
 .ei:nth-last-child(-n+2){border-bottom:none}
-.ei-k{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:2px;font-weight:500}
-.ei-v{font-size:13px;font-weight:500;color:var(--text)}
-.ei-v.nil{color:var(--muted);font-weight:400;font-style:italic}
+.ei-k{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:3px;font-weight:500}
+.ei-input{border:none!important;background:transparent!important;padding:0!important;border-radius:0!important;border-bottom:1px dashed transparent!important;font-size:13px;font-weight:500;color:var(--text);width:100%;font-family:'Inter',sans-serif;transition:border-color .15s}
+.ei-input:hover{border-bottom-color:var(--border)!important}
+.ei-input:focus{outline:none!important;border-bottom-color:var(--accent-mid)!important}
+.ei-input.nil{color:var(--muted);font-style:italic;font-weight:400}
+.ei-input::placeholder{color:#ccc;font-style:normal}
 
 /* FORM */
 .field-group{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
@@ -400,6 +404,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
         <span class="ext-label">Extracted from documents</span>
         <span class="ext-count" id="extCount"></span>
       </div>
+      <div class="ext-warn">⚠️ <strong>Check every field carefully</strong> — AI recognition can make mistakes. Click any field to correct it.</div>
       <div class="ext-grid" id="extGrid"></div>
     </div>
 
@@ -797,16 +802,39 @@ async function runOCR(){
 
 function buildScreen2(){
   const rows=[
-    ['Tenant',ext.tenant_name],['Tenant EID',ext.tenant_emirates_id],
-    ['Lessor',ext.lessor_name],['Lessor EID',ext.lessor_emirates_id],
-    ['Building',ext.building_name],['Unit No.',ext.property_no],
-    ['Area m²',ext.property_area],['Location',ext.location],
-    ['DEWA No.',ext.premises_no_dewa],['Makani No.',ext.makani_no],
-    ['Plot No.',ext.plot_no],['Prev. Rent',ext.annual_rent?ext.annual_rent+' AED':''],
+    {label:'Tenant name',   key:'tenant_name'},
+    {label:'Tenant EID',    key:'tenant_emirates_id'},
+    {label:'Lessor name',   key:'lessor_name'},
+    {label:'Lessor EID',    key:'lessor_emirates_id'},
+    {label:'Owner name',    key:'owner_name'},
+    {label:'Building',      key:'building_name'},
+    {label:'Unit No.',      key:'property_no'},
+    {label:'Property type', key:'property_type'},
+    {label:'Area m²',       key:'property_area'},
+    {label:'Location',      key:'location'},
+    {label:'DEWA No.',      key:'premises_no_dewa'},
+    {label:'Makani No.',    key:'makani_no'},
+    {label:'Plot No.',      key:'plot_no'},
+    {label:'Security dep.', key:'security_deposit'},
   ];
-  const filled=rows.filter(([,v])=>v).length;
-  $('extCount').textContent=filled+'/'+rows.length;
-  $('extGrid').innerHTML=rows.map(([k,val])=>`<div class="ei"><div class="ei-k">${k}</div><div class="ei-v ${val?'':'nil'}">${val||'—'}</div></div>`).join('');
+
+  $('extGrid').innerHTML=rows.map(({label,key})=>{
+    const val=(ext[key]||'').toString().trim();
+    return`<div class="ei">
+      <div class="ei-k">${label}</div>
+      <input class="ei-input${val?'':' nil'}" data-key="${key}" value="${val.replace(/"/g,'&quot;')}" placeholder="not found">
+    </div>`;
+  }).join('');
+
+  // Live sync: update ext when user edits a field
+  $('extGrid').addEventListener('input',e=>{
+    const inp=e.target;if(!inp.dataset.key)return;
+    ext[inp.dataset.key]=inp.value;
+    inp.classList.toggle('nil',!inp.value.trim());
+    updateExtCount();
+  });
+
+  updateExtCount();
 
   if(ext.contract_from) $('contract_from').value=yr(ext.contract_from);
   if(ext.contract_to)   $('contract_to').value=yr(ext.contract_to);
@@ -815,6 +843,12 @@ function buildScreen2(){
   if(ext.tenant_phone)     $('tenant_phone').value=ext.tenant_phone;
 
   recalc();step(1);go('s2');
+}
+
+function updateExtCount(){
+  const inputs=$('extGrid').querySelectorAll('.ei-input');
+  const filled=[...inputs].filter(i=>i.value.trim()).length;
+  $('extCount').textContent=`${filled}/${inputs.length}`;
 }
 
 // DD/MM/YYYY → DD/MM/YYYY year+1 (for pre-filling from previous Ejari)
