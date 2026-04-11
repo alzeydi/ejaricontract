@@ -367,8 +367,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
               <div class="pay-cur">AED</div>
             </div>
           </div>
-          <button class="btn btn-dark" onclick="openSheet()">Pay 30 AED &amp; Extract →</button>
-          <div style="text-align:center;font-size:12px;color:var(--muted);margin-top:8px">☕ Less than a coffee at Starbucks</div>
+          <button class="btn btn-dark" id="payBtn" onclick="openSheet()" disabled>Pay 30 AED &amp; Extract →</button>
+          <div id="payHint" style="text-align:center;font-size:12px;color:var(--muted);margin-top:8px">Upload 3 required documents to continue</div>
           <div class="trust" style="margin-top:9px">
             <span>🔒 Ziina</span><span class="trust-sep">·</span>
             <span>Apple Pay</span><span class="trust-sep">·</span>
@@ -617,6 +617,17 @@ function onFile(fid,bid,sid){
   const f=$(fid).files[0];
   $(bid).classList.toggle('has-file',!!f);
   $(sid).textContent=f?'✓ '+f.name:'';
+  checkPayReady();
+}
+
+function checkPayReady(){
+  const required=['fTEID','fLEID','fTD'];
+  const done=required.filter(id=>$(id).files[0]).length;
+  const ready=done===3;
+  $('payBtn').disabled=!ready;
+  $('payHint').textContent=ready
+    ?'☕ Less than a coffee at Starbucks'
+    :`Upload ${3-done} more required document${3-done===1?'':'s'} to continue`;
 }
 
 // Sheet
