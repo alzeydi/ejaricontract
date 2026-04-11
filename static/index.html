@@ -193,6 +193,30 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
 .gen-spin{width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .65s linear infinite;display:none;flex-shrink:0}
 
+/* NEXT STEPS */
+.dl-success{display:none;align-items:center;gap:12px;background:var(--accent-bg);border:1px solid rgba(42,122,111,.3);border-radius:8px;padding:16px;margin-top:16px}
+.dl-success.on{display:flex}
+.dl-success-icon{font-size:28px;flex-shrink:0}
+.dl-success-title{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:2px}
+.dl-success-sub{font-size:12px;color:var(--muted)}
+.next-steps{display:none;margin-top:16px}
+.next-steps.on{display:block}
+.ns-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.ns-list{display:flex;flex-direction:column;gap:0;position:relative}
+.ns-list::before{content:'';position:absolute;left:15px;top:16px;bottom:16px;width:1px;background:var(--border);z-index:0}
+.ns-item{display:flex;align-items:flex-start;gap:14px;padding:12px 0;position:relative;z-index:1}
+.ns-num{width:30px;height:30px;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1.5px solid var(--border);background:var(--white);color:var(--muted)}
+.ns-num.done{background:var(--accent);border-color:var(--accent);color:#fff}
+.ns-body{}
+.ns-label{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.ns-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.ns-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:2px 7px;border-radius:3px;margin-top:5px;border:1px solid}
+.ns-tag.green{background:var(--accent-bg);color:var(--accent);border-color:rgba(42,122,111,.2)}
+.ns-tag.gray{background:#f0f0f0;color:var(--muted);border-color:var(--border)}
+.ns-tag.gold{background:var(--gold-bg);color:var(--gold);border-color:rgba(184,134,11,.2)}
+.ns-dl-again{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--accent);background:transparent;border:1px solid rgba(42,122,111,.3);border-radius:7px;padding:10px 16px;cursor:pointer;margin-top:16px;transition:background .15s}
+.ns-dl-again:hover{background:var(--accent-bg)}
+
 @media(max-width:560px){
   .upload-grid,.field-group,.ext-grid{grid-template-columns:1fr}
   .span2{grid-column:span 1}
@@ -437,8 +461,83 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
           <div class="gen-spin" id="genSpin"></div>
         </button>
 
+        <!-- Success banner -->
+        <div class="dl-success" id="dlSuccess">
+          <div class="dl-success-icon">🎉</div>
+          <div>
+            <div class="dl-success-title">Contract downloaded — you're almost done!</div>
+            <div class="dl-success-sub">Follow the steps below to complete Ejari registration</div>
+          </div>
+        </div>
+
       </div>
     </div>
+
+    <!-- Next steps instruction -->
+    <div class="next-steps" id="nextSteps">
+      <div class="section">
+        <div class="section-head">
+          <div class="section-icon">🗺️</div>
+          <div>
+            <div class="section-title">What to do next</div>
+            <div class="section-desc">4 steps to complete your Ejari registration</div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="ns-list">
+
+            <div class="ns-item">
+              <div class="ns-num done">✓</div>
+              <div class="ns-body">
+                <div class="ns-label">Generate the tenancy contract</div>
+                <div class="ns-desc">Done — your DLD unified contract PDF is ready.</div>
+                <span class="ns-tag green">✦ Completed</span>
+              </div>
+            </div>
+
+            <div class="ns-item">
+              <div class="ns-num">2</div>
+              <div class="ns-body">
+                <div class="ns-label">Print &amp; sign the contract</div>
+                <div class="ns-desc">Both <strong>landlord and tenant</strong> must sign all pages. You can also use a digital signature (DocuSign, Adobe Sign).</div>
+                <span class="ns-tag gray">Landlord + Tenant</span>
+              </div>
+            </div>
+
+            <div class="ns-item">
+              <div class="ns-num">3</div>
+              <div class="ns-body">
+                <div class="ns-label">Register via Dubai REST app</div>
+                <div class="ns-desc">Open the <strong>Dubai REST</strong> app → Ejari → New Registration. Upload the signed contract. You'll need <strong>UAE Pass</strong> to log in.</div>
+                <span class="ns-tag gold">Fee: AED 155</span>
+                <span class="ns-tag gray" style="margin-left:4px">Dubai REST · UAE Pass</span>
+              </div>
+            </div>
+
+            <div class="ns-item">
+              <div class="ns-num">4</div>
+              <div class="ns-body">
+                <div class="ns-label">Receive Ejari certificate</div>
+                <div class="ns-desc">Issued within <strong>1–2 working days</strong>. Required for DEWA connection, residency visa renewal, and any rental disputes at RERA.</div>
+                <span class="ns-tag green">✓ You're done</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-top:16px;font-size:12px;color:var(--muted);line-height:1.6">
+            💡 <strong style="color:var(--text)">No Dubai REST app?</strong> You can also register at any approved <strong>Ejari typing centre</strong> in Dubai. They charge ~AED 150–200 including the registration fee.
+          </div>
+
+          <button class="ns-dl-again" onclick="genPDF()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Download contract again
+          </button>
+
+        </div>
+      </div>
+    </div>
+
   </div>
 
 </main>
@@ -776,7 +875,12 @@ async function genPDF(){
     a.href=URL.createObjectURL(blob);
     a.download=`ejari_${(ext.tenant_name||'contract').replace(/\s+/g,'_')}.pdf`;
     a.click();
-    step(2);toast('PDF downloaded successfully!');
+    step(2);
+    toast('PDF downloaded successfully!');
+    $('dlSuccess').classList.add('on');
+    $('nextSteps').classList.add('on');
+    $('genBtn').textContent='↓ Download again';
+    setTimeout(()=>$('nextSteps').scrollIntoView({behavior:'smooth',block:'start'}),300);
   }catch(err){toast(err.message,'fail');}
   finally{btn.disabled=false;txt.textContent='Generate & Download PDF';sp.style.display='none';}
 }
