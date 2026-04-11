@@ -271,7 +271,7 @@ def create_payment():
             'amount': 3000,          # 30 AED in fils
             'currency_code': 'AED',
             'message': 'Ejari Helper — AI document extraction',
-            'success_url': f'{base_url}/payment-success?intent_id={{id}}',
+            'success_url': f'{base_url}/?paid=1',
             'cancel_url':  f'{base_url}/?cancelled=1',
             'failure_url': f'{base_url}/?failed=1',
             'test': test_mode,

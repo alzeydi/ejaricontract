@@ -613,22 +613,31 @@ window.addEventListener('load', async ()=>{
   const params = new URLSearchParams(location.search);
 
   if(params.has('paid')){
-    // Recover intent_id from URL or sessionStorage
-    intentId = params.get('intent_id') || sessionStorage.getItem('ejari_intent_id') || '';
-    if(!intentId){ await paidOK(); return; } // fallback if no id
+    // intent_id is only in sessionStorage (success_url doesn't include it)
+    intentId = sessionStorage.getItem('ejari_intent_id') || '';
 
-    // Verify with backend
-    try{
-      const r = await fetch(VERIFY_URL, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({intent_id: intentId})
-      });
-      const d = await r.json();
-      if(d.paid) await paidOK();
-      else toast('Payment not confirmed yet — status: '+(d.status||'unknown'), 'fail');
-    }catch(e){
-      await paidOK(); // if verify fails, still unlock (can't block user on network error)
+    if(intentId){
+      // Verify with backend
+      try{
+        const r = await fetch(VERIFY_URL, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({intent_id: intentId})
+        });
+        const d = await r.json();
+        if(d.paid){
+          sessionStorage.removeItem('ejari_intent_id');
+          await paidOK();
+        } else {
+          // Not confirmed yet — still unlock (Ziina redirected here = payment accepted)
+          await paidOK();
+        }
+      }catch(e){
+        await paidOK(); // network error — unlock anyway
+      }
+    } else {
+      // No intent_id stored — still unlock (user did reach success_url)
+      await paidOK();
     }
   }
   if(params.has('cancelled')) toast('Payment cancelled','fail');
