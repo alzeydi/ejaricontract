@@ -753,6 +753,17 @@ window.addEventListener('load', async ()=>{
   if(params.has('failed'))    toast('Payment failed — please try again','fail');
 });
 
+// Reset button if page is restored from bfcache (Back button after Ziina redirect)
+window.addEventListener('pageshow', function(e){
+  if(e.persisted){
+    const btn=$('shBtn');
+    if(btn && btn.disabled){
+      btn.disabled=false;
+      $('shTxt').textContent='Pay 30 AED';
+    }
+  }
+});
+
 // OCR
 function b64(file){return new Promise((ok,fail)=>{const r=new FileReader();r.onload=()=>ok(r.result.split(',')[1]);r.onerror=fail;r.readAsDataURL(file);});}
 function mtype(f){return f.type==='application/pdf'?'application/pdf':f.type==='image/png'?'image/png':f.type==='image/webp'?'image/webp':'image/jpeg';}
