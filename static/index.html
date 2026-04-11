@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ejari Helper — Fill your tenancy contract in minutes</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Fraunces:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
 :root{
   --bg:#f4f3f0;
@@ -148,7 +149,8 @@ main{max-width:780px;margin:0 auto;padding:36px 24px 80px}
 .opt{font-size:10px;background:#eee;color:var(--muted);padding:1px 5px;border-radius:3px;font-weight:400;text-transform:none;letter-spacing:0}
 input,select{border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text);background:var(--white);width:100%;transition:border-color .15s;appearance:none}
 input:focus,select:focus{outline:none;border-color:var(--accent-mid)}
-input[type=date]{appearance:auto;padding-right:8px;cursor:pointer}
+.flatpickr-input{cursor:pointer!important}
+.flatpickr-calendar{font-family:'Inter',sans-serif;font-size:13px}
 input::placeholder{color:#bbb}
 input.calc{border-color:var(--gold)!important;background:var(--gold-bg)!important}
 select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:28px;cursor:pointer}
@@ -422,9 +424,9 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
         <div class="row-label">📅 Contract period</div>
         <div class="field-group">
-          <div class="field span2"><label>Contract date <span class="opt">optional — defaults to today</span></label><input type="date" id="contract_date"></div>
-          <div class="field"><label>From <span class="req">*</span></label><input type="date" id="contract_from"></div>
-          <div class="field"><label>To <span class="req">*</span></label><input type="date" id="contract_to"></div>
+          <div class="field span2"><label>Contract date <span class="opt">optional — defaults to today</span></label><input type="text" id="contract_date" placeholder="DD/MM/YYYY" readonly></div>
+          <div class="field"><label>From <span class="req">*</span></label><input type="text" id="contract_from" placeholder="DD/MM/YYYY" readonly></div>
+          <div class="field"><label>To <span class="req">*</span></label><input type="text" id="contract_to" placeholder="DD/MM/YYYY" readonly></div>
         </div>
 
         <div class="row-label">💰 Financials</div>
@@ -712,9 +714,6 @@ async function runOCRWithData(files){
 
 // On return from Ziina — verify payment then unlock OCR
 window.addEventListener('load', async ()=>{
-  // Default contract date = today
-  $('contract_date').value = new Date().toISOString().split('T')[0];
-
   const params = new URLSearchParams(location.search);
 
   if(params.has('paid')){
@@ -818,22 +817,14 @@ function buildScreen2(){
   recalc();step(1);go('s2');
 }
 
-// DD/MM/YYYY → YYYY-MM-DD (for date input), year+1
-function yr(s){
-  const p=s.split('/');if(p.length!==3)return'';
-  const[d,m,y]=p;return`${+y+1}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
-}
-// YYYY-MM-DD → DD/MM/YYYY (for PDF)
-function fromISO(s){
-  if(!s)return'';const p=s.split('-');
-  if(p.length!==3)return s;return`${p[2]}/${p[1]}/${p[0]}`;
-}
+// DD/MM/YYYY → DD/MM/YYYY year+1 (for pre-filling from previous Ejari)
+function yr(s){const p=s.split('/');return p.length===3?`${p[0]}/${p[1]}/${+p[2]+1}`:s;}
 function fmt(x){const n=parseFloat(String(x).replace(/[,\s]/g,''));return isNaN(n)?x:n.toLocaleString();}
 
 function parseD(s){
-  if(!s)return null;
-  const d=new Date(s+'T00:00:00');
-  return isNaN(d.getTime())?null:d;
+  const p=s.split('/');if(p.length!==3)return null;
+  const[d,m,y]=[+p[0],+p[1],+p[2]];
+  return(d&&m&&y&&y>2000)?new Date(y,m-1,d):null;
 }
 function recalc(){
   if(cvHeld)return;
@@ -851,13 +842,12 @@ function recalc(){
   }
 }
 $('contract_value').addEventListener('input',function(){cvHeld=!!this.value.trim();$('cv_hint').textContent='';this.classList.remove('calc');});
-['contract_from','contract_to','annual_rent'].forEach(id=>$(id).addEventListener('input',recalc));
+$('annual_rent').addEventListener('input',recalc);
 
 async function genPDF(){
   const req=['tenant_phone','contract_from','contract_to','annual_rent','contract_value','mode_of_payment'];
   for(const id of req){if(!v(id)){toast('Fill all required fields (*)','fail');return;}}
-  const today=new Date().toISOString().split('T')[0];
-  const contractDate=fromISO(v('contract_date')||today);
+  const contractDate=v('contract_date')||new Date().toLocaleDateString('en-GB');
   const data={
     date:contractDate,
     owner_name:ext.owner_name||ext.lessor_name||'',
@@ -872,7 +862,7 @@ async function genPDF(){
     building_name:ext.building_name||'',property_no:ext.property_no||'',
     property_type:ext.property_type||'Apartment',property_area:ext.property_area||'',
     location:ext.location||'',premises_no_dewa:ext.premises_no_dewa||'',
-    contract_from:fromISO(v('contract_from')),contract_to:fromISO(v('contract_to')),
+    contract_from:v('contract_from'),contract_to:v('contract_to'),
     contract_value:v('contract_value'),annual_rent:v('annual_rent'),
     security_deposit:v('security_deposit'),mode_of_payment:v('mode_of_payment'),
     tenant_sign_date:contractDate,lessor_sign_date:contractDate,
@@ -897,6 +887,22 @@ async function genPDF(){
   }catch(err){toast(err.message,'fail');}
   finally{btn.disabled=false;txt.textContent='Generate & Download PDF';sp.style.display='none';}
 }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+const FP_CFG = {dateFormat:'d/m/Y', allowInput:false, disableMobile:true};
+flatpickr('#contract_date', {...FP_CFG, defaultDate:'today'});
+flatpickr('#contract_from', {...FP_CFG, onChange: recalc});
+flatpickr('#contract_to',   {...FP_CFG, onChange: recalc});
+
+// Override buildScreen2 date-setting to use flatpickr API
+const _origBuild = buildScreen2;
+buildScreen2 = function(){
+  _origBuild();
+  if(ext.contract_from) $('contract_from')._flatpickr.setDate(yr(ext.contract_from), false, 'd/m/Y');
+  if(ext.contract_to)   $('contract_to')._flatpickr.setDate(yr(ext.contract_to),   false, 'd/m/Y');
+  recalc();
+};
 </script>
 </body>
 </html>
