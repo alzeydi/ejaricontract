@@ -193,8 +193,15 @@ def extract():
     try:
         payload = request.json
         files = payload.get('files', [])
+        intent_id = payload.get('intent_id', '')
+
         if not files:
             return jsonify({'error': 'No files provided'}), 400
+
+        # Validate payment session — one payment = one extraction
+        if intent_id:
+            if intent_id in used_intents:
+                return jsonify({'error': 'This payment has already been used. Please make a new payment to extract again.', 'code': 'already_used'}), 403
 
         # Run all documents in parallel threads
         from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -224,6 +231,10 @@ def extract():
                     'contract_from','contract_to']
         for k in defaults:
             merged.setdefault(k, '')
+
+        # Mark intent as used — prevents re-use of the same payment
+        if intent_id:
+            used_intents.add(intent_id)
 
         return jsonify({'ok': True, 'data': merged})
 
@@ -255,8 +266,9 @@ ZIINA_API_KEY = os.environ.get('ZIINA_API_KEY', '')
 ZIINA_API     = 'https://api-v2.ziina.com/api'
 ZIINA_HEADERS = {'Authorization': f'Bearer {ZIINA_API_KEY}', 'Content-Type': 'application/json'}
 
-# In-memory store of paid payment_intent ids (replace with DB in production)
+# In-memory store of paid and used payment_intent ids (replace with DB in production)
 paid_intents = set()
+used_intents = set()  # intent_ids that have already been used for extraction
 
 
 @app.route('/create-payment', methods=['POST'])
