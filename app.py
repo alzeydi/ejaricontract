@@ -134,6 +134,15 @@ def fill_ejari_pdf(data):
 
 # ── Routes ─────────────────────────────────────────────────────────────
 
+@app.before_request
+def redirect_www():
+    """Redirect www.ejarihelper.ae → ejarihelper.ae"""
+    from flask import redirect, request as req
+    host = req.host.lower()
+    if host.startswith('www.'):
+        url = req.url.replace('://www.', '://', 1)
+        return redirect(url, code=301)
+
 @app.route('/')
 def index():
     return send_from_directory('static', 'index.html')
