@@ -178,6 +178,13 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .method{font-size:11px;font-weight:500;padding:5px 10px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text)}
 .demo-note{display:none;font-size:12px;color:var(--blue);background:var(--blue-bg);border:1px solid rgba(26,79,138,.15);border-radius:6px;padding:8px 12px;margin-bottom:12px}
 
+/* PAY CONFIRM BANNER */
+.pay-confirm{display:none;align-items:center;gap:12px;background:var(--accent-bg);border:1px solid rgba(42,122,111,.3);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.pay-confirm.on{display:flex}
+.pay-confirm-icon{font-size:22px;flex-shrink:0}
+.pay-confirm-title{font-size:13px;font-weight:600;color:var(--accent);margin-bottom:2px}
+.pay-confirm-sub{font-size:12px;color:var(--muted)}
+
 /* TOAST */
 .toast{position:fixed;bottom:20px;right:20px;padding:11px 16px;border-radius:7px;font-size:13px;font-weight:500;opacity:0;transform:translateY(12px);transition:all .25s;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.12);max-width:280px}
 .toast.show{opacity:1;transform:translateY(0)}
@@ -336,6 +343,15 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
             <span>Apple Pay</span><span class="trust-sep">·</span>
             <span>Google Pay</span><span class="trust-sep">·</span>
             <span>Visa / MC</span>
+          </div>
+        </div>
+
+        <!-- Payment confirmation banner (shown after returning from Ziina) -->
+        <div class="pay-confirm" id="payConfirm">
+          <div class="pay-confirm-icon">✅</div>
+          <div>
+            <div class="pay-confirm-title">Payment confirmed — 30 AED</div>
+            <div class="pay-confirm-sub" id="payConfirmSub">Analysing your documents with AI…</div>
           </div>
         </div>
 
@@ -511,6 +527,21 @@ async function doPay(){
   $('shTxt').textContent='Creating payment…';
 
   try{
+    // Save uploaded files to sessionStorage BEFORE redirect (page will reload on return)
+    const slots=[
+      {id:'fTEID',lbl:'TENANT_EMIRATES_ID'},{id:'fLEID',lbl:'LESSOR_EMIRATES_ID'},
+      {id:'fTD',lbl:'TITLE_DEED'},{id:'fEJ',lbl:'PREVIOUS_EJARI'}
+    ];
+    const savedFiles=[];
+    for(const {id,lbl} of slots){
+      const file=$(id).files[0];
+      if(file){
+        const data=await b64(file);
+        savedFiles.push({label:lbl,data,mime_type:mtype(file),name:file.name});
+      }
+    }
+    if(savedFiles.length) sessionStorage.setItem('ejari_files',JSON.stringify(savedFiles));
+
     const resp = await fetch(PAY_URL, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -533,10 +564,48 @@ async function doPay(){
   }
 }
 
-function paidOK(){
+async function paidOK(){
   $('payBlock').style.display='none';
-  $('ocrBtn').style.display='flex';
-  toast('Payment confirmed — now extract your documents');
+  $('payConfirm').classList.add('on');
+
+  // Restore file names in the upload UI
+  const saved=JSON.parse(sessionStorage.getItem('ejari_files')||'[]');
+  const uiMap={TENANT_EMIRATES_ID:['bTEID','sTEID'],LESSOR_EMIRATES_ID:['bLEID','sLEID'],TITLE_DEED:['bTD','sTD'],PREVIOUS_EJARI:['bEJ','sEJ']};
+  saved.forEach(f=>{
+    const ids=uiMap[f.label];
+    if(ids){$(ids[0]).classList.add('has-file');$(ids[1]).textContent='✓ '+f.name;}
+  });
+
+  if(saved.length){
+    // Auto-run OCR with saved files — no need to re-upload
+    await runOCRWithData(saved);
+  }else{
+    // No saved files (edge case) — show manual button
+    $('payConfirmSub').textContent='Upload documents below and click Extract';
+    $('ocrBtn').style.display='flex';
+  }
+}
+
+// Run OCR with pre-loaded base64 data (after payment redirect)
+async function runOCRWithData(files){
+  setSt('loading','Analysing documents with AI…');
+  try{
+    const r=await fetch(EXT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files})});
+    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error||'Server error '+r.status);}
+    const res=await r.json();
+    if(!res.ok) throw new Error(res.error||'Extraction failed');
+    ext=res.data;
+    const n=Object.values(ext).filter(x=>x&&String(x).trim()).length;
+    setSt('ok',`✓ Extracted ${n} fields from ${files.length} document(s)`);
+    $('payConfirmSub').textContent=`Extraction complete — ${n} fields filled automatically`;
+    sessionStorage.removeItem('ejari_files');
+    setTimeout(buildScreen2,700);
+  }catch(err){
+    setSt('err','⚠ '+err.message);
+    $('payConfirmSub').textContent='Extraction failed — try again below';
+    $('ocrBtn').style.display='flex';
+    $('ocrTxt').textContent='✨ Try again';
+  }
 }
 
 // On return from Ziina — verify payment then unlock OCR
@@ -546,7 +615,7 @@ window.addEventListener('load', async ()=>{
   if(params.has('paid')){
     // Recover intent_id from URL or sessionStorage
     intentId = params.get('intent_id') || sessionStorage.getItem('ejari_intent_id') || '';
-    if(!intentId){ paidOK(); return; } // fallback if no id
+    if(!intentId){ await paidOK(); return; } // fallback if no id
 
     // Verify with backend
     try{
@@ -556,10 +625,10 @@ window.addEventListener('load', async ()=>{
         body: JSON.stringify({intent_id: intentId})
       });
       const d = await r.json();
-      if(d.paid) paidOK();
+      if(d.paid) await paidOK();
       else toast('Payment not confirmed yet — status: '+(d.status||'unknown'), 'fail');
     }catch(e){
-      paidOK(); // if verify fails, still unlock (can't block user on network error)
+      await paidOK(); // if verify fails, still unlock (can't block user on network error)
     }
   }
   if(params.has('cancelled')) toast('Payment cancelled','fail');
