@@ -165,25 +165,6 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .term-n{font-size:12px;color:var(--muted);min-width:16px;flex-shrink:0}
 .small-note{font-size:12px;color:var(--muted);padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:6px;margin-top:16px;line-height:1.6}
 
-/* SHEET */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:900;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(2px)}
-.overlay.on{opacity:1;pointer-events:all}
-.sheet{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-radius:16px 16px 0 0;padding:0 24px 40px;z-index:901;transform:translateY(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);max-width:560px;margin:0 auto}
-.sheet.on{transform:translateY(0)}
-.sh-bar{width:36px;height:4px;background:#e0e0e0;border-radius:2px;margin:12px auto 18px}
-.sh-x{position:absolute;top:14px;right:20px;width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--muted)}
-.sh-x:hover{background:var(--border)}
-.sh-title{font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin-bottom:3px}
-.sh-sub{font-size:13px;color:var(--muted);margin-bottom:16px}
-.sh-price{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;background:var(--gold-bg);border:1px solid rgba(184,134,11,.2);border-radius:8px;margin-bottom:14px}
-.sh-p-lbl{font-size:13px;font-weight:500}
-.sh-p-lbl small{font-size:11px;color:var(--muted);display:block;margin-top:2px}
-.sh-p-val .old{font-size:11px;color:var(--muted);text-decoration:line-through;text-align:right}
-.sh-p-val .new{font-size:24px;font-weight:700;text-align:right;line-height:1}
-.sh-p-val .cur{font-size:11px;color:var(--muted);text-align:right}
-.methods{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap}
-.method{font-size:11px;font-weight:500;padding:5px 10px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text)}
-.demo-note{display:none;font-size:12px;color:var(--blue);background:var(--blue-bg);border:1px solid rgba(26,79,138,.15);border-radius:6px;padding:8px 12px;margin-bottom:12px}
 
 /* PAY CONFIRM BANNER */
 .pay-confirm{display:none;align-items:center;gap:12px;background:var(--accent-bg);border:1px solid rgba(42,122,111,.3);border-radius:8px;padding:14px 16px;margin-bottom:12px}
@@ -367,7 +348,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
               <div class="pay-cur">AED</div>
             </div>
           </div>
-          <button class="btn btn-dark" id="payBtn" onclick="openSheet()" disabled>Pay 30 AED &amp; Extract →</button>
+          <button class="btn btn-dark" id="payBtn" onclick="doPay()" disabled><span id="payTxt">Pay 30 AED &amp; Extract →</span></button>
           <div id="payHint" style="text-align:center;font-size:12px;color:var(--muted);margin-top:8px">Upload 3 required documents to continue</div>
           <div class="trust" style="margin-top:9px">
             <span>🔒 Ziina</span><span class="trust-sep">·</span>
@@ -551,31 +532,6 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
 </main>
 
-<!-- Sheet -->
-<div class="overlay" id="ov" onclick="closeSheet()"></div>
-<div class="sheet" id="sh">
-  <div class="sh-bar"></div>
-  <div class="sh-x" onclick="closeSheet()">✕</div>
-  <div class="sh-title">Unlock AI extraction</div>
-  <div class="sh-sub">One-time · no account · no subscription</div>
-  <div class="demo-note" id="demoNote">🧪 Demo mode — no real charge will be made</div>
-  <div class="sh-price">
-    <div class="sh-p-lbl">AI document extraction<small>Emirates IDs · Title Deed · previous Ejari</small></div>
-    <div class="sh-p-val">
-      <div class="old">35 AED</div>
-      <div class="new">30</div>
-      <div class="cur">AED</div>
-    </div>
-  </div>
-  <div style="font-size:12px;color:var(--muted);text-align:center;margin:-8px 0 14px">☕ The price of a coffee in Dubai</div>
-  <div class="methods">
-    <div class="method">Apple Pay</div>
-    <div class="method">G Google Pay</div>
-    <div class="method">💳 Visa / MC</div>
-  </div>
-  <button class="btn btn-dark" id="shBtn" onclick="doPay()"><span id="shTxt">Pay 30 AED</span></button>
-  <div class="trust" style="margin-top:10px">🔒 Secured by Ziina · Your documents are never stored</div>
-</div>
 
 <div class="toast" id="toast"></div>
 
@@ -585,7 +541,6 @@ const EXTRACT_URL = '/extract';
 const PAY_URL     = '/create-payment';
 const VERIFY_URL  = '/verify-payment';
 const EXT_URL = '/extract';
-const DEMO    = true; // false + STRIPE_LINK for production
 
 let ext = {}, cvHeld = false;
 const $ = id => document.getElementById(id);
@@ -630,20 +585,10 @@ function checkPayReady(){
     :`Upload ${3-done} more required document${3-done===1?'':'s'} to continue`;
 }
 
-// Sheet
-function openSheet(){
-  $('sh').classList.add('on');$('ov').classList.add('on');
-  document.body.style.overflow='hidden';
-}
-function closeSheet(){
-  $('sh').classList.remove('on');$('ov').classList.remove('on');
-  document.body.style.overflow='';
-}
-
 async function doPay(){
-  const btn=$('shBtn');
+  const btn=$('payBtn');
   btn.disabled=true;
-  $('shTxt').textContent='Creating payment…';
+  $('payTxt').textContent='Creating payment…';
 
   try{
     // Save uploaded files to sessionStorage BEFORE redirect (page will reload on return)
@@ -672,14 +617,13 @@ async function doPay(){
     intentId = data.intent_id;
     sessionStorage.setItem('ejari_intent_id', intentId);
 
-    // Redirect to Ziina hosted payment page
-    $('shTxt').textContent='Redirecting to payment…';
+    $('payTxt').textContent='Redirecting to payment…';
     window.location.href = data.redirect_url;
 
   }catch(err){
     toast('Payment error: '+err.message, 'fail');
     btn.disabled=false;
-    $('shTxt').textContent='Pay 30 AED';
+    $('payTxt').textContent='Pay 30 AED & Extract →';
   }
 }
 
@@ -767,10 +711,10 @@ window.addEventListener('load', async ()=>{
 // Reset button if page is restored from bfcache (Back button after Ziina redirect)
 window.addEventListener('pageshow', function(e){
   if(e.persisted){
-    const btn=$('shBtn');
+    const btn=$('payBtn');
     if(btn && btn.disabled){
       btn.disabled=false;
-      $('shTxt').textContent='Pay 30 AED';
+      $('payTxt').textContent='Pay 30 AED & Extract →';
     }
   }
 });
