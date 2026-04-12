@@ -235,6 +235,16 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   .ei{border-right:none}
   .steps .s-lbl{display:none}
 }
+
+/* FOOTER */
+.site-footer{background:var(--white);border-top:1px solid var(--border);padding:28px 24px;margin-top:48px}
+.site-footer-inner{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.footer-brand{font-size:14px;font-weight:600;color:var(--text)}
+.footer-desc{font-size:12px;color:var(--muted);line-height:1.6;max-width:540px}
+.footer-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:4px}
+.footer-meta a{font-size:11px;color:var(--muted);text-decoration:none}
+.footer-meta a:hover{color:var(--accent)}
+.footer-copy{font-size:11px;color:var(--muted)}
 </style>
 <script type="application/ld+json">
 {
@@ -284,6 +294,14 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
           "text": "Sign and submit the contract through the Dubai REST app for Ejari certificate. Registration fee: AED 155."
         }
       ]
+    },
+    {
+      "@type": "Organization",
+      "name": "Ejari Helper",
+      "url": "__BASE_URL__/",
+      "description": "AI-powered Dubai tenancy contract generator for Ejari registration. Built and maintained in Dubai, UAE.",
+      "areaServed": {"@type": "City", "name": "Dubai", "addressCountry": "AE"},
+      "knowsAbout": ["Ejari registration", "Dubai tenancy contract", "DLD contract", "UAE rental law"]
     }
   ]
 }
@@ -608,6 +626,27 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
 </main>
 
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div class="footer-brand">Ejari Helper</div>
+    <p class="footer-desc">
+      AI-powered Dubai tenancy contract generator for Ejari registration.
+      Built for Dubai tenants and landlords — generates DLD-format tenancy contract PDFs
+      from your Emirates IDs and Title Deed in minutes. No account required.
+    </p>
+    <div class="footer-meta">
+      <span class="footer-copy">© 2025 Ejari Helper · Dubai, UAE</span>
+      <span style="color:var(--border)">·</span>
+      <span class="footer-copy">Updated April 2026</span>
+      <span style="color:var(--border)">·</span>
+      <a href="mailto:hello@ejarihelper.ae">hello@ejarihelper.ae</a>
+      <span style="color:var(--border)">·</span>
+      <a href="/privacy">Privacy</a>
+      <span style="color:var(--border)">·</span>
+      <a href="/terms">Terms</a>
+    </div>
+  </div>
+</footer>
 
 <div class="toast" id="toast"></div>
 
@@ -964,21 +1003,22 @@ async function genPDF(){
   finally{btn.disabled=false;txt.textContent='Generate & Download PDF';sp.style.display='none';}
 }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/flatpickr" onload="initFlatpickr()"></script>
 <script>
-const FP_CFG = {dateFormat:'d/m/Y', allowInput:false, disableMobile:true};
-flatpickr('#contract_date', {...FP_CFG, defaultDate:'today'});
-flatpickr('#contract_from', {...FP_CFG, onChange: recalc});
-flatpickr('#contract_to',   {...FP_CFG, onChange: recalc});
+function initFlatpickr(){
+  const FP_CFG = {dateFormat:'d/m/Y', allowInput:false, disableMobile:true};
+  flatpickr('#contract_date', {...FP_CFG, defaultDate:'today'});
+  flatpickr('#contract_from', {...FP_CFG, onChange: recalc});
+  flatpickr('#contract_to',   {...FP_CFG, onChange: recalc});
 
-// Override buildScreen2 date-setting to use flatpickr API
-const _origBuild = buildScreen2;
-buildScreen2 = function(){
-  _origBuild();
-  if(ext.contract_from) $('contract_from')._flatpickr.setDate(yr(ext.contract_from), false, 'd/m/Y');
-  if(ext.contract_to)   $('contract_to')._flatpickr.setDate(yr(ext.contract_to),   false, 'd/m/Y');
-  recalc();
-};
+  const _origBuild = buildScreen2;
+  buildScreen2 = function(){
+    _origBuild();
+    if(ext.contract_from) $('contract_from')._flatpickr.setDate(yr(ext.contract_from), false, 'd/m/Y');
+    if(ext.contract_to)   $('contract_to')._flatpickr.setDate(yr(ext.contract_to),   false, 'd/m/Y');
+    recalc();
+  };
+}
 </script>
 </body>
 </html>
