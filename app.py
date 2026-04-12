@@ -261,8 +261,36 @@ def sitemap_xml():
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>{base_url}/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>{base_url}/terms</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
 </urlset>'''
     return xml, 200, {'Content-Type': 'application/xml'}
+
+
+@app.route('/privacy')
+def privacy():
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    with open(os.path.join(app.static_folder, 'privacy.html'), encoding='utf-8') as f:
+        html = f.read()
+    html = html.replace('__BASE_URL__', base_url)
+    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+
+
+@app.route('/terms')
+def terms():
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    with open(os.path.join(app.static_folder, 'terms.html'), encoding='utf-8') as f:
+        html = f.read()
+    html = html.replace('__BASE_URL__', base_url)
+    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
 
 @app.route('/health')
 def health():
