@@ -245,6 +245,18 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .star.hover,.star.chosen{color:#f5a623;transform:scale(1.1)}
 .rating-thanks{font-size:12px;color:var(--accent);margin-top:6px;display:none}
 
+/* LEAD WIDGET */
+.lead-widget{background:var(--accent-bg);border:1.5px solid rgba(22,66,60,.2);border-radius:10px;padding:18px 20px;margin-top:14px}
+.lead-widget-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.lead-widget-desc{font-size:12px;color:var(--sub);line-height:1.5;margin-bottom:12px}
+.lead-row{display:flex;gap:8px}
+.lead-input{flex:1;border:1.5px solid var(--border);border-radius:7px;padding:9px 12px;font-size:13px;font-family:inherit;color:var(--text);background:var(--white);outline:none;min-width:0}
+.lead-input:focus{border-color:var(--accent)}
+.lead-btn{background:var(--accent);color:white;border:none;border-radius:7px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.lead-btn:hover{background:var(--accent-mid)}
+.lead-note{font-size:11px;color:var(--muted);margin-top:8px}
+.lead-success{font-size:13px;font-weight:500;color:#2e7d32;padding:4px 0;display:none}
+
 /* GOOD TO KNOW */
 .know-section{margin-top:32px}
 .know-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;gap:12px}
@@ -765,6 +777,20 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
             Download contract again
           </button>
 
+          <!-- Lead capture -->
+          <div class="lead-widget" id="leadWidget">
+            <div class="lead-widget-title">Want us to register Ejari for you?</div>
+            <div class="lead-widget-desc">Leave your WhatsApp number — we'll contact you and handle the full DLD registration. No queues, no typing centres.</div>
+            <div id="leadForm">
+              <div class="lead-row">
+                <input class="lead-input" id="leadPhone" type="tel" placeholder="+971 50 123 4567" maxlength="20">
+                <button class="lead-btn" onclick="submitLead()">Contact me →</button>
+              </div>
+              <div class="lead-note">We'll reach out within a few hours · No spam, one message only</div>
+            </div>
+            <div class="lead-success" id="leadSuccess">✓ Got it! We'll message you on WhatsApp shortly.</div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -1102,6 +1128,20 @@ function starsReset(){
   if(_chosenStars) return;
   document.querySelectorAll('.star').forEach(s=>s.classList.remove('hover'));
 }
+async function submitLead(){
+  const phone = $('leadPhone').value.trim();
+  if(!phone || phone.replace(/[\s\-+]/g,'').length < 7){ $('leadPhone').focus(); return; }
+  const btn = document.querySelector('.lead-btn');
+  btn.disabled = true;
+  btn.textContent = '…';
+  try {
+    await fetch('/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone})});
+  } catch(e){}
+  $('leadForm').style.display = 'none';
+  $('leadSuccess').style.display = 'block';
+  sessionStorage.setItem('ejari_lead','1');
+}
+
 function submitRating(stars){
   if(sessionStorage.getItem('ejari_rated')) return;
   _chosenStars = stars;
@@ -1173,6 +1213,8 @@ async function genPDF(){
     $('nextSteps').classList.add('on');
     $('genBtn').textContent='↓ Download again';
     if(!sessionStorage.getItem('ejari_rated')) $('ratingWidget').classList.add('on');
+    if(sessionStorage.getItem('ejari_lead')){ $('leadWidget').style.display='none'; }
+    else { $('leadSuccess').style.display='none'; }
     setTimeout(()=>$('nextSteps').scrollIntoView({behavior:'smooth',block:'start'}),300);
   }catch(err){toast(err.message,'fail');}
   finally{btn.disabled=false;txt.textContent='Generate & Download PDF';sp.style.display='none';}

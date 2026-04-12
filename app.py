@@ -161,6 +161,14 @@ def _init_db():
                         created_at TIMESTAMP DEFAULT NOW()
                     )
                 ''')
+                cur.execute('''
+                    CREATE TABLE IF NOT EXISTS leads (
+                        id SERIAL PRIMARY KEY,
+                        phone TEXT NOT NULL,
+                        source TEXT DEFAULT 'post_download',
+                        created_at TIMESTAMP DEFAULT NOW()
+                    )
+                ''')
     finally:
         conn.close()
 
@@ -244,6 +252,50 @@ def rate():
         return jsonify({'ok': False, 'error': 'Invalid rating'}), 400
     save_rating(stars)
     return jsonify({'ok': True})
+
+@app.route('/lead', methods=['POST'])
+def lead():
+    body = request.json or {}
+    phone = (body.get('phone') or '').strip()
+    if not phone or len(phone.replace(' ', '').replace('-', '').replace('+', '')) < 7:
+        return jsonify({'ok': False, 'error': 'Invalid phone'}), 400
+    conn = _get_conn()
+    if conn:
+        try:
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute('INSERT INTO leads (phone, source) VALUES (%s, %s)',
+                                (phone, 'post_download'))
+        finally:
+            conn.close()
+    else:
+        print(f'[lead] {phone}')  # fallback: visible in Railway logs
+    return jsonify({'ok': True})
+
+
+@app.route('/admin/leads')
+def admin_leads():
+    admin_pw = os.environ.get('ADMIN_PASSWORD', '')
+    if not admin_pw:
+        return jsonify({'error': 'ADMIN_PASSWORD env var not set'}), 403
+    auth = request.authorization
+    if not auth or auth.password != admin_pw:
+        return 'Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Ejari Admin"'}
+    conn = _get_conn()
+    if not conn:
+        return jsonify({'error': 'No DB connection'}), 500
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    'SELECT id, phone, source, created_at FROM leads ORDER BY created_at DESC LIMIT 200'
+                )
+                rows = cur.fetchall()
+        leads_list = [{'id': r[0], 'phone': r[1], 'source': r[2], 'created_at': str(r[3])} for r in rows]
+        return jsonify({'total': len(leads_list), 'leads': leads_list})
+    finally:
+        conn.close()
+
 
 @app.route('/robots.txt')
 def robots_txt():
