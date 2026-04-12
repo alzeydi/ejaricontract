@@ -846,12 +846,14 @@ window.addEventListener('load', async ()=>{
 });
 
 // Reset button if page is restored from bfcache (Back button after Ziina redirect)
+// Only re-enable if stuck in payment flow — not if disabled due to missing docs
 window.addEventListener('pageshow', function(e){
   if(e.persisted){
     const btn=$('payBtn');
-    if(btn && btn.disabled){
+    const txt=$('payTxt');
+    if(btn && txt && (txt.textContent.includes('Redirecting') || txt.textContent.includes('Creating payment'))){
       btn.disabled=false;
-      $('payTxt').textContent='Pay 30 AED & Extract →';
+      txt.textContent='Pay 30 AED & Extract →';
     }
   }
 });
