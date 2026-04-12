@@ -236,6 +236,15 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   .steps .s-lbl{display:none}
 }
 
+/* RATING WIDGET */
+.rating-widget{display:none;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:18px 20px;margin-top:12px;text-align:center}
+.rating-widget.on{display:block}
+.rating-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px}
+.stars{display:flex;justify-content:center;gap:6px;margin-bottom:6px;cursor:pointer}
+.star{font-size:32px;color:#ddd;transition:color .12s,transform .1s;line-height:1;user-select:none}
+.star.hover,.star.chosen{color:#f5a623;transform:scale(1.1)}
+.rating-thanks{font-size:12px;color:var(--accent);margin-top:6px;display:none}
+
 /* FOOTER */
 .site-footer{background:var(--white);border-top:1px solid var(--border);padding:28px 24px;margin-top:48px}
 .site-footer-inner{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
@@ -264,7 +273,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
         "availability": "https://schema.org/InStock"
       },
       "areaServed": {"@type": "City", "name": "Dubai", "addressCountry": "AE"},
-      "featureList": "AI document extraction, DLD tenancy contract PDF, Ejari registration support, no account required"
+      "featureList": "AI document extraction, DLD tenancy contract PDF, Ejari registration support, no account required"__RATING_JSON__
     },
     {
       "@type": "HowTo",
@@ -552,6 +561,19 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
             <div class="dl-success-title">Contract downloaded — you're almost done!</div>
             <div class="dl-success-sub">Follow the steps below to complete Ejari registration</div>
           </div>
+        </div>
+
+        <!-- Rating widget -->
+        <div class="rating-widget" id="ratingWidget">
+          <div class="rating-title">How was your experience?</div>
+          <div class="stars" id="ratingStars" onmouseleave="starsReset()">
+            <span class="star" onmouseover="starsHover(1)" onclick="submitRating(1)">★</span>
+            <span class="star" onmouseover="starsHover(2)" onclick="submitRating(2)">★</span>
+            <span class="star" onmouseover="starsHover(3)" onclick="submitRating(3)">★</span>
+            <span class="star" onmouseover="starsHover(4)" onclick="submitRating(4)">★</span>
+            <span class="star" onmouseover="starsHover(5)" onclick="submitRating(5)">★</span>
+          </div>
+          <div class="rating-thanks" id="ratingThanks">Thank you! Your feedback helps others find us ✓</div>
         </div>
 
       </div>
@@ -941,6 +963,31 @@ function parseD(s){
   const[d,m,y]=[+p[0],+p[1],+p[2]];
   return(d&&m&&y&&y>2000)?new Date(y,m-1,d):null;
 }
+// ── Rating widget ────────────────────────────────────────────────────
+let _chosenStars = 0;
+function starsHover(n){
+  if(_chosenStars) return;
+  document.querySelectorAll('.star').forEach((s,i)=>{
+    s.classList.toggle('hover', i < n);
+  });
+}
+function starsReset(){
+  if(_chosenStars) return;
+  document.querySelectorAll('.star').forEach(s=>s.classList.remove('hover'));
+}
+function submitRating(stars){
+  if(sessionStorage.getItem('ejari_rated')) return;
+  _chosenStars = stars;
+  document.querySelectorAll('.star').forEach((s,i)=>{
+    s.classList.remove('hover');
+    s.classList.toggle('chosen', i < stars);
+  });
+  $('ratingStars').style.pointerEvents = 'none';
+  sessionStorage.setItem('ejari_rated','1');
+  fetch('/rate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stars})}).catch(()=>{});
+  setTimeout(()=>{ $('ratingThanks').style.display='block'; }, 250);
+}
+
 function recalc(){
   if(cvHeld)return;
   const fd=parseD(v('contract_from')),td=parseD(v('contract_to'));
@@ -998,6 +1045,7 @@ async function genPDF(){
     $('dlSuccess').classList.add('on');
     $('nextSteps').classList.add('on');
     $('genBtn').textContent='↓ Download again';
+    if(!sessionStorage.getItem('ejari_rated')) $('ratingWidget').classList.add('on');
     setTimeout(()=>$('nextSteps').scrollIntoView({behavior:'smooth',block:'start'}),300);
   }catch(err){toast(err.message,'fail');}
   finally{btn.disabled=false;txt.textContent='Generate & Download PDF';sp.style.display='none';}

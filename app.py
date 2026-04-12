@@ -2,6 +2,7 @@
 """Ejari Tenancy Contract Generator - Flask Backend"""
 
 import io, os, base64, json
+from pathlib import Path
 from datetime import datetime
 from flask import Flask, request, send_file, jsonify, send_from_directory
 from flask_cors import CORS
@@ -132,6 +133,31 @@ def fill_ejari_pdf(data):
     return out.read()
 
 
+# ── Ratings storage ────────────────────────────────────────────────────
+RATINGS_FILE = Path(os.path.dirname(__file__)) / 'ratings.json'
+
+def load_ratings():
+    try:
+        if RATINGS_FILE.exists():
+            return json.loads(RATINGS_FILE.read_text())
+    except Exception:
+        pass
+    return {'total': 0, 'count': 0}
+
+def save_ratings(data):
+    try:
+        RATINGS_FILE.write_text(json.dumps(data))
+    except Exception:
+        pass
+
+def rating_json_fragment():
+    """Return aggregateRating JSON fragment for schema injection (empty until 3+ reviews)."""
+    r = load_ratings()
+    if r['count'] < 3:
+        return ''
+    avg = round(r['total'] / r['count'], 1)
+    return f', "aggregateRating": {{"@type": "AggregateRating", "ratingValue": "{avg}", "ratingCount": "{r[\'count\']}"}}'
+
 # ── Routes ─────────────────────────────────────────────────────────────
 
 @app.before_request
@@ -148,7 +174,21 @@ def index():
     base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
     with open(os.path.join(app.static_folder, 'index.html'), encoding='utf-8') as f:
         html = f.read()
-    return html.replace('__BASE_URL__', base_url), 200, {'Content-Type': 'text/html; charset=utf-8'}
+    html = html.replace('__BASE_URL__', base_url)
+    html = html.replace('__RATING_JSON__', rating_json_fragment())
+    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+
+@app.route('/rate', methods=['POST'])
+def rate():
+    body = request.json or {}
+    stars = body.get('stars')
+    if not isinstance(stars, int) or stars < 1 or stars > 5:
+        return jsonify({'ok': False, 'error': 'Invalid rating'}), 400
+    data = load_ratings()
+    data['total'] += stars
+    data['count'] += 1
+    save_ratings(data)
+    return jsonify({'ok': True})
 
 @app.route('/robots.txt')
 def robots_txt():
