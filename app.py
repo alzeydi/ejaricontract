@@ -262,6 +262,21 @@ def sitemap_xml():
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>{base_url}/guide/ejari-registration</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>{base_url}/guide/dewa-activation</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>{base_url}/guide/rental-dispute</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>{base_url}/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
@@ -273,6 +288,21 @@ def sitemap_xml():
   </url>
 </urlset>'''
     return xml, 200, {'Content-Type': 'application/xml'}
+
+
+_GUIDE_SLUGS = {'ejari-registration', 'dewa-activation', 'rental-dispute'}
+
+@app.route('/guide/<slug>')
+def guide(slug):
+    if slug not in _GUIDE_SLUGS:
+        from flask import redirect
+        return redirect('/', 302)
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    guide_path = os.path.join(app.static_folder, 'guide', f'{slug}.html')
+    with open(guide_path, encoding='utf-8') as f:
+        html = f.read()
+    html = html.replace('__BASE_URL__', base_url)
+    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
 
 
 @app.route('/privacy')

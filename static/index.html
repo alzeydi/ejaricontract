@@ -245,6 +245,33 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .star.hover,.star.chosen{color:#f5a623;transform:scale(1.1)}
 .rating-thanks{font-size:12px;color:var(--accent);margin-top:6px;display:none}
 
+/* GOOD TO KNOW */
+.know-section{margin-top:32px}
+.know-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;gap:12px}
+.know-title{font-size:15px;font-weight:600;color:var(--text)}
+.know-all{font-size:12px;color:var(--accent);text-decoration:none}
+.know-all:hover{text-decoration:underline}
+.know-items{display:flex;flex-direction:column;gap:5px}
+.know-item{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.know-item[open]{border-color:var(--accent)}
+.know-q{padding:12px 16px;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;-webkit-tap-highlight-color:transparent}
+.know-q::-webkit-details-marker{display:none}
+.know-q::after{content:'+';font-size:18px;font-weight:300;color:var(--muted);flex-shrink:0;line-height:1}
+.know-item[open] .know-q::after{content:'−'}
+.know-a{padding:0 16px 13px;font-size:13px;color:var(--sub);line-height:1.65}
+.know-a a{color:var(--accent)}
+
+/* GUIDES GRID */
+.guides-section{margin-top:28px}
+.guides-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px}
+.guides-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.guide-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:14px;text-decoration:none;display:flex;flex-direction:column;gap:4px;transition:border-color .15s}
+.guide-card:hover{border-color:var(--accent);text-decoration:none}
+.gc-icon{font-size:20px}
+.gc-title{font-size:13px;font-weight:600;color:var(--text)}
+.gc-desc{font-size:11px;color:var(--muted);line-height:1.4}
+@media(max-width:480px){.guides-grid{grid-template-columns:1fr}}
+
 /* FOOTER */
 .site-footer{background:var(--white);border-top:1px solid var(--border);padding:28px 24px;margin-top:48px}
 .site-footer-inner{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
@@ -311,6 +338,21 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       "description": "AI-powered Dubai tenancy contract generator for Ejari registration. Built and maintained in Dubai, UAE.",
       "areaServed": {"@type": "City", "name": "Dubai", "addressCountry": "AE"},
       "knowsAbout": ["Ejari registration", "Dubai tenancy contract", "DLD contract", "UAE rental law"]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type":"Question","name":"What is Ejari and is registration mandatory?","acceptedAnswer":{"@type":"Answer","text":"Ejari is Dubai's official tenancy contract registration system run by RERA. All rental contracts in Dubai must be registered. Without Ejari you cannot connect DEWA, renew a residency visa, or file a rental dispute. The penalty for not registering is up to AED 50,000."}},
+        {"@type":"Question","name":"What documents are needed for Ejari registration?","acceptedAnswer":{"@type":"Answer","text":"You need: a signed tenancy contract in DLD standard format, tenant's Emirates ID, landlord's Emirates ID or passport, the property Title Deed, and the previous Ejari certificate if renewing."}},
+        {"@type":"Question","name":"How much does Ejari registration cost in Dubai?","acceptedAnswer":{"@type":"Answer","text":"Online registration via the Dubai REST app costs AED 122.50 including VAT. At a typing centre the fee is AED 215–220. Renewal costs the same. Cancellation is free."}},
+        {"@type":"Question","name":"Who pays for Ejari — landlord or tenant?","acceptedAnswer":{"@type":"Answer","text":"UAE law does not specify which party pays. It is negotiated between landlord and tenant and should be stated in the tenancy contract."}},
+        {"@type":"Question","name":"How long does it take to receive the Ejari certificate?","acceptedAnswer":{"@type":"Answer","text":"Online registration via the Dubai REST app is instant — the certificate is issued by email as soon as documents are approved and payment is made."}},
+        {"@type":"Question","name":"What is the difference between a tenancy contract and an Ejari certificate?","acceptedAnswer":{"@type":"Answer","text":"The tenancy contract is the legal agreement between landlord and tenant. The Ejari certificate is the government's registration of that contract. Both are required — the contract alone is not recognised in DEWA, visa, or court systems."}},
+        {"@type":"Question","name":"Do I need Ejari to connect DEWA?","acceptedAnswer":{"@type":"Answer","text":"Yes. DEWA requires your Ejari registration number and the 9-digit Premises Number to process your Move In application."}},
+        {"@type":"Question","name":"Can a landlord increase rent mid-contract?","acceptedAnswer":{"@type":"Answer","text":"No. Under Dubai Law No. 26 of 2007, rent is fixed for the entire contract period. Increases can only happen at renewal with 90 days written notice and within RERA's permitted percentage limits."}},
+        {"@type":"Question","name":"What happens if I don't renew Ejari when my contract renews?","acceptedAnswer":{"@type":"Answer","text":"Your old Ejari expires at contract end. Without renewal you lose legal standing — DEWA may flag your account and residency visa renewals may be blocked. Renew within 30 days of signing your new contract."}},
+        {"@type":"Question","name":"How do I get my security deposit back in Dubai?","acceptedAnswer":{"@type":"Answer","text":"The landlord must return your deposit minus legitimate deductions at tenancy end. Document move-out conditions with photos and a signed handover report. If refused, file at the Rental Dispute Centre — cases resolve in ~15 days."}}
+      ]
     }
   ]
 }
@@ -477,6 +519,89 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
       </div>
     </div>
+
+    <!-- Guides grid -->
+    <div class="guides-section" id="guides">
+      <div class="guides-title">Step-by-step guides</div>
+      <div class="guides-grid">
+        <a href="/guide/ejari-registration" class="guide-card">
+          <div class="gc-icon">📋</div>
+          <div class="gc-title">Register Ejari</div>
+          <div class="gc-desc">Online registration, fees & documents</div>
+        </a>
+        <a href="/guide/dewa-activation" class="guide-card">
+          <div class="gc-icon">💡</div>
+          <div class="gc-title">Activate DEWA</div>
+          <div class="gc-desc">Electricity & water for new tenants</div>
+        </a>
+        <a href="/guide/rental-dispute" class="guide-card">
+          <div class="gc-icon">⚖️</div>
+          <div class="gc-title">Rental Disputes</div>
+          <div class="gc-desc">File a complaint at the RDC</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Good to know -->
+    <section class="know-section" aria-label="Ejari questions answered">
+      <div class="know-header">
+        <h2 class="know-title">Good to know</h2>
+      </div>
+      <div class="know-items">
+
+        <details class="know-item">
+          <summary class="know-q">What is Ejari and is registration mandatory?</summary>
+          <div class="know-a">Ejari (Arabic: إيجاري, "My Rent") is Dubai's official tenancy contract registration system run by RERA and the Dubai Land Department. <strong>All rental contracts in Dubai must be registered</strong> — including apartments, villas, offices and shops. Without Ejari you cannot connect DEWA utilities, renew a residency visa, or file a rental dispute. The penalty for not registering is up to AED 50,000.</div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">What documents are needed for Ejari registration?</summary>
+          <div class="know-a">You need: (1) a signed tenancy contract in DLD standard format, (2) tenant's Emirates ID, (3) landlord's Emirates ID or passport, (4) the property's Title Deed, and (5) the previous Ejari certificate if you are renewing. Ejari Helper generates the tenancy contract from your Emirates IDs and Title Deed automatically — you just upload them and AI fills in all the fields.</div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">How much does Ejari registration cost in Dubai?</summary>
+          <div class="know-a">Online registration via the Dubai REST app or DLD website costs <strong>AED 122.50 including VAT</strong>. At a typing centre the fee is AED 215–220. Renewal costs the same as first-time registration. Cancellation is free.</div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">Who pays for Ejari — landlord or tenant?</summary>
+          <div class="know-a">UAE law does not specify which party must pay. It is negotiated and should be stated in the tenancy contract. In practice, the landlord or agent typically pays for first registration, while renewal costs are often passed to the tenant. If you register online yourself the fee is only AED 122.50 — much less than a typing centre.</div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">How long does it take to receive the Ejari certificate?</summary>
+          <div class="know-a">Online registration via the Dubai REST app is <strong>instant</strong> — the certificate is issued by email as a PDF as soon as your documents are approved and payment is made. At a typing centre it is processed on-site the same day. If there is a rejection (e.g. address mismatch), fix the issue and resubmit at no extra charge.</div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">What is the difference between a tenancy contract and an Ejari certificate?</summary>
+          <div class="know-a">The <strong>tenancy contract</strong> is the legal agreement between you and your landlord — it sets the rent, dates, and conditions. The <strong>Ejari certificate</strong> is the government's registration of that contract. You need both. The contract alone is not recognised in government systems — banks, DEWA, RERA, and Dubai Courts all require a valid Ejari certificate.</div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">Do I need Ejari to connect DEWA?</summary>
+          <div class="know-a">Yes. DEWA requires your Ejari registration number and the 9-digit Premises Number (also on the Ejari certificate) to process your Move In application. Register Ejari first, then apply for DEWA — electricity and water activate within 24 hours of payment. See our <a href="/guide/dewa-activation">DEWA activation guide →</a></div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">Can a landlord increase rent mid-contract or without notice?</summary>
+          <div class="know-a">No. Under Dubai Law No. 26 of 2007, rent is fixed for the entire contract period. Increases can only happen at renewal, with <strong>90 days written notice</strong> and within RERA's permitted limits (0–20% depending on how far below market your current rent is). A notice with less than 90 days is not legally enforceable. If your landlord insists, file a case at the <a href="/guide/rental-dispute">Rental Dispute Centre →</a></div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">What happens if I don't renew Ejari when my contract renews?</summary>
+          <div class="know-a">Your old Ejari expires at the end of the contract period. Without a renewed Ejari you lose legal standing — DEWA may flag your account, you cannot file disputes at the RDC, and residency visa renewals may be blocked. Renew Ejari within 30 days of signing your new contract. The process is the same as first registration — plus you upload the old Ejari certificate.</div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">How do I get my security deposit back in Dubai?</summary>
+          <div class="know-a">The landlord must return your deposit at the end of the tenancy, minus legitimate deductions (unpaid bills or actual property damage). Normal wear and tear cannot be deducted. Document the property condition on move-out with photos and a signed handover report. If the landlord refuses, file a case at the <a href="/guide/rental-dispute">Rental Dispute Centre</a> — deposit disputes are resolved in ~15 days. Filing fee: 3.5% of the annual rent, minimum AED 500.</div>
+        </details>
+
+      </div>
+    </section>
+
   </div>
 
   <!-- ── SCREEN 2: COMPLETE ── -->
