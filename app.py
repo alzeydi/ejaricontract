@@ -266,7 +266,21 @@ def sitemap_xml():
 
 @app.route('/health')
 def health():
-    return jsonify({'status': 'ok', 'template': os.path.exists(TEMPLATE_PDF)})
+    db_status = 'no_url'
+    ratings = None
+    if _DB_URL:
+        try:
+            r = load_ratings()
+            ratings = r
+            db_status = 'ok'
+        except Exception as e:
+            db_status = str(e)
+    return jsonify({
+        'status': 'ok',
+        'template': os.path.exists(TEMPLATE_PDF),
+        'db': db_status,
+        'ratings': ratings,
+    })
 
 def build_content_block(f):
     """Build image or document block from file dict."""
