@@ -145,7 +145,29 @@ def redirect_www():
 
 @app.route('/')
 def index():
-    return send_from_directory('static', 'index.html')
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    with open(os.path.join(app.static_folder, 'index.html'), encoding='utf-8') as f:
+        html = f.read()
+    return html.replace('__BASE_URL__', base_url), 200, {'Content-Type': 'text/html; charset=utf-8'}
+
+@app.route('/robots.txt')
+def robots_txt():
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    content = f'User-agent: *\nAllow: /\nSitemap: {base_url}/sitemap.xml\n'
+    return content, 200, {'Content-Type': 'text/plain'}
+
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    xml = f'''<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>{base_url}/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>'''
+    return xml, 200, {'Content-Type': 'application/xml'}
 
 @app.route('/health')
 def health():
