@@ -133,20 +133,77 @@ def fill_ejari_pdf(data):
     return out.read()
 
 
-# ── Ratings storage ────────────────────────────────────────────────────
-RATINGS_FILE = Path(os.path.dirname(__file__)) / 'ratings.json'
+# ── Ratings storage (PostgreSQL with file fallback) ─────────────────────
+_RATINGS_FILE = Path(os.path.dirname(__file__)) / 'ratings.json'
+_DB_URL = os.environ.get('DATABASE_URL', '')
+
+def _get_conn():
+    if not _DB_URL:
+        return None
+    import psycopg2
+    url = _DB_URL
+    # Railway sometimes uses postgres:// — psycopg2 needs postgresql://
+    if url.startswith('postgres://'):
+        url = 'postgresql://' + url[len('postgres://'):]
+    return psycopg2.connect(url)
+
+def _init_db():
+    conn = _get_conn()
+    if not conn:
+        return
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute('''
+                    CREATE TABLE IF NOT EXISTS ratings (
+                        id SERIAL PRIMARY KEY,
+                        stars INTEGER NOT NULL CHECK (stars BETWEEN 1 AND 5),
+                        created_at TIMESTAMP DEFAULT NOW()
+                    )
+                ''')
+    finally:
+        conn.close()
+
+try:
+    _init_db()
+except Exception as e:
+    print(f'[ratings] DB init skipped: {e}')
 
 def load_ratings():
+    conn = _get_conn()
+    if conn:
+        try:
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute('SELECT COUNT(*), COALESCE(SUM(stars),0) FROM ratings')
+                    count, total = cur.fetchone()
+                    return {'count': int(count), 'total': int(total)}
+        finally:
+            conn.close()
+    # file fallback (local dev)
     try:
-        if RATINGS_FILE.exists():
-            return json.loads(RATINGS_FILE.read_text())
+        if _RATINGS_FILE.exists():
+            return json.loads(_RATINGS_FILE.read_text())
     except Exception:
         pass
-    return {'total': 0, 'count': 0}
+    return {'count': 0, 'total': 0}
 
-def save_ratings(data):
+def save_rating(stars):
+    conn = _get_conn()
+    if conn:
+        try:
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute('INSERT INTO ratings (stars) VALUES (%s)', (stars,))
+        finally:
+            conn.close()
+        return
+    # file fallback (local dev)
     try:
-        RATINGS_FILE.write_text(json.dumps(data))
+        data = load_ratings()
+        data['total'] += stars
+        data['count'] += 1
+        _RATINGS_FILE.write_text(json.dumps(data))
     except Exception:
         pass
 
@@ -184,10 +241,7 @@ def rate():
     stars = body.get('stars')
     if not isinstance(stars, int) or stars < 1 or stars > 5:
         return jsonify({'ok': False, 'error': 'Invalid rating'}), 400
-    data = load_ratings()
-    data['total'] += stars
-    data['count'] += 1
-    save_ratings(data)
+    save_rating(stars)
     return jsonify({'ok': True})
 
 @app.route('/robots.txt')
