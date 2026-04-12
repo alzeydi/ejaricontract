@@ -213,7 +213,8 @@ def rating_json_fragment():
     if r['count'] < 3:
         return ''
     avg = round(r['total'] / r['count'], 1)
-    return f', "aggregateRating": {{"@type": "AggregateRating", "ratingValue": "{avg}", "ratingCount": "{r[\'count\']}"}}'
+    count = r['count']
+    return f', "aggregateRating": {{"@type": "AggregateRating", "ratingValue": "{avg}", "ratingCount": "{count}"}}'
 
 # ── Routes ─────────────────────────────────────────────────────────────
 
