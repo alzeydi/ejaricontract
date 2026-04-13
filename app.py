@@ -253,6 +253,23 @@ def rate():
     save_rating(stars)
     return jsonify({'ok': True})
 
+
+def _send_telegram(text: str):
+    """Send notification to Telegram. Requires TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID env vars."""
+    token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+    chat_id = os.environ.get('TELEGRAM_CHAT_ID', '')
+    if not token or not chat_id:
+        return
+    try:
+        req_lib.post(
+            f'https://api.telegram.org/bot{token}/sendMessage',
+            json={'chat_id': chat_id, 'text': text, 'parse_mode': 'HTML'},
+            timeout=5
+        )
+    except Exception as e:
+        print(f'[telegram] {e}')
+
+
 @app.route('/lead', methods=['POST'])
 def lead():
     body = request.json or {}
@@ -270,7 +287,47 @@ def lead():
             conn.close()
     else:
         print(f'[lead] {phone}')  # fallback: visible in Railway logs
+    _send_telegram(
+        f'🔔 <b>New Ejari Helper lead</b>\n'
+        f'📱 {phone}\n'
+        f'⏰ {datetime.now().strftime("%d %b %Y, %H:%M")}'
+    )
     return jsonify({'ok': True})
+
+
+@app.route('/admin/telegram-setup')
+def telegram_setup():
+    """Helper: fetch recent bot updates to find your Telegram chat_id."""
+    admin_pw = os.environ.get('ADMIN_PASSWORD', '')
+    if not admin_pw:
+        return jsonify({'error': 'ADMIN_PASSWORD not set'}), 403
+    auth = request.authorization
+    if not auth or auth.password != admin_pw:
+        return 'Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Ejari Admin"'}
+    token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+    if not token:
+        return jsonify({'error': 'TELEGRAM_BOT_TOKEN not set in Railway'}), 400
+    try:
+        resp = req_lib.get(f'https://api.telegram.org/bot{token}/getUpdates', timeout=5)
+        data = resp.json()
+        chats = {}
+        for update in data.get('result', []):
+            msg = update.get('message') or update.get('channel_post') or {}
+            chat = msg.get('chat', {})
+            if chat and chat.get('id') not in chats:
+                chats[chat['id']] = {
+                    'chat_id': chat.get('id'),
+                    'type': chat.get('type'),
+                    'name': (f"{chat.get('first_name','')} {chat.get('last_name','')}").strip()
+                          or chat.get('title') or chat.get('username', ''),
+                }
+        return jsonify({
+            'instruction': 'Send any message to your bot first, then refresh this page',
+            'set_this_env': 'TELEGRAM_CHAT_ID',
+            'found_chats': list(chats.values()),
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/admin/leads')
