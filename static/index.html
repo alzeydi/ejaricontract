@@ -245,6 +245,12 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .star.hover,.star.chosen{color:#f5a623;transform:scale(1.1)}
 .rating-thanks{font-size:12px;color:var(--accent);margin-top:6px;display:none}
 
+/* VIDEO EMBED */
+.video-section{margin-bottom:20px}
+.video-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:10px}
+.video-wrap{position:relative;padding-bottom:56.25%;height:0;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);background:#000}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+
 /* LEAD WIDGET */
 .lead-widget{background:var(--accent-bg);border:1.5px solid rgba(22,66,60,.2);border-radius:10px;padding:18px 20px;margin-top:14px}
 .lead-widget-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
@@ -352,6 +358,17 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       "knowsAbout": ["Ejari registration", "Dubai tenancy contract", "DLD contract", "UAE rental law"]
     },
     {
+      "@type": "VideoObject",
+      "name": "How to Generate Your Dubai Ejari Tenancy Contract Online",
+      "description": "Step-by-step walkthrough of Ejari Helper — upload your Emirates IDs and Title Deed, AI auto-fills your DLD tenancy contract PDF in minutes. Covers Ejari registration process in Dubai.",
+      "thumbnailUrl": "https://img.youtube.com/vi/PKyHOI0i1z0/maxresdefault.jpg",
+      "uploadDate": "2026-04-13",
+      "duration": "PT6M",
+      "embedUrl": "https://www.youtube.com/embed/PKyHOI0i1z0",
+      "contentUrl": "https://www.youtube.com/watch?v=PKyHOI0i1z0",
+      "publisher": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/"}
+    },
+    {
       "@type": "FAQPage",
       "mainEntity": [
         {"@type":"Question","name":"What is Ejari and is registration mandatory?","acceptedAnswer":{"@type":"Answer","text":"Ejari is Dubai's official tenancy contract registration system run by RERA. All rental contracts in Dubai must be registered. Without Ejari you cannot connect DEWA, renew a residency visa, or file a rental dispute. The penalty for not registering is up to AED 50,000."}},
@@ -447,6 +464,14 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
           <span class="hiw-tag green">✓ Done</span>
         </div>
 
+      </div>
+    </div>
+
+    <!-- Video -->
+    <div class="video-section">
+      <div class="video-label">Watch how it works — 6 min</div>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/PKyHOI0i1z0" title="How to Generate Your Dubai Ejari Tenancy Contract Online | Ejari Helper" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
       </div>
     </div>
 
