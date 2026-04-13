@@ -4,7 +4,7 @@
 import io, os, base64, json
 from pathlib import Path
 from datetime import datetime
-from flask import Flask, request, send_file, jsonify, send_from_directory
+from flask import Flask, request, send_file, jsonify, send_from_directory, session, redirect
 from flask_cors import CORS
 from reportlab.pdfgen import canvas
 from pypdf import PdfReader, PdfWriter
@@ -12,6 +12,8 @@ import anthropic
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
+# Secret key for session cookies — set SECRET_KEY in Railway env vars
+app.secret_key = os.environ.get('SECRET_KEY') or os.environ.get('ADMIN_PASSWORD', 'dev-key')
 
 TEMPLATE_PDF = os.path.join(os.path.dirname(__file__), 'template.pdf')
 claude = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from env
@@ -298,9 +300,8 @@ def lead():
 @app.route('/admin/telegram-setup')
 def telegram_setup():
     """Helper: fetch recent bot updates to find your Telegram chat_id."""
-    ok, err = _check_admin(request)
-    if not ok:
-        return err
+    if not _is_admin():
+        return redirect('/admin')
     token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
     if not token:
         return jsonify({'error': 'TELEGRAM_BOT_TOKEN not set in Railway'}), 400
@@ -327,26 +328,128 @@ def telegram_setup():
         return jsonify({'error': str(e)}), 500
 
 
-def _check_admin(req):
-    """Check admin password from ?key= query param or HTTP Basic Auth."""
+def _is_admin():
+    """True if request carries a valid admin session cookie."""
     admin_pw = os.environ.get('ADMIN_PASSWORD', '')
-    if not admin_pw:
-        return False, (jsonify({'error': 'ADMIN_PASSWORD env var not set'}), 403)
-    # Accept ?key=password in URL (works in all browsers)
-    if req.args.get('key') == admin_pw:
-        return True, None
-    # Also accept Basic Auth as fallback
-    auth = req.authorization
-    if auth and auth.password == admin_pw:
-        return True, None
-    return False, ('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Ejari Admin"'})
+    return bool(admin_pw and session.get('admin') == admin_pw)
+
+
+_ADMIN_CSS = """
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f4f3f0;color:#111;font-size:14px;min-height:100vh}
+.top{background:#fff;border-bottom:1px solid #ddd;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between}
+.top-brand{font-weight:700;font-size:15px;color:#16423c}
+.top-out{font-size:12px;color:#999;text-decoration:none}
+.top-out:hover{color:#16423c}
+.wrap{max-width:700px;margin:32px auto;padding:0 20px}
+h1{font-size:18px;font-weight:600;margin-bottom:20px}
+.card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:28px}
+.meta{font-size:12px;color:#999;margin-bottom:20px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-weight:600;color:#555;padding:7px 10px;border-bottom:1.5px solid #ddd}
+td{padding:8px 10px;border-bottom:1px solid #f4f3f0;vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.phone{font-weight:500;color:#16423c}
+td.date{color:#999;font-size:12px}
+.empty{color:#999;text-align:center;padding:32px 0}
+label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:6px}
+input[type=password]{width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;outline:none}
+input[type=password]:focus{border-color:#16423c}
+.btn{display:block;width:100%;background:#16423c;color:#fff;border:none;border-radius:7px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;margin-top:14px}
+.btn:hover{background:#2a7a6f}
+.err{background:#fdf2f2;border:1px solid #e8bebe;border-radius:7px;padding:10px 14px;font-size:13px;color:#c0392b;margin-bottom:16px}
+</style>"""
+
+
+def _login_page(error=False):
+    err = '<div class="err">Wrong password — try again.</div>' if error else ''
+    return f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — Ejari Helper</title>{_ADMIN_CSS}</head><body>
+<div style="display:flex;align-items:center;justify-content:center;min-height:100vh">
+<div style="width:320px">
+  <div style="font-weight:700;font-size:16px;color:#16423c;text-align:center;margin-bottom:24px">Ejari Helper</div>
+  <div class="card">
+    <h1 style="margin-bottom:20px;font-size:16px">Admin sign in</h1>
+    {err}
+    <form method="POST" action="/admin/login">
+      <label>Password</label>
+      <input type="password" name="password" autofocus>
+      <button class="btn">Sign in →</button>
+    </form>
+  </div>
+</div></div></body></html>""", 200
+
+
+def _leads_page(leads_list):
+    total = len(leads_list)
+    rows = ''.join(
+        f'<tr><td class="phone">{r["phone"]}</td>'
+        f'<td class="date">{r["created_at"][:16].replace("T"," ")}</td></tr>'
+        for r in leads_list
+    ) or f'<tr><td colspan="2" class="empty">No leads yet</td></tr>'
+    return f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leads — Ejari Helper</title>{_ADMIN_CSS}</head><body>
+<div class="top">
+  <span class="top-brand">Ejari Helper · Admin</span>
+  <a href="/admin/logout" class="top-out">Sign out</a>
+</div>
+<div class="wrap">
+  <h1>Leads</h1>
+  <div class="card">
+    <div class="meta">{total} lead{'s' if total != 1 else ''} total · newest first</div>
+    <table>
+      <tr><th>Phone / WhatsApp</th><th>Date</th></tr>
+      {rows}
+    </table>
+  </div>
+</div></body></html>"""
+
+
+@app.route('/admin')
+def admin_index():
+    if not os.environ.get('ADMIN_PASSWORD'):
+        return 'ADMIN_PASSWORD env var not set', 403
+    if not _is_admin():
+        return _login_page()
+    # Load leads and render HTML table
+    conn = _get_conn()
+    if not conn:
+        return _leads_page([])
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    'SELECT id, phone, source, created_at FROM leads ORDER BY created_at DESC LIMIT 200'
+                )
+                rows = cur.fetchall()
+        leads_list = [{'id': r[0], 'phone': r[1], 'source': r[2], 'created_at': str(r[3])} for r in rows]
+        return _leads_page(leads_list)
+    finally:
+        conn.close()
+
+
+@app.route('/admin/login', methods=['POST'])
+def admin_login():
+    admin_pw = os.environ.get('ADMIN_PASSWORD', '')
+    if request.form.get('password') == admin_pw:
+        session['admin'] = admin_pw
+        return redirect('/admin')
+    return _login_page(error=True)
+
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin', None)
+    return redirect('/admin')
 
 
 @app.route('/admin/leads')
 def admin_leads():
-    ok, err = _check_admin(request)
-    if not ok:
-        return err
+    if not _is_admin():
+        return redirect('/admin')
     conn = _get_conn()
     if not conn:
         return jsonify({'error': 'No DB connection'}), 500
