@@ -298,12 +298,9 @@ def lead():
 @app.route('/admin/telegram-setup')
 def telegram_setup():
     """Helper: fetch recent bot updates to find your Telegram chat_id."""
-    admin_pw = os.environ.get('ADMIN_PASSWORD', '')
-    if not admin_pw:
-        return jsonify({'error': 'ADMIN_PASSWORD not set'}), 403
-    auth = request.authorization
-    if not auth or auth.password != admin_pw:
-        return 'Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Ejari Admin"'}
+    ok, err = _check_admin(request)
+    if not ok:
+        return err
     token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
     if not token:
         return jsonify({'error': 'TELEGRAM_BOT_TOKEN not set in Railway'}), 400
@@ -330,14 +327,26 @@ def telegram_setup():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/admin/leads')
-def admin_leads():
+def _check_admin(req):
+    """Check admin password from ?key= query param or HTTP Basic Auth."""
     admin_pw = os.environ.get('ADMIN_PASSWORD', '')
     if not admin_pw:
-        return jsonify({'error': 'ADMIN_PASSWORD env var not set'}), 403
-    auth = request.authorization
-    if not auth or auth.password != admin_pw:
-        return 'Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Ejari Admin"'}
+        return False, (jsonify({'error': 'ADMIN_PASSWORD env var not set'}), 403)
+    # Accept ?key=password in URL (works in all browsers)
+    if req.args.get('key') == admin_pw:
+        return True, None
+    # Also accept Basic Auth as fallback
+    auth = req.authorization
+    if auth and auth.password == admin_pw:
+        return True, None
+    return False, ('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Ejari Admin"'})
+
+
+@app.route('/admin/leads')
+def admin_leads():
+    ok, err = _check_admin(request)
+    if not ok:
+        return err
     conn = _get_conn()
     if not conn:
         return jsonify({'error': 'No DB connection'}), 500
