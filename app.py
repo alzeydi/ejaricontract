@@ -6,11 +6,15 @@ from pathlib import Path
 from datetime import datetime
 from flask import Flask, request, send_file, jsonify, send_from_directory, session, redirect
 from flask_cors import CORS
+from werkzeug.middleware.proxy_fix import ProxyFix
 from reportlab.pdfgen import canvas
 from pypdf import PdfReader, PdfWriter
 import anthropic
 
 app = Flask(__name__, static_folder='static')
+# Trust X-Forwarded-Proto/Host from the platform's reverse proxy so request.host_url
+# returns https://… — otherwise canonical, og:url, JSON-LD, sitemap, robots all use http://
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 CORS(app)
 # Secret key for session cookies — set SECRET_KEY in Railway env vars
 app.secret_key = os.environ.get('SECRET_KEY') or os.environ.get('ADMIN_PASSWORD', 'dev-key')
