@@ -502,6 +502,21 @@ def sitemap_xml():
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>{base_url}/guide/ejari-renewal</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>{base_url}/guide/tenancy-contract-dubai</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>{base_url}/guide/dewa-premises-number</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>{base_url}/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
@@ -515,7 +530,8 @@ def sitemap_xml():
     return xml, 200, {'Content-Type': 'application/xml'}
 
 
-_GUIDE_SLUGS = {'ejari-registration', 'dewa-activation', 'rental-dispute'}
+_GUIDE_SLUGS = {'ejari-registration', 'dewa-activation', 'rental-dispute',
+                'ejari-renewal', 'dewa-premises-number', 'tenancy-contract-dubai'}
 
 @app.route('/guide/<slug>')
 def guide(slug):
