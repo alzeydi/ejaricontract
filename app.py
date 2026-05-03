@@ -2,15 +2,22 @@
 """Ejari Tenancy Contract Generator - Flask Backend"""
 
 import io, os, base64, json
+from pathlib import Path
 from datetime import datetime
-from flask import Flask, request, send_file, jsonify, send_from_directory
+from flask import Flask, request, send_file, jsonify, send_from_directory, session, redirect
 from flask_cors import CORS
+from werkzeug.middleware.proxy_fix import ProxyFix
 from reportlab.pdfgen import canvas
 from pypdf import PdfReader, PdfWriter
 import anthropic
 
 app = Flask(__name__, static_folder='static')
+# Trust X-Forwarded-Proto/Host from the platform's reverse proxy so request.host_url
+# returns https://… — otherwise canonical, og:url, JSON-LD, sitemap, robots all use http://
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 CORS(app)
+# Secret key for session cookies — set SECRET_KEY in Railway env vars
+app.secret_key = os.environ.get('SECRET_KEY') or os.environ.get('ADMIN_PASSWORD', 'dev-key')
 
 TEMPLATE_PDF = os.path.join(os.path.dirname(__file__), 'template.pdf')
 claude = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from env
@@ -132,15 +139,447 @@ def fill_ejari_pdf(data):
     return out.read()
 
 
+# ── Ratings storage (PostgreSQL with file fallback) ─────────────────────
+_RATINGS_FILE = Path(os.path.dirname(__file__)) / 'ratings.json'
+_DB_URL = os.environ.get('DATABASE_URL', '')
+
+def _get_conn():
+    if not _DB_URL:
+        return None
+    import psycopg2
+    url = _DB_URL
+    # Railway sometimes uses postgres:// — psycopg2 needs postgresql://
+    if url.startswith('postgres://'):
+        url = 'postgresql://' + url[len('postgres://'):]
+    return psycopg2.connect(url)
+
+def _init_db():
+    conn = _get_conn()
+    if not conn:
+        return
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute('''
+                    CREATE TABLE IF NOT EXISTS ratings (
+                        id SERIAL PRIMARY KEY,
+                        stars INTEGER NOT NULL CHECK (stars BETWEEN 1 AND 5),
+                        created_at TIMESTAMP DEFAULT NOW()
+                    )
+                ''')
+                cur.execute('''
+                    CREATE TABLE IF NOT EXISTS leads (
+                        id SERIAL PRIMARY KEY,
+                        phone TEXT NOT NULL,
+                        source TEXT DEFAULT 'post_download',
+                        created_at TIMESTAMP DEFAULT NOW()
+                    )
+                ''')
+    finally:
+        conn.close()
+
+try:
+    _init_db()
+except Exception as e:
+    print(f'[ratings] DB init skipped: {e}')
+
+def load_ratings():
+    conn = _get_conn()
+    if conn:
+        try:
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute('SELECT COUNT(*), COALESCE(SUM(stars),0) FROM ratings')
+                    count, total = cur.fetchone()
+                    return {'count': int(count), 'total': int(total)}
+        finally:
+            conn.close()
+    # file fallback (local dev)
+    try:
+        if _RATINGS_FILE.exists():
+            return json.loads(_RATINGS_FILE.read_text())
+    except Exception:
+        pass
+    return {'count': 0, 'total': 0}
+
+def save_rating(stars):
+    conn = _get_conn()
+    if conn:
+        try:
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute('INSERT INTO ratings (stars) VALUES (%s)', (stars,))
+        finally:
+            conn.close()
+        return
+    # file fallback (local dev)
+    try:
+        data = load_ratings()
+        data['total'] += stars
+        data['count'] += 1
+        _RATINGS_FILE.write_text(json.dumps(data))
+    except Exception:
+        pass
+
+def rating_json_fragment():
+    """Return aggregateRating JSON fragment for schema injection (empty until 3+ reviews)."""
+    r = load_ratings()
+    if r['count'] < 3:
+        return ''
+    avg = round(r['total'] / r['count'], 1)
+    count = r['count']
+    return f', "aggregateRating": {{"@type": "AggregateRating", "ratingValue": "{avg}", "ratingCount": "{count}"}}'
+
 # ── Routes ─────────────────────────────────────────────────────────────
+
+@app.before_request
+def redirect_www():
+    """Redirect www.ejarihelper.ae → ejarihelper.ae"""
+    from flask import redirect, request as req
+    host = req.host.lower()
+    if host.startswith('www.'):
+        url = req.url.replace('://www.', '://', 1)
+        return redirect(url, code=301)
 
 @app.route('/')
 def index():
-    return send_from_directory('static', 'index.html')
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    with open(os.path.join(app.static_folder, 'index.html'), encoding='utf-8') as f:
+        html = f.read()
+    html = html.replace('__BASE_URL__', base_url)
+    html = html.replace('__RATING_JSON__', rating_json_fragment())
+    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+
+@app.route('/rate', methods=['POST'])
+def rate():
+    body = request.json or {}
+    stars = body.get('stars')
+    if not isinstance(stars, int) or stars < 1 or stars > 5:
+        return jsonify({'ok': False, 'error': 'Invalid rating'}), 400
+    save_rating(stars)
+    return jsonify({'ok': True})
+
+
+def _send_telegram(text: str):
+    """Send notification to Telegram. Requires TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID env vars."""
+    token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+    chat_id = os.environ.get('TELEGRAM_CHAT_ID', '')
+    if not token or not chat_id:
+        return
+    try:
+        req_lib.post(
+            f'https://api.telegram.org/bot{token}/sendMessage',
+            json={'chat_id': chat_id, 'text': text, 'parse_mode': 'HTML'},
+            timeout=5
+        )
+    except Exception as e:
+        print(f'[telegram] {e}')
+
+
+@app.route('/lead', methods=['POST'])
+def lead():
+    body = request.json or {}
+    phone = (body.get('phone') or '').strip()
+    if not phone or len(phone.replace(' ', '').replace('-', '').replace('+', '')) < 7:
+        return jsonify({'ok': False, 'error': 'Invalid phone'}), 400
+    conn = _get_conn()
+    if conn:
+        try:
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute('INSERT INTO leads (phone, source) VALUES (%s, %s)',
+                                (phone, 'post_download'))
+        finally:
+            conn.close()
+    else:
+        print(f'[lead] {phone}')  # fallback: visible in Railway logs
+    _send_telegram(
+        f'🔔 <b>New Ejari Helper lead</b>\n'
+        f'📱 {phone}\n'
+        f'⏰ {datetime.now().strftime("%d %b %Y, %H:%M")}'
+    )
+    return jsonify({'ok': True})
+
+
+@app.route('/admin/telegram-setup')
+def telegram_setup():
+    """Helper: fetch recent bot updates to find your Telegram chat_id."""
+    if not _is_admin():
+        return redirect('/admin')
+    token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+    if not token:
+        return jsonify({'error': 'TELEGRAM_BOT_TOKEN not set in Railway'}), 400
+    try:
+        resp = req_lib.get(f'https://api.telegram.org/bot{token}/getUpdates', timeout=5)
+        data = resp.json()
+        chats = {}
+        for update in data.get('result', []):
+            msg = update.get('message') or update.get('channel_post') or {}
+            chat = msg.get('chat', {})
+            if chat and chat.get('id') not in chats:
+                chats[chat['id']] = {
+                    'chat_id': chat.get('id'),
+                    'type': chat.get('type'),
+                    'name': (f"{chat.get('first_name','')} {chat.get('last_name','')}").strip()
+                          or chat.get('title') or chat.get('username', ''),
+                }
+        return jsonify({
+            'instruction': 'Send any message to your bot first, then refresh this page',
+            'set_this_env': 'TELEGRAM_CHAT_ID',
+            'found_chats': list(chats.values()),
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+def _is_admin():
+    """True if request carries a valid admin session cookie."""
+    admin_pw = os.environ.get('ADMIN_PASSWORD', '')
+    return bool(admin_pw and session.get('admin') == admin_pw)
+
+
+_ADMIN_CSS = """
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f4f3f0;color:#111;font-size:14px;min-height:100vh}
+.top{background:#fff;border-bottom:1px solid #ddd;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between}
+.top-brand{font-weight:700;font-size:15px;color:#16423c}
+.top-out{font-size:12px;color:#999;text-decoration:none}
+.top-out:hover{color:#16423c}
+.wrap{max-width:700px;margin:32px auto;padding:0 20px}
+h1{font-size:18px;font-weight:600;margin-bottom:20px}
+.card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:28px}
+.meta{font-size:12px;color:#999;margin-bottom:20px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-weight:600;color:#555;padding:7px 10px;border-bottom:1.5px solid #ddd}
+td{padding:8px 10px;border-bottom:1px solid #f4f3f0;vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.phone{font-weight:500;color:#16423c}
+td.date{color:#999;font-size:12px}
+.empty{color:#999;text-align:center;padding:32px 0}
+label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:6px}
+input[type=password]{width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;outline:none}
+input[type=password]:focus{border-color:#16423c}
+.btn{display:block;width:100%;background:#16423c;color:#fff;border:none;border-radius:7px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;margin-top:14px}
+.btn:hover{background:#2a7a6f}
+.err{background:#fdf2f2;border:1px solid #e8bebe;border-radius:7px;padding:10px 14px;font-size:13px;color:#c0392b;margin-bottom:16px}
+</style>"""
+
+
+def _login_page(error=False):
+    err = '<div class="err">Wrong password — try again.</div>' if error else ''
+    return f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — Ejari Helper</title>{_ADMIN_CSS}</head><body>
+<div style="display:flex;align-items:center;justify-content:center;min-height:100vh">
+<div style="width:320px">
+  <div style="font-weight:700;font-size:16px;color:#16423c;text-align:center;margin-bottom:24px">Ejari Helper</div>
+  <div class="card">
+    <h1 style="margin-bottom:20px;font-size:16px">Admin sign in</h1>
+    {err}
+    <form method="POST" action="/admin/login">
+      <label>Password</label>
+      <input type="password" name="password" autofocus>
+      <button class="btn">Sign in →</button>
+    </form>
+  </div>
+</div></div></body></html>""", 200
+
+
+def _leads_page(leads_list):
+    total = len(leads_list)
+    rows = ''.join(
+        f'<tr><td class="phone">{r["phone"]}</td>'
+        f'<td class="date">{r["created_at"][:16].replace("T"," ")}</td></tr>'
+        for r in leads_list
+    ) or f'<tr><td colspan="2" class="empty">No leads yet</td></tr>'
+    return f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leads — Ejari Helper</title>{_ADMIN_CSS}</head><body>
+<div class="top">
+  <span class="top-brand">Ejari Helper · Admin</span>
+  <a href="/admin/logout" class="top-out">Sign out</a>
+</div>
+<div class="wrap">
+  <h1>Leads</h1>
+  <div class="card">
+    <div class="meta">{total} lead{'s' if total != 1 else ''} total · newest first</div>
+    <table>
+      <tr><th>Phone / WhatsApp</th><th>Date</th></tr>
+      {rows}
+    </table>
+  </div>
+</div></body></html>"""
+
+
+@app.route('/admin')
+def admin_index():
+    if not os.environ.get('ADMIN_PASSWORD'):
+        return 'ADMIN_PASSWORD env var not set', 403
+    if not _is_admin():
+        return _login_page()
+    # Load leads and render HTML table
+    conn = _get_conn()
+    if not conn:
+        return _leads_page([])
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    'SELECT id, phone, source, created_at FROM leads ORDER BY created_at DESC LIMIT 200'
+                )
+                rows = cur.fetchall()
+        leads_list = [{'id': r[0], 'phone': r[1], 'source': r[2], 'created_at': str(r[3])} for r in rows]
+        return _leads_page(leads_list)
+    finally:
+        conn.close()
+
+
+@app.route('/admin/login', methods=['POST'])
+def admin_login():
+    admin_pw = os.environ.get('ADMIN_PASSWORD', '')
+    if request.form.get('password') == admin_pw:
+        session['admin'] = admin_pw
+        return redirect('/admin')
+    return _login_page(error=True)
+
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin', None)
+    return redirect('/admin')
+
+
+@app.route('/admin/leads')
+def admin_leads():
+    if not _is_admin():
+        return redirect('/admin')
+    conn = _get_conn()
+    if not conn:
+        return jsonify({'error': 'No DB connection'}), 500
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    'SELECT id, phone, source, created_at FROM leads ORDER BY created_at DESC LIMIT 200'
+                )
+                rows = cur.fetchall()
+        leads_list = [{'id': r[0], 'phone': r[1], 'source': r[2], 'created_at': str(r[3])} for r in rows]
+        return jsonify({'total': len(leads_list), 'leads': leads_list})
+    finally:
+        conn.close()
+
+
+@app.route('/robots.txt')
+def robots_txt():
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    content = f'User-agent: *\nAllow: /\nSitemap: {base_url}/sitemap.xml\n'
+    return content, 200, {'Content-Type': 'text/plain'}
+
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    xml = f'''<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>{base_url}/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>{base_url}/guide/ejari-registration</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>{base_url}/guide/dewa-activation</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>{base_url}/guide/rental-dispute</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>{base_url}/guide/ejari-renewal</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>{base_url}/guide/tenancy-contract-dubai</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>{base_url}/guide/dewa-premises-number</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>{base_url}/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>{base_url}/terms</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>'''
+    return xml, 200, {'Content-Type': 'application/xml'}
+
+
+_GUIDE_SLUGS = {'ejari-registration', 'dewa-activation', 'rental-dispute',
+                'ejari-renewal', 'dewa-premises-number', 'tenancy-contract-dubai'}
+
+@app.route('/guide/<slug>')
+def guide(slug):
+    if slug not in _GUIDE_SLUGS:
+        from flask import redirect
+        return redirect('/', 302)
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    guide_path = os.path.join(app.static_folder, 'guide', f'{slug}.html')
+    with open(guide_path, encoding='utf-8') as f:
+        html = f.read()
+    html = html.replace('__BASE_URL__', base_url)
+    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+
+
+@app.route('/privacy')
+def privacy():
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    with open(os.path.join(app.static_folder, 'privacy.html'), encoding='utf-8') as f:
+        html = f.read()
+    html = html.replace('__BASE_URL__', base_url)
+    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+
+
+@app.route('/terms')
+def terms():
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    with open(os.path.join(app.static_folder, 'terms.html'), encoding='utf-8') as f:
+        html = f.read()
+    html = html.replace('__BASE_URL__', base_url)
+    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
 
 @app.route('/health')
 def health():
-    return jsonify({'status': 'ok', 'template': os.path.exists(TEMPLATE_PDF)})
+    db_status = 'no_url'
+    ratings = None
+    if _DB_URL:
+        try:
+            r = load_ratings()
+            ratings = r
+            db_status = 'ok'
+        except Exception as e:
+            db_status = str(e)
+    return jsonify({
+        'status': 'ok',
+        'template': os.path.exists(TEMPLATE_PDF),
+        'db': db_status,
+        'ratings': ratings,
+    })
 
 def build_content_block(f):
     """Build image or document block from file dict."""

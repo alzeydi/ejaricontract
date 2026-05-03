@@ -1,11 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18081980009"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-18081980009');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ejari Helper — Fill your tenancy contract in minutes</title>
+<meta name="robots" content="index, follow">
+<title>Ejari Contract Online — Dubai Tenancy | Ejari Helper</title>
+<meta name="description" content="Fill your Dubai tenancy contract online in minutes. Upload Emirates IDs & Title Deed — AI auto-fills a DLD-format Ejari contract PDF. 30 AED, no account needed.">
+<link rel="canonical" href="__BASE_URL__/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="__BASE_URL__/">
+<meta property="og:title" content="Ejari Contract Online — Dubai Tenancy Contract | Ejari Helper">
+<meta property="og:description" content="Fill your Dubai tenancy contract online in minutes. AI auto-fills a DLD Ejari PDF from your documents. 30 AED · No account needed.">
+<meta property="og:site_name" content="Ejari Helper">
+<meta property="og:image" content="__BASE_URL__/static/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ejari Helper — Dubai tenancy contracts in minutes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ejari Contract Online — Dubai Tenancy Contract | Ejari Helper">
+<meta name="twitter:description" content="Fill your Dubai tenancy contract online in minutes. AI auto-fills a DLD Ejari PDF from your documents. 30 AED · No account needed.">
+<meta name="twitter:image" content="__BASE_URL__/static/og-image.png">
+<meta name="theme-color" content="#16423c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Fraunces:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"></noscript>
 <style>
 :root{
   --bg:#f4f3f0;
@@ -165,25 +194,6 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .term-n{font-size:12px;color:var(--muted);min-width:16px;flex-shrink:0}
 .small-note{font-size:12px;color:var(--muted);padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:6px;margin-top:16px;line-height:1.6}
 
-/* SHEET */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:900;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(2px)}
-.overlay.on{opacity:1;pointer-events:all}
-.sheet{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-radius:16px 16px 0 0;padding:0 24px 40px;z-index:901;transform:translateY(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);max-width:560px;margin:0 auto}
-.sheet.on{transform:translateY(0)}
-.sh-bar{width:36px;height:4px;background:#e0e0e0;border-radius:2px;margin:12px auto 18px}
-.sh-x{position:absolute;top:14px;right:20px;width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--muted)}
-.sh-x:hover{background:var(--border)}
-.sh-title{font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin-bottom:3px}
-.sh-sub{font-size:13px;color:var(--muted);margin-bottom:16px}
-.sh-price{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;background:var(--gold-bg);border:1px solid rgba(184,134,11,.2);border-radius:8px;margin-bottom:14px}
-.sh-p-lbl{font-size:13px;font-weight:500}
-.sh-p-lbl small{font-size:11px;color:var(--muted);display:block;margin-top:2px}
-.sh-p-val .old{font-size:11px;color:var(--muted);text-decoration:line-through;text-align:right}
-.sh-p-val .new{font-size:24px;font-weight:700;text-align:right;line-height:1}
-.sh-p-val .cur{font-size:11px;color:var(--muted);text-align:right}
-.methods{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap}
-.method{font-size:11px;font-weight:500;padding:5px 10px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text)}
-.demo-note{display:none;font-size:12px;color:var(--blue);background:var(--blue-bg);border:1px solid rgba(26,79,138,.15);border-radius:6px;padding:8px 12px;margin-bottom:12px}
 
 /* PAY CONFIRM BANNER */
 .pay-confirm{display:none;align-items:center;gap:12px;background:var(--accent-bg);border:1px solid rgba(42,122,111,.3);border-radius:8px;padding:14px 16px;margin-bottom:12px}
@@ -230,7 +240,157 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   .ei{border-right:none}
   .steps .s-lbl{display:none}
 }
+
+/* RATING WIDGET */
+.rating-widget{display:none;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:18px 20px;margin-top:12px;text-align:center}
+.rating-widget.on{display:block}
+.rating-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px}
+.stars{display:flex;justify-content:center;gap:6px;margin-bottom:6px;cursor:pointer}
+.star{font-size:32px;color:#ddd;transition:color .12s,transform .1s;line-height:1;user-select:none}
+.star.hover,.star.chosen{color:#f5a623;transform:scale(1.1)}
+.rating-thanks{font-size:12px;color:var(--accent);margin-top:6px;display:none}
+
+/* VIDEO EMBED */
+.video-section{margin-bottom:20px}
+.video-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:10px}
+.video-wrap{position:relative;padding-bottom:56.25%;height:0;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);background:#000}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+
+/* LEAD WIDGET */
+.lead-widget{background:var(--accent-bg);border:1.5px solid rgba(22,66,60,.2);border-radius:10px;padding:18px 20px;margin-top:14px}
+.lead-widget-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.lead-widget-desc{font-size:12px;color:var(--sub);line-height:1.5;margin-bottom:12px}
+.lead-row{display:flex;gap:8px}
+.lead-input{flex:1;border:1.5px solid var(--border);border-radius:7px;padding:9px 12px;font-size:13px;font-family:inherit;color:var(--text);background:var(--white);outline:none;min-width:0}
+.lead-input:focus{border-color:var(--accent)}
+.lead-btn{background:var(--accent);color:white;border:none;border-radius:7px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.lead-btn:hover{background:var(--accent-mid)}
+.lead-note{font-size:11px;color:var(--muted);margin-top:8px}
+.lead-success{font-size:13px;font-weight:500;color:#2e7d32;padding:4px 0;display:none}
+
+/* GOOD TO KNOW */
+.know-section{margin-top:32px}
+.know-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;gap:12px}
+.know-title{font-size:15px;font-weight:600;color:var(--text)}
+.know-all{font-size:12px;color:var(--accent);text-decoration:none}
+.know-all:hover{text-decoration:underline}
+.know-items{display:flex;flex-direction:column;gap:5px}
+.know-item{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.know-item[open]{border-color:var(--accent)}
+.know-q{padding:12px 16px;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;-webkit-tap-highlight-color:transparent}
+.know-q::-webkit-details-marker{display:none}
+.know-q::after{content:'+';font-size:18px;font-weight:300;color:var(--muted);flex-shrink:0;line-height:1}
+.know-item[open] .know-q::after{content:'−'}
+.know-a{padding:0 16px 13px;font-size:13px;color:var(--sub);line-height:1.65}
+.know-a a{color:var(--accent)}
+
+/* GUIDES GRID */
+.guides-section{margin-top:28px}
+.guides-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px}
+.guides-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.guide-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:14px;text-decoration:none;display:flex;flex-direction:column;gap:4px;transition:border-color .15s}
+.guide-card:hover{border-color:var(--accent);text-decoration:none}
+.gc-icon{font-size:20px}
+.gc-title{font-size:13px;font-weight:600;color:var(--text)}
+.gc-desc{font-size:11px;color:var(--muted);line-height:1.4}
+@media(max-width:480px){.guides-grid{grid-template-columns:1fr}}
+
+/* FOOTER */
+.site-footer{background:var(--white);border-top:1px solid var(--border);padding:28px 24px;margin-top:48px}
+.site-footer-inner{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.footer-brand{font-size:14px;font-weight:600;color:var(--text)}
+.footer-desc{font-size:12px;color:var(--muted);line-height:1.6;max-width:540px}
+.footer-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:4px}
+.footer-meta a{font-size:11px;color:var(--muted);text-decoration:none}
+.footer-meta a:hover{color:var(--accent)}
+.footer-copy{font-size:11px;color:var(--muted)}
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Ejari Helper",
+      "url": "__BASE_URL__/",
+      "description": "AI-powered tool to fill Dubai tenancy contracts online. Upload Emirates IDs and Title Deed, get a DLD-format Ejari contract PDF instantly.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "30",
+        "priceCurrency": "AED",
+        "availability": "https://schema.org/InStock"
+      },
+      "areaServed": {"@type": "City", "name": "Dubai", "addressCountry": "AE"},
+      "featureList": "AI document extraction, DLD tenancy contract PDF, Ejari registration support, no account required"__RATING_JSON__
+    },
+    {
+      "@type": "HowTo",
+      "name": "How to fill a Dubai tenancy contract online for Ejari registration",
+      "description": "Generate a pre-filled DLD unified tenancy contract PDF for Ejari registration in Dubai using AI.",
+      "totalTime": "PT5M",
+      "estimatedCost": {"@type": "MonetaryAmount", "currency": "AED", "value": "30"},
+      "step": [
+        {
+          "@type": "HowToStep", "position": 1,
+          "name": "Upload documents",
+          "text": "Upload tenant and lessor Emirates IDs, Title Deed, and optionally the previous Ejari certificate. AI extracts all data automatically."
+        },
+        {
+          "@type": "HowToStep", "position": 2,
+          "name": "Pay and extract",
+          "text": "Pay 30 AED via Apple Pay, Google Pay, or card. AI reads your documents and pre-fills the Dubai tenancy contract."
+        },
+        {
+          "@type": "HowToStep", "position": 3,
+          "name": "Download the tenancy contract PDF",
+          "text": "Review extracted fields, complete rental period and financials, then download your DLD-format Ejari contract PDF."
+        },
+        {
+          "@type": "HowToStep", "position": 4,
+          "name": "Register via Dubai REST app",
+          "text": "Sign and submit the contract through the Dubai REST app for Ejari certificate. Registration fee: AED 155."
+        }
+      ]
+    },
+    {
+      "@type": "Organization",
+      "name": "Ejari Helper",
+      "url": "__BASE_URL__/",
+      "description": "AI-powered Dubai tenancy contract generator for Ejari registration. Built and maintained in Dubai, UAE.",
+      "areaServed": {"@type": "City", "name": "Dubai", "addressCountry": "AE"},
+      "knowsAbout": ["Ejari registration", "Dubai tenancy contract", "DLD contract", "UAE rental law"]
+    },
+    {
+      "@type": "VideoObject",
+      "name": "How to Generate Your Dubai Ejari Tenancy Contract Online",
+      "description": "Step-by-step walkthrough of Ejari Helper — upload your Emirates IDs and Title Deed, AI auto-fills your DLD tenancy contract PDF in minutes. Covers Ejari registration process in Dubai.",
+      "thumbnailUrl": "https://img.youtube.com/vi/PKyHOI0i1z0/maxresdefault.jpg",
+      "uploadDate": "2026-04-13T00:00:00Z",
+      "duration": "PT6M",
+      "embedUrl": "https://www.youtube.com/embed/PKyHOI0i1z0",
+      "contentUrl": "https://www.youtube.com/watch?v=PKyHOI0i1z0",
+      "publisher": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/"}
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type":"Question","name":"What is Ejari and is registration mandatory?","acceptedAnswer":{"@type":"Answer","text":"Ejari is Dubai's official tenancy contract registration system run by RERA. All rental contracts in Dubai must be registered. Without Ejari you cannot connect DEWA, renew a residency visa, or file a rental dispute. The penalty for not registering is up to AED 50,000."}},
+        {"@type":"Question","name":"What documents are needed for Ejari registration?","acceptedAnswer":{"@type":"Answer","text":"You need: a signed tenancy contract in DLD standard format, tenant's Emirates ID, landlord's Emirates ID or passport, the property Title Deed, and the previous Ejari certificate if renewing."}},
+        {"@type":"Question","name":"How much does Ejari registration cost in Dubai?","acceptedAnswer":{"@type":"Answer","text":"Online registration via the Dubai REST app costs AED 122.50 including VAT. At a typing centre the fee is AED 215–220. Renewal costs the same. Cancellation is free."}},
+        {"@type":"Question","name":"Who pays for Ejari — landlord or tenant?","acceptedAnswer":{"@type":"Answer","text":"UAE law does not specify which party pays. It is negotiated between landlord and tenant and should be stated in the tenancy contract."}},
+        {"@type":"Question","name":"How long does it take to receive the Ejari certificate?","acceptedAnswer":{"@type":"Answer","text":"Online registration via the Dubai REST app is instant — the certificate is issued by email as soon as documents are approved and payment is made."}},
+        {"@type":"Question","name":"What is the difference between a tenancy contract and an Ejari certificate?","acceptedAnswer":{"@type":"Answer","text":"The tenancy contract is the legal agreement between landlord and tenant. The Ejari certificate is the government's registration of that contract. Both are required — the contract alone is not recognised in DEWA, visa, or court systems."}},
+        {"@type":"Question","name":"Do I need Ejari to connect DEWA?","acceptedAnswer":{"@type":"Answer","text":"Yes. DEWA requires your Ejari registration number and the 9-digit Premises Number to process your Move In application."}},
+        {"@type":"Question","name":"Can a landlord increase rent mid-contract?","acceptedAnswer":{"@type":"Answer","text":"No. Under Dubai Law No. 26 of 2007, rent is fixed for the entire contract period. Increases can only happen at renewal with 90 days written notice and within RERA's permitted percentage limits."}},
+        {"@type":"Question","name":"What happens if I don't renew Ejari when my contract renews?","acceptedAnswer":{"@type":"Answer","text":"Your old Ejari expires at contract end. Without renewal you lose legal standing — DEWA may flag your account and residency visa renewals may be blocked. Renew within 30 days of signing your new contract."}},
+        {"@type":"Question","name":"How do I get my security deposit back in Dubai?","acceptedAnswer":{"@type":"Answer","text":"The landlord must return your deposit minus legitimate deductions at tenancy end. Document move-out conditions with photos and a signed handover report. If refused, file at the Rental Dispute Centre — cases resolve in ~15 days."}}
+      ]
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -272,39 +432,39 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   <div id="s1">
 
     <div class="hero">
-      <div class="tag">✦ AI-powered · DLD official format</div>
-      <h1>Your Ejari contract,<br><i>ready in minutes</i></h1>
-      <p>Upload your documents — AI reads and fills the contract automatically. No account required.</p>
+      <div class="tag">✦ AI-powered · DLD official format · Dubai</div>
+      <h1>Dubai tenancy contract online,<br><i>ready in minutes</i></h1>
+      <p>Upload your documents — AI reads, extracts and fills your Ejari contract automatically. No account required.</p>
     </div>
 
     <div class="how-it-works">
-      <div class="hiw-title">How Ejari registration works</div>
+      <h2 class="hiw-title">How Ejari registration works in Dubai</h2>
       <div class="hiw-steps">
 
         <div class="hiw-step">
           <div class="hiw-num done">1</div>
-          <div class="hiw-label">Fill the tenancy contract</div>
+          <h3 class="hiw-label">Fill the tenancy contract</h3>
           <div class="hiw-desc">Generate a pre-filled DLD unified contract PDF.</div>
           <span class="hiw-tag green">✦ Ejari Helper does this</span>
         </div>
 
         <div class="hiw-step">
           <div class="hiw-num">2</div>
-          <div class="hiw-label">Sign the contract</div>
+          <h3 class="hiw-label">Sign the contract</h3>
           <div class="hiw-desc">Both landlord and tenant sign — in person or digitally.</div>
           <span class="hiw-tag gray">Landlord + Tenant</span>
         </div>
 
         <div class="hiw-step">
           <div class="hiw-num">3</div>
-          <div class="hiw-label">Register via Dubai REST app</div>
+          <h3 class="hiw-label">Register via Dubai REST app</h3>
           <div class="hiw-desc">Submit signed contract through DLD app. Fee: AED 155.</div>
           <span class="hiw-tag gray">Dubai REST · UAE Pass</span>
         </div>
 
         <div class="hiw-step">
           <div class="hiw-num">4</div>
-          <div class="hiw-label">Receive Ejari certificate</div>
+          <h3 class="hiw-label">Receive Ejari certificate</h3>
           <div class="hiw-desc">Issued in 1–2 days. Required for DEWA, visa &amp; disputes.</div>
           <span class="hiw-tag green">✓ Done</span>
         </div>
@@ -316,7 +476,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       <div class="section-head">
         <div class="section-icon">📄</div>
         <div>
-          <div class="section-title">Upload documents</div>
+          <h2 class="section-title">Upload documents</h2>
           <div class="section-desc">Emirates IDs · Title Deed · previous Ejari (optional)</div>
         </div>
       </div>
@@ -367,7 +527,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
               <div class="pay-cur">AED</div>
             </div>
           </div>
-          <button class="btn btn-dark" id="payBtn" onclick="openSheet()" disabled>Pay 30 AED &amp; Extract →</button>
+          <button class="btn btn-dark" id="payBtn" onclick="doPay()" disabled><span id="payTxt">Pay 30 AED &amp; Extract →</span></button>
           <div id="payHint" style="text-align:center;font-size:12px;color:var(--muted);margin-top:8px">Upload 3 required documents to continue</div>
           <div class="trust" style="margin-top:9px">
             <span>🔒 Ziina</span><span class="trust-sep">·</span>
@@ -393,6 +553,112 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
       </div>
     </div>
+
+    <!-- Video -->
+    <div class="video-section" style="margin-top:28px">
+      <div class="video-label">Watch how it works — 6 min</div>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/PKyHOI0i1z0" title="How to Generate Your Dubai Ejari Tenancy Contract Online | Ejari Helper" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+
+    <!-- Guides grid -->
+    <div class="guides-section" id="guides">
+      <div class="guides-title">Step-by-step guides</div>
+      <div class="guides-grid">
+        <a href="/guide/tenancy-contract-dubai" class="guide-card">
+          <div class="gc-icon">📄</div>
+          <div class="gc-title">Tenancy contract</div>
+          <div class="gc-desc">DLD format, required fields & rejection reasons</div>
+        </a>
+        <a href="/guide/ejari-registration" class="guide-card">
+          <div class="gc-icon">📋</div>
+          <div class="gc-title">Register Ejari</div>
+          <div class="gc-desc">Online registration, fees & documents</div>
+        </a>
+        <a href="/guide/ejari-renewal" class="guide-card">
+          <div class="gc-icon">🔄</div>
+          <div class="gc-title">Renew Ejari</div>
+          <div class="gc-desc">Renewal process, fee & deadline</div>
+        </a>
+        <a href="/guide/dewa-activation" class="guide-card">
+          <div class="gc-icon">💡</div>
+          <div class="gc-title">Activate DEWA</div>
+          <div class="gc-desc">Electricity & water for new tenants</div>
+        </a>
+        <a href="/guide/dewa-premises-number" class="guide-card">
+          <div class="gc-icon">🏢</div>
+          <div class="gc-title">DEWA Premises Number</div>
+          <div class="gc-desc">What it is and where to find it</div>
+        </a>
+        <a href="/guide/rental-dispute" class="guide-card">
+          <div class="gc-icon">⚖️</div>
+          <div class="gc-title">Rental Disputes</div>
+          <div class="gc-desc">File a complaint at the RDC</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Good to know -->
+    <section class="know-section" aria-label="Ejari questions answered">
+      <div class="know-header">
+        <h2 class="know-title">Good to know</h2>
+      </div>
+      <div class="know-items">
+
+        <details class="know-item">
+          <summary class="know-q">What is Ejari and is registration mandatory?</summary>
+          <div class="know-a">Ejari (Arabic: إيجاري, "My Rent") is Dubai's official tenancy contract registration system run by RERA and the Dubai Land Department. <strong>All rental contracts in Dubai must be registered</strong> — including apartments, villas, offices and shops. Without Ejari you cannot connect DEWA utilities, renew a residency visa, or file a rental dispute. The penalty for not registering is up to AED 50,000.</div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">What documents are needed for Ejari registration?</summary>
+          <div class="know-a">You need: (1) a signed tenancy contract in DLD standard format, (2) tenant's Emirates ID, (3) landlord's Emirates ID or passport, (4) the property's Title Deed, and (5) the previous Ejari certificate if you are renewing. Ejari Helper generates the tenancy contract from your Emirates IDs and Title Deed automatically — you just upload them and AI fills in all the fields.</div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">How much does Ejari registration cost in Dubai?</summary>
+          <div class="know-a">Online registration via the Dubai REST app or DLD website costs <strong>AED 122.50 including VAT</strong>. At a typing centre the fee is AED 215–220. Renewal costs the same as first-time registration. Cancellation is free.</div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">Who pays for Ejari — landlord or tenant?</summary>
+          <div class="know-a">UAE law does not specify which party must pay. It is negotiated and should be stated in the tenancy contract. In practice, the landlord or agent typically pays for first registration, while renewal costs are often passed to the tenant. If you register online yourself the fee is only AED 122.50 — much less than a typing centre.</div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">How long does it take to receive the Ejari certificate?</summary>
+          <div class="know-a">Online registration via the Dubai REST app is <strong>instant</strong> — the certificate is issued by email as a PDF as soon as your documents are approved and payment is made. At a typing centre it is processed on-site the same day. If there is a rejection (e.g. address mismatch), fix the issue and resubmit at no extra charge.</div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">What is the difference between a tenancy contract and an Ejari certificate?</summary>
+          <div class="know-a">The <strong>tenancy contract</strong> is the legal agreement between you and your landlord — it sets the rent, dates, and conditions. The <strong>Ejari certificate</strong> is the government's registration of that contract. You need both. The contract alone is not recognised in government systems — banks, DEWA, RERA, and Dubai Courts all require a valid Ejari certificate.</div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">Do I need Ejari to connect DEWA?</summary>
+          <div class="know-a">Yes. DEWA requires your Ejari registration number and the 9-digit Premises Number (also on the Ejari certificate) to process your Move In application. Register Ejari first, then apply for DEWA — electricity and water activate within 24 hours of payment. See our <a href="/guide/dewa-activation">DEWA activation guide →</a></div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">Can a landlord increase rent mid-contract or without notice?</summary>
+          <div class="know-a">No. Under Dubai Law No. 26 of 2007, rent is fixed for the entire contract period. Increases can only happen at renewal, with <strong>90 days written notice</strong> and within RERA's permitted limits (0–20% depending on how far below market your current rent is). A notice with less than 90 days is not legally enforceable. If your landlord insists, file a case at the <a href="/guide/rental-dispute">Rental Dispute Centre →</a></div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">What happens if I don't renew Ejari when my contract renews?</summary>
+          <div class="know-a">Your old Ejari expires at the end of the contract period. Without a renewed Ejari you lose legal standing — DEWA may flag your account, you cannot file disputes at the RDC, and residency visa renewals may be blocked. Renew Ejari within 30 days of signing your new contract. The process is the same as first registration — plus you upload the old Ejari certificate.</div>
+        </details>
+
+        <details class="know-item">
+          <summary class="know-q">How do I get my security deposit back in Dubai?</summary>
+          <div class="know-a">The landlord must return your deposit at the end of the tenancy, minus legitimate deductions (unpaid bills or actual property damage). Normal wear and tear cannot be deducted. Document the property condition on move-out with photos and a signed handover report. If the landlord refuses, file a case at the <a href="/guide/rental-dispute">Rental Dispute Centre</a> — deposit disputes are resolved in ~15 days. Filing fee: 3.5% of the annual rent, minimum AED 500.</div>
+        </details>
+
+      </div>
+    </section>
+
   </div>
 
   <!-- ── SCREEN 2: COMPLETE ── -->
@@ -413,7 +679,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       <div class="section-head">
         <div class="section-icon">✏️</div>
         <div>
-          <div class="section-title">Complete the contract</div>
+          <h2 class="section-title">Complete the tenancy contract</h2>
           <div class="section-desc">Fill in what changes year to year</div>
         </div>
       </div>
@@ -479,6 +745,19 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
           </div>
         </div>
 
+        <!-- Rating widget -->
+        <div class="rating-widget" id="ratingWidget">
+          <div class="rating-title">How was your experience?</div>
+          <div class="stars" id="ratingStars" onmouseleave="starsReset()">
+            <span class="star" onmouseover="starsHover(1)" onclick="submitRating(1)">★</span>
+            <span class="star" onmouseover="starsHover(2)" onclick="submitRating(2)">★</span>
+            <span class="star" onmouseover="starsHover(3)" onclick="submitRating(3)">★</span>
+            <span class="star" onmouseover="starsHover(4)" onclick="submitRating(4)">★</span>
+            <span class="star" onmouseover="starsHover(5)" onclick="submitRating(5)">★</span>
+          </div>
+          <div class="rating-thanks" id="ratingThanks">Thank you! Your feedback helps others find us ✓</div>
+        </div>
+
       </div>
     </div>
 
@@ -488,7 +767,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
         <div class="section-head">
           <div class="section-icon">🗺️</div>
           <div>
-            <div class="section-title">What to do next</div>
+            <h2 class="section-title">What to do next</h2>
             <div class="section-desc">4 steps to complete your Ejari registration</div>
           </div>
         </div>
@@ -543,6 +822,20 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
             Download contract again
           </button>
 
+          <!-- Lead capture -->
+          <div class="lead-widget" id="leadWidget">
+            <div class="lead-widget-title">Want us to register Ejari for you?</div>
+            <div class="lead-widget-desc">Leave your WhatsApp number — we'll contact you and handle the full DLD registration. No queues, no typing centres.</div>
+            <div id="leadForm">
+              <div class="lead-row">
+                <input class="lead-input" id="leadPhone" type="tel" placeholder="+971 50 123 4567" maxlength="20">
+                <button class="lead-btn" onclick="submitLead()">Contact me →</button>
+              </div>
+              <div class="lead-note">We'll reach out within a few hours · No spam, one message only</div>
+            </div>
+            <div class="lead-success" id="leadSuccess">✓ Got it! We'll message you on WhatsApp shortly.</div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -551,31 +844,27 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
 </main>
 
-<!-- Sheet -->
-<div class="overlay" id="ov" onclick="closeSheet()"></div>
-<div class="sheet" id="sh">
-  <div class="sh-bar"></div>
-  <div class="sh-x" onclick="closeSheet()">✕</div>
-  <div class="sh-title">Unlock AI extraction</div>
-  <div class="sh-sub">One-time · no account · no subscription</div>
-  <div class="demo-note" id="demoNote">🧪 Demo mode — no real charge will be made</div>
-  <div class="sh-price">
-    <div class="sh-p-lbl">AI document extraction<small>Emirates IDs · Title Deed · previous Ejari</small></div>
-    <div class="sh-p-val">
-      <div class="old">35 AED</div>
-      <div class="new">30</div>
-      <div class="cur">AED</div>
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div class="footer-brand">Ejari Helper</div>
+    <p class="footer-desc">
+      AI-powered Dubai tenancy contract generator for Ejari registration.
+      Built for Dubai tenants and landlords — generates DLD-format tenancy contract PDFs
+      from your Emirates IDs and Title Deed in minutes. No account required.
+    </p>
+    <div class="footer-meta">
+      <span class="footer-copy">© 2025 Ejari Helper · Dubai, UAE</span>
+      <span style="color:var(--border)">·</span>
+      <span class="footer-copy">Updated April 2026</span>
+      <span style="color:var(--border)">·</span>
+      <a href="mailto:hello@ejarihelper.ae" onclick="this.href='mailto:'+atob('YWx6ZXlkaUBnbWFpbC5jb20=')">hello@ejarihelper.ae</a>
+      <span style="color:var(--border)">·</span>
+      <a href="/privacy">Privacy</a>
+      <span style="color:var(--border)">·</span>
+      <a href="/terms">Terms</a>
     </div>
   </div>
-  <div style="font-size:12px;color:var(--muted);text-align:center;margin:-8px 0 14px">☕ The price of a coffee in Dubai</div>
-  <div class="methods">
-    <div class="method">Apple Pay</div>
-    <div class="method">G Google Pay</div>
-    <div class="method">💳 Visa / MC</div>
-  </div>
-  <button class="btn btn-dark" id="shBtn" onclick="doPay()"><span id="shTxt">Pay 30 AED</span></button>
-  <div class="trust" style="margin-top:10px">🔒 Secured by Ziina · Your documents are never stored</div>
-</div>
+</footer>
 
 <div class="toast" id="toast"></div>
 
@@ -585,7 +874,6 @@ const EXTRACT_URL = '/extract';
 const PAY_URL     = '/create-payment';
 const VERIFY_URL  = '/verify-payment';
 const EXT_URL = '/extract';
-const DEMO    = true; // false + STRIPE_LINK for production
 
 let ext = {}, cvHeld = false;
 const $ = id => document.getElementById(id);
@@ -630,20 +918,10 @@ function checkPayReady(){
     :`Upload ${3-done} more required document${3-done===1?'':'s'} to continue`;
 }
 
-// Sheet
-function openSheet(){
-  $('sh').classList.add('on');$('ov').classList.add('on');
-  document.body.style.overflow='hidden';
-}
-function closeSheet(){
-  $('sh').classList.remove('on');$('ov').classList.remove('on');
-  document.body.style.overflow='';
-}
-
 async function doPay(){
-  const btn=$('shBtn');
+  const btn=$('payBtn');
   btn.disabled=true;
-  $('shTxt').textContent='Creating payment…';
+  $('payTxt').textContent='Creating payment…';
 
   try{
     // Save uploaded files to sessionStorage BEFORE redirect (page will reload on return)
@@ -672,14 +950,13 @@ async function doPay(){
     intentId = data.intent_id;
     sessionStorage.setItem('ejari_intent_id', intentId);
 
-    // Redirect to Ziina hosted payment page
-    $('shTxt').textContent='Redirecting to payment…';
+    $('payTxt').textContent='Redirecting to payment…';
     window.location.href = data.redirect_url;
 
   }catch(err){
     toast('Payment error: '+err.message, 'fail');
     btn.disabled=false;
-    $('shTxt').textContent='Pay 30 AED';
+    $('payTxt').textContent='Pay 30 AED & Extract →';
   }
 }
 
@@ -765,12 +1042,14 @@ window.addEventListener('load', async ()=>{
 });
 
 // Reset button if page is restored from bfcache (Back button after Ziina redirect)
+// Only re-enable if stuck in payment flow — not if disabled due to missing docs
 window.addEventListener('pageshow', function(e){
   if(e.persisted){
-    const btn=$('shBtn');
-    if(btn && btn.disabled){
+    const btn=$('payBtn');
+    const txt=$('payTxt');
+    if(btn && txt && (txt.textContent.includes('Redirecting') || txt.textContent.includes('Creating payment'))){
       btn.disabled=false;
-      $('shTxt').textContent='Pay 30 AED';
+      txt.textContent='Pay 30 AED & Extract →';
     }
   }
 });
@@ -882,6 +1161,45 @@ function parseD(s){
   const[d,m,y]=[+p[0],+p[1],+p[2]];
   return(d&&m&&y&&y>2000)?new Date(y,m-1,d):null;
 }
+// ── Rating widget ────────────────────────────────────────────────────
+let _chosenStars = 0;
+function starsHover(n){
+  if(_chosenStars) return;
+  document.querySelectorAll('.star').forEach((s,i)=>{
+    s.classList.toggle('hover', i < n);
+  });
+}
+function starsReset(){
+  if(_chosenStars) return;
+  document.querySelectorAll('.star').forEach(s=>s.classList.remove('hover'));
+}
+async function submitLead(){
+  const phone = $('leadPhone').value.trim();
+  if(!phone || phone.replace(/[\s\-+]/g,'').length < 7){ $('leadPhone').focus(); return; }
+  const btn = document.querySelector('.lead-btn');
+  btn.disabled = true;
+  btn.textContent = '…';
+  try {
+    await fetch('/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone})});
+  } catch(e){}
+  $('leadForm').style.display = 'none';
+  $('leadSuccess').style.display = 'block';
+  sessionStorage.setItem('ejari_lead','1');
+}
+
+function submitRating(stars){
+  if(sessionStorage.getItem('ejari_rated')) return;
+  _chosenStars = stars;
+  document.querySelectorAll('.star').forEach((s,i)=>{
+    s.classList.remove('hover');
+    s.classList.toggle('chosen', i < stars);
+  });
+  $('ratingStars').style.pointerEvents = 'none';
+  sessionStorage.setItem('ejari_rated','1');
+  fetch('/rate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stars})}).catch(()=>{});
+  setTimeout(()=>{ $('ratingThanks').style.display='block'; }, 250);
+}
+
 function recalc(){
   if(cvHeld)return;
   const fd=parseD(v('contract_from')),td=parseD(v('contract_to'));
@@ -939,26 +1257,30 @@ async function genPDF(){
     $('dlSuccess').classList.add('on');
     $('nextSteps').classList.add('on');
     $('genBtn').textContent='↓ Download again';
+    if(!sessionStorage.getItem('ejari_rated')) $('ratingWidget').classList.add('on');
+    if(sessionStorage.getItem('ejari_lead')){ $('leadWidget').style.display='none'; }
+    else { $('leadSuccess').style.display='none'; }
     setTimeout(()=>$('nextSteps').scrollIntoView({behavior:'smooth',block:'start'}),300);
   }catch(err){toast(err.message,'fail');}
   finally{btn.disabled=false;txt.textContent='Generate & Download PDF';sp.style.display='none';}
 }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/flatpickr" onload="initFlatpickr()"></script>
 <script>
-const FP_CFG = {dateFormat:'d/m/Y', allowInput:false, disableMobile:true};
-flatpickr('#contract_date', {...FP_CFG, defaultDate:'today'});
-flatpickr('#contract_from', {...FP_CFG, onChange: recalc});
-flatpickr('#contract_to',   {...FP_CFG, onChange: recalc});
+function initFlatpickr(){
+  const FP_CFG = {dateFormat:'d/m/Y', allowInput:false, disableMobile:true};
+  flatpickr('#contract_date', {...FP_CFG, defaultDate:'today'});
+  flatpickr('#contract_from', {...FP_CFG, onChange: recalc});
+  flatpickr('#contract_to',   {...FP_CFG, onChange: recalc});
 
-// Override buildScreen2 date-setting to use flatpickr API
-const _origBuild = buildScreen2;
-buildScreen2 = function(){
-  _origBuild();
-  if(ext.contract_from) $('contract_from')._flatpickr.setDate(yr(ext.contract_from), false, 'd/m/Y');
-  if(ext.contract_to)   $('contract_to')._flatpickr.setDate(yr(ext.contract_to),   false, 'd/m/Y');
-  recalc();
-};
+  const _origBuild = buildScreen2;
+  buildScreen2 = function(){
+    _origBuild();
+    if(ext.contract_from) $('contract_from')._flatpickr.setDate(yr(ext.contract_from), false, 'd/m/Y');
+    if(ext.contract_to)   $('contract_to')._flatpickr.setDate(yr(ext.contract_to),   false, 'd/m/Y');
+    recalc();
+  };
+}
 </script>
 </body>
 </html>
