@@ -517,6 +517,11 @@ def sitemap_xml():
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>{base_url}/how-it-works</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>{base_url}/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
@@ -559,6 +564,15 @@ def privacy():
 def terms():
     base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
     with open(os.path.join(app.static_folder, 'terms.html'), encoding='utf-8') as f:
+        html = f.read()
+    html = html.replace('__BASE_URL__', base_url)
+    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+
+
+@app.route('/how-it-works')
+def how_it_works():
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    with open(os.path.join(app.static_folder, 'how-it-works.html'), encoding='utf-8') as f:
         html = f.read()
     html = html.replace('__BASE_URL__', base_url)
     return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
