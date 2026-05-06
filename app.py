@@ -22,6 +22,10 @@ app.secret_key = os.environ.get('SECRET_KEY') or os.environ.get('ADMIN_PASSWORD'
 TEMPLATE_PDF = os.path.join(os.path.dirname(__file__), 'template.pdf')
 claude = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from env
 
+# FREE_MODE=true  → no payment required; AI extraction is free
+# FREE_MODE=false (default) → users must pay 30 AED via Ziina before extraction
+FREE_MODE = os.environ.get('FREE_MODE', 'false').lower() in ('1', 'true', 'yes')
+
 def get_template_size():
     r = PdfReader(TEMPLATE_PDF)
     p = r.pages[0]
@@ -595,6 +599,11 @@ def health():
         'ratings': ratings,
     })
 
+@app.route('/config')
+def config():
+    return jsonify({'free_mode': FREE_MODE})
+
+
 def build_content_block(f):
     """Build image or document block from file dict."""
     mime = f['mime_type']
@@ -651,8 +660,8 @@ def extract():
         if not files:
             return jsonify({'error': 'No files provided'}), 400
 
-        # Validate payment session — one payment = one extraction
-        if intent_id:
+        # Validate payment session — one payment = one extraction (skipped in FREE_MODE)
+        if not FREE_MODE and intent_id:
             if intent_id in used_intents:
                 return jsonify({'error': 'This payment has already been used. Please make a new payment to extract again.', 'code': 'already_used'}), 403
 
@@ -685,8 +694,8 @@ def extract():
         for k in defaults:
             merged.setdefault(k, '')
 
-        # Mark intent as used — prevents re-use of the same payment
-        if intent_id:
+        # Mark intent as used — prevents re-use of the same payment (skipped in FREE_MODE)
+        if not FREE_MODE and intent_id:
             used_intents.add(intent_id)
 
         return jsonify({'ok': True, 'data': merged})

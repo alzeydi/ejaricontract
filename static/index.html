@@ -866,6 +866,22 @@ const VERIFY_URL  = '/verify-payment';
 const EXT_URL = '/extract';
 
 let ext = {}, cvHeld = false;
+let FREE_MODE = false;
+
+// Load server config and apply mode
+(async () => {
+  try {
+    const cfg = await fetch('/config').then(r => r.json());
+    FREE_MODE = !!cfg.free_mode;
+  } catch(_) {}
+  if (FREE_MODE) {
+    const pb = $('payBlock');
+    if (pb) pb.style.display = 'none';
+    const ob = $('ocrBtn');
+    if (ob) ob.style.display = 'flex';
+    checkPayReady();
+  }
+})();
 const $ = id => document.getElementById(id);
 const v = id => ($( id)?.value||'').trim();
 
@@ -902,10 +918,14 @@ function checkPayReady(){
   const required=['fTEID','fLEID','fTD'];
   const done=required.filter(id=>$(id).files[0]).length;
   const ready=done===3;
-  $('payBtn').disabled=!ready;
-  $('payHint').textContent=ready
-    ?'☕ Less than a coffee at Starbucks'
-    :`Upload ${3-done} more required document${3-done===1?'':'s'} to continue`;
+  if(FREE_MODE){
+    $('ocrBtn').disabled=!ready;
+  }else{
+    $('payBtn').disabled=!ready;
+    $('payHint').textContent=ready
+      ?'☕ Less than a coffee at Starbucks'
+      :`Upload ${3-done} more required document${3-done===1?'':'s'} to continue`;
+  }
 }
 
 async function doPay(){
