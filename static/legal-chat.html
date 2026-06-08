@@ -339,6 +339,7 @@ footer a:hover{color:var(--accent)}
   let history = [];
   let state = null;
   let timerInterval = null;
+  let freeMode = false;
 
   if (window.marked) marked.setOptions({breaks:true, gfm:true});
 
@@ -479,6 +480,16 @@ footer a:hover{color:var(--accent)}
     try{
       const r = await fetch('/legal-chat/state', {credentials:'same-origin'});
       state = await r.json();
+      freeMode = !!state.free_mode;
+      if (freeMode){
+        // Server says payments are off — hide all paywall/timer chrome.
+        paywall.hidden = true;
+        teaserBadge.hidden = true;
+        timerBadge.hidden = true;
+        composer.style.display = 'flex';
+        modeLabel.textContent = 'Type your question below';
+        return;
+      }
       if (state.mode === 'paid' && state.paid_until){
         unlockPaid(state.paid_until);
       } else if (state.mode === 'locked'){
@@ -518,10 +529,13 @@ footer a:hover{color:var(--accent)}
         renderMessage('ai', 'Something went wrong: ' + (j.error || 'unknown error') + '. Please try again.');
       } else {
         history.push({role:'assistant', content:j.reply});
-        // First answer after free → teaser blur; otherwise full
-        const isTeaser = j.mode === 'locked';
+        // First answer after free → teaser blur; otherwise full.
+        // In free mode (LEGAL_FREE_MODE on backend), never blur or lock.
+        const isTeaser = !freeMode && j.mode === 'locked';
         renderMessage('ai', j.reply, {teaser:isTeaser});
-        if (isTeaser){
+        if (freeMode){
+          // No paywall, no timer — just stay in chat mode.
+        } else if (isTeaser){
           lockComposerForPaywall();
         } else if (j.mode === 'paid' && j.paid_until){
           unlockPaid(j.paid_until);
