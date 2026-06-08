@@ -944,7 +944,7 @@ def legal_payment_success():
             # Fire-and-forget Trustpilot invitation (3 days after the session)
             if email:
                 trustpilot_invite(email, name, reference_id=f'legal-{intent_id}', delay_days=3)
-            return redirect('/legal-chat?unlocked=1')
+            return redirect(f'/legal-chat?unlocked=1&tid={intent_id}')
         return redirect(f'/legal-chat?pending=1')
     except Exception as e:
         return f'Error verifying payment: {e}', 500
