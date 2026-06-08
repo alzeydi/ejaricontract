@@ -270,6 +270,87 @@ def rate():
     return jsonify({'ok': True})
 
 
+# ── Trustpilot Invitation API ──────────────────────────────────────────
+# Sends a service review invitation a few days after a paid Legal Chat session.
+# Requires three env vars (no-ops silently if any are missing):
+#   TRUSTPILOT_API_KEY, TRUSTPILOT_API_SECRET, TRUSTPILOT_BUSINESS_UNIT_ID
+TP_API_BASE = 'https://api.trustpilot.com'
+_tp_token = {'value': '', 'exp': 0}
+
+
+def _trustpilot_token():
+    api_key = os.environ.get('TRUSTPILOT_API_KEY', '')
+    api_secret = os.environ.get('TRUSTPILOT_API_SECRET', '')
+    if not (api_key and api_secret):
+        return ''
+    import time as _time
+    if _tp_token['value'] and _tp_token['exp'] > _time.time() + 60:
+        return _tp_token['value']
+    creds = base64.b64encode(f'{api_key}:{api_secret}'.encode()).decode()
+    try:
+        r = req_lib.post(
+            f'{TP_API_BASE}/v1/oauth/oauth-business-users-for-applications/accesstoken',
+            headers={'Authorization': f'Basic {creds}',
+                     'Content-Type': 'application/x-www-form-urlencoded'},
+            data='grant_type=client_credentials',
+            timeout=10,
+        )
+        data = r.json()
+        _tp_token['value'] = data.get('access_token', '')
+        _tp_token['exp'] = _time.time() + int(data.get('expires_in', 3600))
+        return _tp_token['value']
+    except Exception as e:
+        print(f'[trustpilot] token error: {e}')
+        return ''
+
+
+def trustpilot_invite(email, name, reference_id, delay_days=3):
+    """Schedule a Trustpilot service review invitation. Best-effort; never raises."""
+    bu_id = os.environ.get('TRUSTPILOT_BUSINESS_UNIT_ID', '')
+    if not (email and bu_id):
+        return False
+    try:
+        token = _trustpilot_token()
+        if not token:
+            return False
+        send_at = datetime.now(timezone.utc) + timedelta(days=delay_days)
+        r = req_lib.post(
+            f'{TP_API_BASE}/v1/private/business-units/{bu_id}/email-invitations',
+            headers={'Authorization': f'Bearer {token}',
+                     'Content-Type': 'application/json'},
+            json={
+                'consumerEmail': email,
+                'consumerName': (name or 'Customer')[:60],
+                'referenceId': reference_id,
+                'senderName': 'Ejari Helper',
+                'replyTo': os.environ.get('TRUSTPILOT_REPLY_TO', 'hello@ejarihelper.ae'),
+                'locale': 'en-US',
+                'preferredSendTime': send_at.strftime('%Y-%m-%dT%H:%M:%S'),
+                'redirectUri': 'https://ejarihelper.ae/?tp=1',
+            },
+            timeout=10,
+        )
+        ok = r.status_code in (200, 201)
+        if not ok:
+            print(f'[trustpilot] invite failed {r.status_code}: {r.text[:200]}')
+        return ok
+    except Exception as e:
+        print(f'[trustpilot] invite error: {e}')
+        return False
+
+
+def _ziina_customer_info(intent_data):
+    """Best-effort extraction of email + name from a Ziina payment_intent response."""
+    email = (intent_data.get('customer_email')
+             or intent_data.get('email')
+             or (intent_data.get('customer') or {}).get('email')
+             or '')
+    name = (intent_data.get('customer_name')
+            or (intent_data.get('customer') or {}).get('name')
+            or '')
+    return (email or '').strip(), (name or '').strip()
+
+
 def _send_telegram(text: str):
     """Send notification to Telegram. Requires TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID env vars."""
     token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
@@ -756,11 +837,16 @@ def legal_payment_success():
             paid_until = datetime.now(timezone.utc) + timedelta(minutes=LEGAL_SESSION_MINUTES)
             session['legal_paid_until'] = paid_until.isoformat()
             session['legal_free_used'] = 0
+            email, name = _ziina_customer_info(data)
             _send_telegram(
                 f'💼 <b>Legal Chat unlocked</b>\n'
                 f'💵 AED {LEGAL_PRICE_FILS // 100}\n'
+                f'📧 {email or "(no email)"}\n'
                 f'⏰ {datetime.now().strftime("%d %b %Y, %H:%M")}'
             )
+            # Fire-and-forget Trustpilot invitation (3 days after the session)
+            if email:
+                trustpilot_invite(email, name, reference_id=f'legal-{intent_id}', delay_days=3)
             return redirect('/legal-chat?unlocked=1')
         return redirect(f'/legal-chat?pending=1')
     except Exception as e:
