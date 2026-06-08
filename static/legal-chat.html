@@ -116,8 +116,8 @@ main{max-width:880px;width:100%;margin:0 auto;padding:28px 20px 32px;flex:1;disp
 
 /* The "teaser" answer: blur the bottom 80% so the user sees the start, but the rest is locked. */
 .msg.ai.teaser{position:relative}
-.msg.ai.teaser .bubble{position:relative;max-height:520px;overflow:hidden}
-.msg.ai.teaser .bubble::after{content:'';position:absolute;left:0;right:0;top:80px;bottom:0;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);background:linear-gradient(180deg,rgba(246,245,241,0) 0%,rgba(246,245,241,.55) 20%,rgba(246,245,241,.92) 60%,rgba(246,245,241,1) 100%);pointer-events:none;border-bottom-left-radius:12px;border-bottom-right-radius:12px}
+.msg.ai.teaser .bubble{position:relative;max-height:560px;overflow:hidden}
+.msg.ai.teaser .bubble::after{content:'';position:absolute;left:0;right:0;top:240px;bottom:0;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);background:linear-gradient(180deg,rgba(246,245,241,0) 0%,rgba(246,245,241,.35) 25%,rgba(246,245,241,.85) 65%,rgba(246,245,241,1) 100%);pointer-events:none;border-bottom-left-radius:12px;border-bottom-right-radius:12px}
 .msg.ai.teaser .bubble *{user-select:none}
 
 .typing{display:inline-flex;align-items:center;gap:4px;padding:6px 4px}
