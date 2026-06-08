@@ -26,6 +26,10 @@ claude = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from env
 # FREE_MODE=false (default) → users must pay 30 AED via Ziina before extraction
 FREE_MODE = os.environ.get('FREE_MODE', 'false').lower() in ('1', 'true', 'yes')
 
+# LEGAL_FREE_MODE=true  → /legal-chat is unlimited and free (paywall hidden)
+# LEGAL_FREE_MODE=false (default) → users pay 100 AED for a 30-minute session
+LEGAL_FREE_MODE = os.environ.get('LEGAL_FREE_MODE', 'false').lower() in ('1', 'true', 'yes')
+
 def get_template_size():
     r = PdfReader(TEMPLATE_PDF)
     p = r.pages[0]
@@ -714,6 +718,10 @@ LEGAL_SYSTEM_PROMPT = (
 
 def _legal_access_state():
     """Return (mode, remaining_free, paid_until_iso). mode ∈ paid|free|locked."""
+    if LEGAL_FREE_MODE:
+        # Pretend the user has an always-fresh paid session — front-end will hide the paywall.
+        far_future = (datetime.now(timezone.utc) + timedelta(days=365)).isoformat()
+        return 'paid', 0, far_future
     now = datetime.now(timezone.utc)
     paid_until_str = session.get('legal_paid_until')
     if paid_until_str:
@@ -744,6 +752,7 @@ def legal_chat_state():
         'mode': mode,
         'remaining_free': remaining,
         'paid_until': paid_until,
+        'free_mode': LEGAL_FREE_MODE,
         'free_limit': LEGAL_FREE_MESSAGES,
         'price_aed': LEGAL_PRICE_FILS // 100,
         'session_minutes': LEGAL_SESSION_MINUTES,
@@ -888,7 +897,7 @@ def health():
 
 @app.route('/config')
 def config():
-    return jsonify({'free_mode': FREE_MODE})
+    return jsonify({'free_mode': FREE_MODE, 'legal_free_mode': LEGAL_FREE_MODE})
 
 
 def build_content_block(f):
