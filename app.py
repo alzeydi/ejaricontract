@@ -866,7 +866,7 @@ def legal_chat_message():
     try:
         msg = claude.messages.create(
             model='claude-opus-4-7',
-            max_tokens=900,
+            max_tokens=2500,
             system=LEGAL_SYSTEM_PROMPT,
             messages=safe,
         )
