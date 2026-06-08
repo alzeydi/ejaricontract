@@ -53,38 +53,20 @@ main{max-width:880px;width:100%;margin:0 auto;padding:28px 20px 32px;flex:1;disp
 
 .hero{margin-bottom:18px}
 .hero-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(42,122,111,.2);padding:4px 10px;border-radius:4px;letter-spacing:.3px;text-transform:uppercase;margin-bottom:10px}
-.hero h1{font-family:'Fraunces',serif;font-size:clamp(24px,3.4vw,34px);font-weight:600;letter-spacing:-.5px;line-height:1.15;margin-bottom:10px}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(24px,3.4vw,32px);font-weight:600;letter-spacing:-.5px;line-height:1.18;margin-bottom:8px}
 .hero h1 i{font-style:italic;font-weight:400;color:var(--accent-mid)}
-.hero-sub{font-size:15px;color:var(--sub);max-width:640px;line-height:1.55}
+.hero-sub{font-size:14.5px;color:var(--sub);max-width:580px;line-height:1.5}
 .hero-sub b{color:var(--text)}
 
-.hero-stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}
-.hs{display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:12px}
-.hs b{color:var(--text);font-weight:600}
-.hs-icon{font-size:14px}
-
-.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0 10px}
-.cmp{padding:14px 16px;border-radius:10px;border:1px solid var(--border);font-size:13px;line-height:1.5}
-.cmp.bad{background:#fbf6f5;border-color:#e6c8c4}
-.cmp.good{background:var(--accent-bg);border-color:rgba(42,122,111,.3)}
-.cmp-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
-.cmp.bad .cmp-label{color:var(--red)}
-.cmp.good .cmp-label{color:var(--accent)}
-.cmp-title{font-weight:600;color:var(--text);margin-bottom:4px}
-.cmp ul{padding-left:16px;margin-top:4px}
-.cmp li{margin-bottom:2px;color:var(--sub)}
-@media(max-width:580px){.compare{grid-template-columns:1fr}}
-
-.chat-cue{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--accent);color:#fff;border-radius:10px 10px 0 0;padding:11px 14px;font-size:13.5px;font-weight:600;letter-spacing:.1px;margin-bottom:-4px;position:relative;z-index:2}
-.chat-cue-dot{width:8px;height:8px;border-radius:50%;background:#7ee2c0;box-shadow:0 0 0 4px rgba(126,226,192,.28);flex-shrink:0;animation:pulse 1.8s ease-out infinite}
-.chat-cue-arrow{display:inline-block;font-size:18px;animation:bounce-y 1.4s ease-in-out infinite}
-@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.25);opacity:.7}}
+.chat-wrap{background:var(--white);border:1.5px solid var(--accent);border-radius:12px;display:flex;flex-direction:column;flex:1;min-height:460px;overflow:hidden;position:relative;box-shadow:0 8px 28px rgba(22,66,60,.10);scroll-margin-top:80px;margin-top:18px}
+.chat-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--accent);color:#fff;gap:10px;flex-wrap:wrap}
+.chat-head .ch-left{color:#fff;font-size:13px;flex:1;min-width:0}
+.chat-head .ch-status{color:rgba(255,255,255,.85)}
+.chat-head .ch-status b{color:#fff;font-weight:600}
+.ch-status-sep{opacity:.4;margin:0 2px}
+.ch-arrow{display:inline-block;margin-left:4px;animation:bounce-y 1.4s ease-in-out infinite}
 @keyframes bounce-y{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
-@media(max-width:520px){.chat-cue{font-size:12.5px;padding:10px 12px;gap:8px}}
-
-.chat-wrap{background:var(--white);border:2px solid var(--accent);border-radius:14px;display:flex;flex-direction:column;flex:1;min-height:480px;overflow:hidden;position:relative;box-shadow:0 12px 40px rgba(22,66,60,.18),0 2px 8px rgba(22,66,60,.06);scroll-margin-top:80px}
-.chat-wrap::before{content:'';position:absolute;inset:-2px;border-radius:14px;background:linear-gradient(135deg,rgba(22,66,60,.18),rgba(42,122,111,0) 40%);pointer-events:none;z-index:-1}
-.chat-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#eef4f3 0%,#fbfbf9 100%)}
+.chat-head .ch-dot{background:#7ee2c0;box-shadow:0 0 0 3px rgba(126,226,192,.25)}
 .ch-left{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--sub)}
 .ch-dot{width:8px;height:8px;border-radius:50%;background:#2e7d32;box-shadow:0 0 0 3px #2e7d3220}
 .ch-status b{color:var(--text);font-weight:600}
@@ -178,20 +160,9 @@ main{max-width:880px;width:100%;margin:0 auto;padding:28px 20px 32px;flex:1;disp
 .rate-google-btn:hover{background:#3367d6}
 .rate-done{font-size:14px;color:var(--accent);font-weight:600;margin-top:12px}
 
-/* Trust strip */
-.trust{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
-.tr{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
-.tr-icon{font-size:18px;margin-bottom:4px}
-.tr-title{font-size:13px;font-weight:600;color:var(--text)}
-.tr-desc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
-@media(max-width:680px){.trust{grid-template-columns:1fr}}
-
-.use-cases{margin-top:18px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
-.use-cases h3{font-family:'Fraunces',serif;font-size:17px;font-weight:600;margin-bottom:10px}
-.uc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 18px}
-.uc{display:flex;gap:8px;font-size:13px;color:var(--sub);padding:4px 0}
-.uc-dot{color:var(--accent);font-weight:700;flex-shrink:0}
-@media(max-width:580px){.uc-grid{grid-template-columns:1fr}}
+/* Trust pills below chat */
+.trust-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
+.tr-pill{font-size:12px;color:var(--sub);background:var(--white);border:1px solid var(--border);padding:6px 11px;border-radius:18px}
 
 .disclaimer{font-size:11px;color:var(--muted);text-align:center;margin-top:18px;line-height:1.5;max-width:580px;margin-left:auto;margin-right:auto}
 
@@ -222,49 +193,15 @@ footer a:hover{color:var(--accent)}
 
 <main>
   <div class="hero">
-    <div class="hero-tag">⚖️ AI Legal Chat · UAE tenancy law</div>
     <h1 id="heroH1"><span id="heroProblem">Your landlord just sent a notice?</span> <i id="heroPromise">Get a real answer in 60 seconds.</i></h1>
-    <p class="hero-sub">A licensed Dubai lawyer charges <b>AED 1,000–1,500 per hour</b> just to read your contract. Our AI assistant — trained on <b>Law 26/2007, Law 33/2008, Decree 43/2013</b> and the live RERA rent index — gives you a citation-backed answer and a concrete next step. <b>AED 100 for 30 minutes</b>. No appointments. No call-backs. No legal jargon you can't decode.</p>
-    <div class="hero-stats">
-      <div class="hs"><span class="hs-icon">⚡</span><span><b>~30 sec</b> per answer</span></div>
-      <div class="hs"><span class="hs-icon">📚</span><span>Cites <b>specific articles</b></span></div>
-      <div class="hs"><span class="hs-icon">🕒</span><span>Available <b>24/7</b></span></div>
-      <div class="hs"><span class="hs-icon">🔒</span><span><b>No account</b> needed</span></div>
-    </div>
-  </div>
-
-  <div class="compare">
-    <div class="cmp bad">
-      <div class="cmp-label">Traditional law firm</div>
-      <div class="cmp-title">AED 1,500/hour · 3-day wait</div>
-      <ul>
-        <li>Book a slot, send documents, wait</li>
-        <li>Pay for the call before you know if it's worth it</li>
-        <li>Generic advice — they don't specialise in rentals</li>
-      </ul>
-    </div>
-    <div class="cmp good">
-      <div class="cmp-label">Ejari Helper AI Legal Chat</div>
-      <div class="cmp-title">AED 100 · 30-minute session · Right now</div>
-      <ul>
-        <li>Ask now, get a structured answer in seconds</li>
-        <li>Specific articles cited — no hand-waving</li>
-        <li>Built specifically for Dubai rental disputes</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="chat-cue">
-    <span class="chat-cue-dot"></span>
-    Ask your rental question in the chat below — get a preview answer instantly
-    <span class="chat-cue-arrow">↓</span>
+    <p class="hero-sub">Citation-backed answers on Dubai rental disputes. <b>AED 100 for 30 minutes</b> of chat.</p>
   </div>
 
   <div class="chat-wrap">
     <div class="chat-head">
       <div class="ch-left">
         <span class="ch-dot"></span>
-        <span class="ch-status">AI Legal Assistant · <b id="modeLabel">Ready</b></span>
+        <span class="ch-status">AI Legal Assistant <span class="ch-status-sep">·</span> <b id="modeLabel">Type your question below</b> <span id="arrowCue" class="ch-arrow">↓</span></span>
       </div>
       <div class="ch-right">
         <span id="teaserBadge" class="ch-badge teaser" hidden>Preview locked</span>
@@ -275,7 +212,7 @@ footer a:hover{color:var(--accent)}
     <div class="messages" id="messages">
       <div class="msg ai">
         <div class="avatar ai">AI</div>
-        <div class="bubble"><p>Hi — I help tenants and landlords in Dubai navigate rental disputes under UAE law.</p><p>Try a real question — for example:</p><ul><li><b>"My landlord won't return my AED 10,000 deposit"</b></li><li><b>"Can my rent be raised 15% this year?"</b></li><li><b>"I received a 12-month eviction notice — is it valid?"</b></li></ul><p>Your first answer is a free preview. To continue the conversation, unlock 30 minutes for AED 100.</p></div>
+        <div class="bubble"><p>Hi 👋 Ask me about your Dubai rental situation — deposits, rent increases, eviction notices, RDC filings. I'll cite the exact law and tell you what to do next.</p></div>
       </div>
     </div>
 
@@ -335,39 +272,13 @@ footer a:hover{color:var(--accent)}
     </div>
   </div>
 
-  <div class="trust">
-    <div class="tr">
-      <div class="tr-icon">📚</div>
-      <div class="tr-title">UAE law citations</div>
-      <div class="tr-desc">Direct references to Law 26/2007, Law 33/2008, Decree 43/2013, and the live RERA rent index.</div>
-    </div>
-    <div class="tr">
-      <div class="tr-icon">⏱</div>
-      <div class="tr-title">Instant, 24/7</div>
-      <div class="tr-desc">No appointments, no follow-up calls. Get a clear, structured answer in under a minute.</div>
-    </div>
-    <div class="tr">
-      <div class="tr-icon">🎯</div>
-      <div class="tr-title">Action plan, not theory</div>
-      <div class="tr-desc">Every answer ends with a concrete step you can take today — file, reply, or gather evidence.</div>
-    </div>
+  <div class="trust-row">
+    <div class="tr-pill">📚 Law 26/2007 · 33/2008 · Decree 43/2013</div>
+    <div class="tr-pill">⚡ ~30 sec per answer</div>
+    <div class="tr-pill">🔒 No account needed</div>
   </div>
 
-  <div class="use-cases">
-    <h3>What people use it for</h3>
-    <div class="uc-grid">
-      <div class="uc"><span class="uc-dot">→</span>Landlord refuses to return security deposit</div>
-      <div class="uc"><span class="uc-dot">→</span>Rent increase notice — check against RERA index</div>
-      <div class="uc"><span class="uc-dot">→</span>12-month eviction notice — verify if valid</div>
-      <div class="uc"><span class="uc-dot">→</span>Early termination — what penalties apply</div>
-      <div class="uc"><span class="uc-dot">→</span>Maintenance dispute — who pays for what</div>
-      <div class="uc"><span class="uc-dot">→</span>RDC filing — fee, evidence, timeline</div>
-      <div class="uc"><span class="uc-dot">→</span>Cheque bounce by tenant — landlord's remedies</div>
-      <div class="uc"><span class="uc-dot">→</span>Reviewing a tenancy contract before signing</div>
-    </div>
-  </div>
-
-  <p class="disclaimer">This service provides legal information based on Dubai tenancy law. It is not a substitute for advice from a licensed UAE advocate. For high-value disputes we recommend filing at the <a href="https://rdc.gov.ae" target="_blank" rel="noopener">RDC</a> or consulting a legal practitioner.</p>
+  <p class="disclaimer">Legal information, not legal representation. For high-value disputes, file at the <a href="https://rdc.gov.ae" target="_blank" rel="noopener">RDC</a> or consult a licensed UAE advocate.</p>
 </main>
 
 <footer>
@@ -581,7 +492,8 @@ footer a:hover{color:var(--accent)}
     history.push({role:'user', content:text});
     renderMessage('user', text);
     suggestionsEl.style.display = 'none';
-    const cue = document.querySelector('.chat-cue'); if (cue) cue.style.display = 'none';
+    const arr = document.getElementById('arrowCue'); if (arr) arr.style.display = 'none';
+    if (modeLabel.textContent === 'Type your question below') modeLabel.textContent = 'Thinking…';
     sendBtn.disabled = true;
     input.value = '';
     input.style.height = 'auto';
