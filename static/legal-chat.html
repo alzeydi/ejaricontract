@@ -8,6 +8,24 @@
   gtag('js', new Date());
   gtag('config', 'AW-18081980009');
   gtag('config', 'AW-18223357108');
+  (function(){
+    try {
+      var p = new URLSearchParams(window.location.search);
+      if (p.get('unlocked') === '1') {
+        var tid = p.get('tid') || '';
+        var key = 'gads_conv_' + tid;
+        if (!tid || !sessionStorage.getItem(key)) {
+          gtag('event', 'conversion', {
+            'send_to': 'AW-18223357108/KX3fCLTfo7scELS5yfFD',
+            'value': 100.0,
+            'currency': 'AED',
+            'transaction_id': tid
+          });
+          if (tid) sessionStorage.setItem(key, '1');
+        }
+      }
+    } catch(e) {}
+  })();
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
