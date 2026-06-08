@@ -311,8 +311,11 @@ footer a:hover{color:var(--accent)}
         <button class="rate-send" id="rateFbSend">Send feedback</button>
       </div>
       <div class="rate-google" id="rateGoogle" hidden>
-        <p style="margin-bottom:10px"><b>Thanks!</b> Mind sharing on Google? It takes 20 seconds and helps others find us.</p>
-        <a id="rateGoogleLink" target="_blank" rel="noopener" class="rate-google-btn">Leave a Google review →</a>
+        <p style="margin-bottom:10px"><b>Thanks!</b> A 30-second review on Trustpilot helps other Dubai tenants find us.</p>
+        <a id="rateGoogleLink" target="_blank" rel="noopener" class="rate-google-btn" style="background:#00b67a">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" style="display:inline-block;vertical-align:middle"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          Review on Trustpilot
+        </a>
       </div>
       <div class="rate-done" id="rateDone" hidden>Thank you! 🙏</div>
     </div>
@@ -468,8 +471,9 @@ footer a:hover{color:var(--accent)}
   }
 
   // ── Rating card ─────────────────────────────────────────────
-  const GOOGLE_REVIEW_URL = 'https://search.google.com/local/writereview?placeid=__PLACE_ID__';
-  // Replace __PLACE_ID__ with the real Google Business Profile place ID when ready.
+  // Trustpilot uses the bare domain — works the moment the profile exists at
+  // trustpilot.com/review/<domain>. No place ID, no verification step.
+  const REVIEW_URL = 'https://www.trustpilot.com/evaluate/ejarihelper.com';
 
   const rateCard = $('rateCard');
   const stars = document.querySelectorAll('#stars button');
@@ -498,14 +502,8 @@ footer a:hover{color:var(--accent)}
       // Persist
       fetch('/rate', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({stars:v})}).catch(()=>{});
       if (v >= 4){
-        // Nudge to Google
-        rateGoogleLink.href = GOOGLE_REVIEW_URL;
+        rateGoogleLink.href = REVIEW_URL;
         rateGoogle.hidden = false;
-        // If place id was never set, just say thanks
-        if (GOOGLE_REVIEW_URL.includes('__PLACE_ID__')){
-          rateGoogle.hidden = true;
-          rateDone.hidden = false;
-        }
       } else {
         rateFeedback.hidden = false;
       }

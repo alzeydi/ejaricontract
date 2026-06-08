@@ -776,6 +776,13 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
             <span class="star" onmouseover="starsHover(5)" onclick="submitRating(5)">★</span>
           </div>
           <div class="rating-thanks" id="ratingThanks">Thank you! Your feedback helps others find us ✓</div>
+          <div class="rating-tp" id="ratingTrustpilot" style="display:none;margin-top:14px;text-align:center">
+            <div style="font-size:13px;color:var(--sub);margin-bottom:8px">A 30-second public review helps other Dubai tenants find us 🙏</div>
+            <a href="https://www.trustpilot.com/evaluate/ejarihelper.com" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:#00b67a;color:#fff;text-decoration:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+              Review on Trustpilot
+            </a>
+          </div>
         </div>
 
       </div>
@@ -872,6 +879,10 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       Built for Dubai tenants and landlords — generates DLD-format tenancy contract PDFs
       from your Emirates IDs and Title Deed in minutes. No account required.
     </p>
+    <a href="https://www.trustpilot.com/review/ejarihelper.com" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:12px;color:var(--sub);text-decoration:none;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:#fbfaf6">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#00b67a"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+      Review us on <b style="color:#00b67a">Trustpilot</b>
+    </a>
     <div class="footer-meta">
       <span class="footer-copy">© 2025 Ejari Helper · Dubai, UAE</span>
       <span style="color:var(--border)">·</span>
@@ -1237,7 +1248,10 @@ function submitRating(stars){
   $('ratingStars').style.pointerEvents = 'none';
   sessionStorage.setItem('ejari_rated','1');
   fetch('/rate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stars})}).catch(()=>{});
-  setTimeout(()=>{ $('ratingThanks').style.display='block'; }, 250);
+  setTimeout(()=>{
+    $('ratingThanks').style.display='block';
+    if (stars >= 4) $('ratingTrustpilot').style.display='block';
+  }, 250);
 }
 
 function recalc(){
