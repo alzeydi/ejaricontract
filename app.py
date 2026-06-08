@@ -237,13 +237,19 @@ def rating_json_fragment():
 # ── Routes ─────────────────────────────────────────────────────────────
 
 @app.before_request
-def redirect_www():
-    """Redirect www.ejarihelper.ae → ejarihelper.ae"""
+def redirect_canonical():
+    """Force canonical host (no www) AND canonical scheme (https) in a single 301.
+    Avoids the http→https→non-www redirect chain that confuses Googlebot and
+    causes 'Page with redirect' indexing errors."""
     from flask import redirect, request as req
     host = req.host.lower()
-    if host.startswith('www.'):
-        url = req.url.replace('://www.', '://', 1)
-        return redirect(url, code=301)
+    proto = req.headers.get('X-Forwarded-Proto', 'http' if not req.is_secure else 'https').lower()
+    needs_https = proto == 'http' and not host.startswith('localhost') and not host.startswith('127.')
+    needs_apex = host.startswith('www.')
+    if needs_https or needs_apex:
+        new_host = host[4:] if needs_apex else host
+        new_scheme = 'https' if needs_https else proto
+        return redirect(f'{new_scheme}://{new_host}{req.full_path.rstrip("?")}', code=301)
 
 @app.route('/')
 def index():
@@ -477,7 +483,16 @@ def admin_leads():
 @app.route('/robots.txt')
 def robots_txt():
     base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
-    content = f'User-agent: *\nAllow: /\nSitemap: {base_url}/sitemap.xml\n'
+    content = (
+        'User-agent: *\n'
+        'Allow: /\n'
+        'Disallow: /admin\n'
+        'Disallow: /admin/\n'
+        'Disallow: /payment-success\n'
+        'Disallow: /verify-payment\n'
+        'Disallow: /create-payment\n'
+        f'Sitemap: {base_url}/sitemap.xml\n'
+    )
     return content, 200, {'Content-Type': 'text/plain'}
 
 @app.route('/sitemap.xml')
@@ -523,17 +538,17 @@ def sitemap_xml():
   <url>
     <loc>{base_url}/how-it-works</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>{base_url}/privacy</loc>
     <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>{base_url}/terms</loc>
     <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <priority>0.5</priority>
   </url>
 </urlset>'''
     return xml, 200, {'Content-Type': 'application/xml'}

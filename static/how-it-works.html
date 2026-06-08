@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="index, follow">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <title>How Ejari Helper Works — Video Walkthrough | Ejari Helper</title>
 <meta name="description" content="Watch a 6-minute walkthrough of how Ejari Helper auto-fills your Dubai tenancy contract from Emirates IDs and Title Deed in minutes.">
 <link rel="canonical" href="__BASE_URL__/how-it-works">
@@ -39,7 +40,11 @@
   "duration": "PT6M",
   "embedUrl": "https://www.youtube.com/embed/PKyHOI0i1z0",
   "contentUrl": "https://www.youtube.com/watch?v=PKyHOI0i1z0",
-  "publisher": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/"}
+  "publisher": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/"},
+  "potentialAction": {
+    "@type": "WatchAction",
+    "target": "__BASE_URL__/how-it-works"
+  }
 }
 </script>
 <style>
@@ -186,6 +191,8 @@ section li{margin-bottom:6px}
 <footer class="site-footer">
   <div class="site-footer-inner">
     <span class="footer-copy">© 2025 Ejari Helper · Dubai, UAE</span>
+    <span style="color:var(--border)">·</span>
+    <span class="footer-copy"><a href="/how-it-works">How it works</a></span>
     <span style="color:var(--border)">·</span>
     <span class="footer-copy"><a href="/privacy">Privacy</a></span>
     <span style="color:var(--border)">·</span>
