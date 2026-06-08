@@ -69,7 +69,14 @@ nav{background:var(--white);border-bottom:1px solid var(--border);height:60px;di
 .brand-sub{font-size:11px;color:var(--muted);letter-spacing:.1px;display:block;margin-top:1px}
 .nav-right{display:flex;align-items:center;gap:12px}
 .nav-badge{font-size:12px;font-weight:500;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(42,122,111,.2);padding:5px 11px;border-radius:20px;display:flex;align-items:center;gap:5px}
-.nav-dld{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;padding:5px 11px;border:1px solid var(--border);border-radius:20px}
+.nav-dld{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;padding:5px 11px;border:1px solid var(--border);border-radius:20px;white-space:nowrap}
+@media(max-width:720px){
+  nav{padding:0 14px;height:56px}
+  .nav-right{gap:8px}
+  .brand-sub{display:none}
+  .nav-hide-mobile{display:none !important}
+  .nav-dld{font-size:11px;padding:5px 9px}
+}
 
 /* MAIN */
 main{max-width:780px;margin:0 auto;padding:36px 24px 80px}
@@ -398,13 +405,13 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       </div>
     </div>
     <div class="nav-right">
-      <a href="/legal-chat" class="nav-dld" style="text-decoration:none;color:var(--accent);border-color:rgba(42,122,111,.3);background:var(--accent-bg)">⚖️ Ask AI Lawyer</a>
-      <a href="/how-it-works" class="nav-dld" style="text-decoration:none;color:inherit">▶ How it works</a>
-      <div class="nav-dld">
+      <a href="/legal-chat" class="nav-dld" style="text-decoration:none;color:var(--accent);border-color:rgba(42,122,111,.3);background:var(--accent-bg);font-weight:600">⚖️ Ask AI Lawyer</a>
+      <a href="/how-it-works" class="nav-dld nav-hide-mobile" style="text-decoration:none;color:inherit">▶ How it works</a>
+      <div class="nav-dld nav-hide-mobile">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#999" stroke-width="1.2"/><path d="M6 4v3M6 8.5v.1" stroke="#999" stroke-width="1.2" stroke-linecap="round"/></svg>
         DLD official format
       </div>
-      <div class="nav-badge">🔒 No data stored</div>
+      <div class="nav-badge nav-hide-mobile">🔒 No data stored</div>
     </div>
   </div>
 </nav>
