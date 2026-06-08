@@ -215,7 +215,7 @@ footer a:hover{color:var(--accent)}
 <main>
   <div class="hero">
     <div class="hero-tag">⚖️ AI Legal Chat · UAE tenancy law</div>
-    <h1>Your landlord just sent a notice? <i>Get a real answer in 60 seconds.</i></h1>
+    <h1 id="heroH1"><span id="heroProblem">Your landlord just sent a notice?</span> <i id="heroPromise">Get a real answer in 60 seconds.</i></h1>
     <p class="hero-sub">A licensed Dubai lawyer charges <b>AED 1,000–1,500 per hour</b> just to read your contract. Our AI assistant — trained on <b>Law 26/2007, Law 33/2008, Decree 43/2013</b> and the live RERA rent index — gives you a citation-backed answer and a concrete next step. <b>AED 100 for 30 minutes</b>. No appointments. No call-backs. No legal jargon you can't decode.</p>
     <div class="hero-stats">
       <div class="hs"><span class="hs-icon">⚡</span><span><b>~30 sec</b> per answer</span></div>
@@ -371,6 +371,33 @@ footer a:hover{color:var(--accent)}
 <script>
 (function(){
   const $ = (id) => document.getElementById(id);
+
+  // ── Rotating hero headlines ─────────────────────────────────
+  // 10 problem-led hooks for different rental pain points. Picked
+  // at random on each page load — gives us informal A/B data via
+  // GA events, no server changes required.
+  const HEROS = [
+    ['Your landlord just sent a notice?',           'Get a real answer in 60 seconds.'],
+    ['Deposit not coming back?',                    'Know your rights in under a minute.'],
+    ['Asked for a 15% rent hike?',                  'Check if it’s even legal.'],
+    ['Eviction notice in your hand?',               'See if it actually holds up.'],
+    ['Landlord refusing repairs?',                  'Find out who really has to pay.'],
+    ['Need to leave the contract early?',           'See the exit penalty before you sign anything.'],
+    ['Cheque just bounced?',                        'Understand your next 14 days.'],
+    ['Ejari rejected your contract?',               'Find the exact fix in seconds.'],
+    ['Renewal terms changed last minute?',          'Know what they can and can’t do.'],
+    ['Being blamed for damage that wasn’t yours?', 'Build your case before the RDC hearing.'],
+  ];
+  try {
+    const pick = HEROS[Math.floor(Math.random() * HEROS.length)];
+    const probEl = document.getElementById('heroProblem');
+    const promEl = document.getElementById('heroPromise');
+    if (probEl && promEl) {
+      probEl.textContent = pick[0];
+      promEl.textContent = pick[1];
+      if (window.gtag) gtag('event', 'hero_variant', {variant: pick[0].slice(0, 40)});
+    }
+  } catch (e) {}
   const messagesEl = $('messages');
   const input = $('input');
   const sendBtn = $('sendBtn');
