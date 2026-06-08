@@ -151,6 +151,25 @@ main{max-width:880px;width:100%;margin:0 auto;padding:28px 20px 32px;flex:1;disp
 .paywall-perks span{display:inline-flex;align-items:center;gap:5px}
 .paywall-perks span::before{content:'✓';color:var(--accent);font-weight:700}
 
+/* Rating card */
+.rate-card{border-top:1px solid var(--border);background:linear-gradient(180deg,#fbf9f4 0%,#fff 100%);padding:20px 22px;text-align:center}
+.rate-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--accent);margin-bottom:6px}
+.rate-card h3{font-family:'Fraunces',serif;font-size:19px;font-weight:600;margin-bottom:4px}
+.rate-sub{font-size:13px;color:var(--sub);margin-bottom:14px}
+.stars{display:flex;justify-content:center;gap:4px;margin-bottom:8px}
+.stars button{background:none;border:none;font-size:32px;color:#d8d4c8;cursor:pointer;padding:2px 6px;line-height:1;transition:color .15s,transform .1s}
+.stars button:hover,.stars button.hover{color:#e8c84a;transform:scale(1.1)}
+.stars button.active{color:#f0b500}
+.rate-feedback{max-width:420px;margin:14px auto 0}
+.rate-feedback textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-family:inherit;font-size:13px;resize:vertical;outline:none;min-height:54px}
+.rate-feedback textarea:focus{border-color:var(--accent)}
+.rate-send{margin-top:8px;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.rate-send:hover{background:var(--accent-mid)}
+.rate-google{max-width:420px;margin:14px auto 0;font-size:13px;color:var(--sub)}
+.rate-google-btn{display:inline-flex;align-items:center;gap:8px;background:#4285f4;color:#fff;text-decoration:none;border-radius:8px;padding:11px 20px;font-size:14px;font-weight:600;box-shadow:0 3px 10px rgba(66,133,244,.25)}
+.rate-google-btn:hover{background:#3367d6}
+.rate-done{font-size:14px;color:var(--accent);font-weight:600;margin-top:12px}
+
 /* Trust strip */
 .trust{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
 .tr{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
@@ -273,6 +292,29 @@ footer a:hover{color:var(--accent)}
         <span>Article citations</span>
         <span>Secure Ziina payment</span>
       </div>
+    </div>
+
+    <!-- Rating card shown after session ends or on demand -->
+    <div class="rate-card" id="rateCard" hidden>
+      <div class="rate-eyebrow">⭐ Session complete</div>
+      <h3>How was your consultation?</h3>
+      <p class="rate-sub" id="rateSub">Your rating helps us improve. Tap a star.</p>
+      <div class="stars" id="stars">
+        <button data-v="1" aria-label="1 star">★</button>
+        <button data-v="2" aria-label="2 stars">★</button>
+        <button data-v="3" aria-label="3 stars">★</button>
+        <button data-v="4" aria-label="4 stars">★</button>
+        <button data-v="5" aria-label="5 stars">★</button>
+      </div>
+      <div class="rate-feedback" id="rateFeedback" hidden>
+        <textarea id="rateFbText" placeholder="What could have been better? (optional)" rows="2"></textarea>
+        <button class="rate-send" id="rateFbSend">Send feedback</button>
+      </div>
+      <div class="rate-google" id="rateGoogle" hidden>
+        <p style="margin-bottom:10px"><b>Thanks!</b> Mind sharing on Google? It takes 20 seconds and helps others find us.</p>
+        <a id="rateGoogleLink" target="_blank" rel="noopener" class="rate-google-btn">Leave a Google review →</a>
+      </div>
+      <div class="rate-done" id="rateDone" hidden>Thank you! 🙏</div>
     </div>
   </div>
 
@@ -413,8 +455,8 @@ footer a:hover{color:var(--accent)}
       if (remainMs <= 0){
         timerEl.textContent = '00:00';
         stopTimer();
-        showToast('Your 30-minute session has ended. Refresh to start a new one.');
         composer.style.display = 'none';
+        showRatingCard();
         return;
       }
       const m = Math.floor(remainMs / 60000);
@@ -424,6 +466,63 @@ footer a:hover{color:var(--accent)}
     tick();
     timerInterval = setInterval(tick, 1000);
   }
+
+  // ── Rating card ─────────────────────────────────────────────
+  const GOOGLE_REVIEW_URL = 'https://search.google.com/local/writereview?placeid=__PLACE_ID__';
+  // Replace __PLACE_ID__ with the real Google Business Profile place ID when ready.
+
+  const rateCard = $('rateCard');
+  const stars = document.querySelectorAll('#stars button');
+  const rateFeedback = $('rateFeedback');
+  const rateGoogle = $('rateGoogle');
+  const rateGoogleLink = $('rateGoogleLink');
+  const rateDone = $('rateDone');
+  let rated = false;
+
+  function showRatingCard(){
+    if (rateCard.hidden === false) return;
+    rateCard.hidden = false;
+    setTimeout(() => rateCard.scrollIntoView({behavior:'smooth', block:'end'}), 100);
+  }
+
+  stars.forEach((btn, i) => {
+    btn.addEventListener('mouseenter', () => {
+      stars.forEach((b, j) => b.classList.toggle('hover', j <= i));
+    });
+    btn.addEventListener('mouseleave', () => stars.forEach(b => b.classList.remove('hover')));
+    btn.addEventListener('click', () => {
+      if (rated) return;
+      rated = true;
+      const v = parseInt(btn.dataset.v, 10);
+      stars.forEach((b, j) => b.classList.toggle('active', j <= i));
+      // Persist
+      fetch('/rate', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({stars:v})}).catch(()=>{});
+      if (v >= 4){
+        // Nudge to Google
+        rateGoogleLink.href = GOOGLE_REVIEW_URL;
+        rateGoogle.hidden = false;
+        // If place id was never set, just say thanks
+        if (GOOGLE_REVIEW_URL.includes('__PLACE_ID__')){
+          rateGoogle.hidden = true;
+          rateDone.hidden = false;
+        }
+      } else {
+        rateFeedback.hidden = false;
+      }
+    });
+  });
+
+  $('rateFbSend').addEventListener('click', async () => {
+    const text = ($('rateFbText').value || '').trim();
+    if (text){
+      // Reuse /lead endpoint as a quick feedback sink (it goes to Telegram + DB)
+      try{
+        await fetch('/lead', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({phone:'feedback:' + text.slice(0,180)})});
+      } catch(e){}
+    }
+    rateFeedback.hidden = true;
+    rateDone.hidden = false;
+  });
   function stopTimer(){ if (timerInterval){ clearInterval(timerInterval); timerInterval = null; } }
 
   async function loadState(){
