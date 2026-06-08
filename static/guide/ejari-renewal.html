@@ -111,6 +111,17 @@ a:hover{text-decoration:underline}
   .fc-branch{grid-template-columns:1fr}
   .guide-title{font-size:22px}
 }
+.dld-dl{background:var(--white);border:1.5px solid var(--accent);border-radius:var(--r);padding:16px 18px;margin-bottom:24px}
+.dld-dl-row{display:flex;align-items:center;gap:14px}
+.dld-dl-icon{font-size:28px;flex-shrink:0}
+.dld-dl-body{flex:1;min-width:0}
+.dld-dl-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.dld-dl-desc{font-size:12px;color:var(--sub);line-height:1.5}
+.dld-dl-btn{background:var(--accent);color:#fff;font-size:13px;font-weight:600;padding:9px 16px;border-radius:7px;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.dld-dl-btn:hover{opacity:.9;text-decoration:none}
+.dld-dl-note{font-size:12px;color:var(--sub);margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);line-height:1.55}
+.dld-dl-note a{color:var(--accent);font-weight:600}
+@media(max-width:540px){.dld-dl-row{flex-wrap:wrap}.dld-dl-btn{width:100%;text-align:center}}
 </style>
 </head>
 <body>
@@ -134,6 +145,19 @@ a:hover{text-decoration:underline}
   <h1 class="guide-title">How to renew Ejari<br>in Dubai — step by step</h1>
   <div class="guide-meta">Updated April 2026 · ⏱ 10 min online · Fee: AED 122.50</div>
   <p class="guide-intro">Ejari registration must be renewed every time your tenancy contract is renewed — even if you stay with the same landlord at the same address. The renewal process is faster than the initial registration because the system already has your property on file. Here's how to do it online in under 10 minutes.</p>
+
+  <div class="dld-dl">
+    <div class="dld-dl-row">
+      <div class="dld-dl-icon">📄</div>
+      <div class="dld-dl-body">
+        <div class="dld-dl-title">Download the blank DLD tenancy contract</div>
+        <div class="dld-dl-desc">Official Dubai Land Department format — print, fill by hand or in Acrobat, then take to Ejari.</div>
+      </div>
+      <a href="/download/dld-tenancy-contract.pdf" class="dld-dl-btn" download>Download PDF</a>
+    </div>
+    <div class="dld-dl-note">Having trouble filling it correctly? <a href="/">Use our AI tool</a> — upload your Emirates IDs and Title Deed, get a pre-filled, Ejari-ready PDF in minutes for AED 30.</div>
+  </div>
+
 
   <div class="fc">
 

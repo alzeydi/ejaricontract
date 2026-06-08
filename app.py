@@ -607,6 +607,13 @@ def how_it_works():
     html = html.replace('__BASE_URL__', base_url)
     return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
 
+@app.route('/download/dld-tenancy-contract.pdf')
+def download_template():
+    """Serve the blank DLD tenancy contract form for manual filling."""
+    return send_file(TEMPLATE_PDF, mimetype='application/pdf',
+                     as_attachment=True, download_name='dld-tenancy-contract.pdf')
+
+
 @app.route('/health')
 def health():
     db_status = 'no_url'
