@@ -12,24 +12,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="index, follow">
 <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-<title>Ask a Dubai Rental Lawyer — AI Legal Chat | Ejari Helper</title>
-<meta name="description" content="Get instant answers on Dubai rental disputes, deposit refunds, rent increases and eviction notices. AI legal chat trained on UAE tenancy law. AED 100 for 30 minutes.">
+<title>Ask a Dubai Rental Lawyer — Instant AI Legal Chat | Ejari Helper</title>
+<meta name="description" content="Stop overpaying lawyers. Get a citation-backed answer on your Dubai rental dispute in under 60 seconds. AED 100 for a 30-minute session — vs AED 1,500/hour at a law firm.">
 <link rel="canonical" href="__BASE_URL__/legal-chat">
 <meta property="og:type" content="website">
 <meta property="og:url" content="__BASE_URL__/legal-chat">
-<meta property="og:title" content="Ask a Dubai Rental Lawyer — AI Legal Chat">
-<meta property="og:description" content="Instant answers on rental disputes, deposit refunds, rent increases & evictions in Dubai. AED 100 / 30 min.">
+<meta property="og:title" content="Ask a Dubai Rental Lawyer — Instant AI Legal Chat">
+<meta property="og:description" content="Answer in 60 seconds. Citation-backed. AED 100 / 30 min — vs AED 1,500/hour at a law firm.">
 <meta property="og:site_name" content="Ejari Helper">
 <meta property="og:image" content="__BASE_URL__/static/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Ask a Dubai Rental Lawyer — AI Legal Chat">
-<meta name="twitter:description" content="Instant answers on rental disputes & tenancy law. AED 100 / 30 min.">
+<meta name="twitter:title" content="Ask a Dubai Rental Lawyer — Instant AI Legal Chat">
+<meta name="twitter:description" content="Answer in 60 seconds. Citation-backed. AED 100 / 30 min.">
 <meta name="twitter:image" content="__BASE_URL__/static/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Service","name":"AI Legal Chat — Dubai Rental Disputes","provider":{"@type":"Organization","name":"Ejari Helper","url":"__BASE_URL__/"},"areaServed":{"@type":"Place","name":"Dubai, UAE"},"serviceType":"Legal information chat for Dubai tenancy law","offers":{"@type":"Offer","price":"100","priceCurrency":"AED","description":"30-minute AI legal consultation on Dubai rental matters"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is the AI legal chat a real lawyer?","acceptedAnswer":{"@type":"Answer","text":"No — it is an AI assistant trained on UAE tenancy law (Law 26/2007, Law 33/2008, Decree 43/2013, RERA rules). It provides legal information, not legal representation, and cites the specific article behind every answer."}},{"@type":"Question","name":"How much does it cost?","acceptedAnswer":{"@type":"Answer","text":"AED 100 unlocks 30 minutes of unlimited chat. Compare to AED 1,000–1,500/hour at a Dubai law firm."}},{"@type":"Question","name":"What kinds of cases does it handle?","acceptedAnswer":{"@type":"Answer","text":"Deposit refunds, rent increases under RERA, eviction notices, maintenance disputes, early termination, RDC filings, contract breaches — both residential and commercial Dubai tenancies."}},{"@type":"Question","name":"Will it tell me whether to file at the RDC?","acceptedAnswer":{"@type":"Answer","text":"Yes — every answer ends with a clear next step. If your case warrants RDC filing, you will get the fee, evidence checklist, and procedure."}}]}
 </script>
 <style>
 :root{--bg:#f4f3f0;--white:#fff;--text:#111;--sub:#555;--muted:#999;--border:#ddd;--accent:#16423c;--accent-bg:#eef4f3;--accent-mid:#2a7a6f;--red:#c0392b;--red-bg:#fdf2f2;--gold:#b8860b;--gold-bg:#fdfaf0;--r:10px}
@@ -49,32 +53,73 @@ main{max-width:880px;width:100%;margin:0 auto;padding:28px 20px 32px;flex:1;disp
 
 .hero{margin-bottom:18px}
 .hero-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(42,122,111,.2);padding:4px 10px;border-radius:4px;letter-spacing:.3px;text-transform:uppercase;margin-bottom:10px}
-.hero h1{font-family:'Fraunces',serif;font-size:clamp(22px,3vw,30px);font-weight:600;letter-spacing:-.4px;line-height:1.2;margin-bottom:6px}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(24px,3.4vw,34px);font-weight:600;letter-spacing:-.5px;line-height:1.15;margin-bottom:10px}
 .hero h1 i{font-style:italic;font-weight:400;color:var(--accent-mid)}
-.hero p{font-size:14px;color:var(--sub);max-width:620px}
+.hero-sub{font-size:15px;color:var(--sub);max-width:640px;line-height:1.55}
+.hero-sub b{color:var(--text)}
 
-.chat-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--r);display:flex;flex-direction:column;flex:1;min-height:480px;overflow:hidden}
+.hero-stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}
+.hs{display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:12px}
+.hs b{color:var(--text);font-weight:600}
+.hs-icon{font-size:14px}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0 10px}
+.cmp{padding:14px 16px;border-radius:10px;border:1px solid var(--border);font-size:13px;line-height:1.5}
+.cmp.bad{background:#fbf6f5;border-color:#e6c8c4}
+.cmp.good{background:var(--accent-bg);border-color:rgba(42,122,111,.3)}
+.cmp-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.cmp.bad .cmp-label{color:var(--red)}
+.cmp.good .cmp-label{color:var(--accent)}
+.cmp-title{font-weight:600;color:var(--text);margin-bottom:4px}
+.cmp ul{padding-left:16px;margin-top:4px}
+.cmp li{margin-bottom:2px;color:var(--sub)}
+@media(max-width:580px){.compare{grid-template-columns:1fr}}
+
+.chat-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--r);display:flex;flex-direction:column;flex:1;min-height:480px;overflow:hidden;position:relative}
 .chat-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:#fbfbf9}
 .ch-left{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--sub)}
 .ch-dot{width:8px;height:8px;border-radius:50%;background:#2e7d32;box-shadow:0 0 0 3px #2e7d3220}
-.ch-status{font-size:12px}
 .ch-status b{color:var(--text);font-weight:600}
 .ch-right{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}
 .ch-timer{font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
 .ch-badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px;background:var(--accent-bg);color:var(--accent);border:1px solid rgba(42,122,111,.15)}
-.ch-badge.free{background:var(--gold-bg);color:var(--gold);border-color:rgba(184,134,11,.2)}
+.ch-badge.teaser{background:var(--gold-bg);color:var(--gold);border-color:rgba(184,134,11,.2)}
 
-.messages{flex:1;overflow-y:auto;padding:18px 18px 6px;display:flex;flex-direction:column;gap:14px}
-.msg{display:flex;gap:10px;max-width:88%}
+.messages{flex:1;overflow-y:auto;padding:18px 18px 6px;display:flex;flex-direction:column;gap:14px;min-height:280px}
+.msg{display:flex;gap:10px;max-width:92%}
 .msg.user{align-self:flex-end;flex-direction:row-reverse}
-.avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
 .avatar.ai{background:var(--accent);color:#fff}
 .avatar.user{background:#e8e8e8;color:var(--sub)}
-.bubble{padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.55;white-space:pre-wrap;word-wrap:break-word}
+.bubble{padding:12px 16px;border-radius:12px;font-size:14px;line-height:1.6;word-wrap:break-word;max-width:680px}
 .msg.ai .bubble{background:#f6f5f1;border:1px solid #eceae3;border-top-left-radius:4px}
-.msg.user .bubble{background:var(--accent);color:#fff;border-top-right-radius:4px}
-.msg.ai .bubble strong{color:var(--accent)}
-.msg.ai .bubble a{color:var(--accent);text-decoration:underline}
+.msg.user .bubble{background:var(--accent);color:#fff;border-top-right-radius:4px;white-space:pre-wrap}
+.bubble h1,.bubble h2,.bubble h3{font-family:'Fraunces',serif;font-weight:600;letter-spacing:-.3px;margin:6px 0 6px}
+.bubble h1{font-size:17px}
+.bubble h2{font-size:15px;color:var(--accent)}
+.bubble h3{font-size:14px}
+.bubble p{margin:6px 0}
+.bubble p:first-child{margin-top:0}.bubble p:last-child{margin-bottom:0}
+.bubble strong{color:var(--text);font-weight:600}
+.bubble em{font-style:italic}
+.bubble ul,.bubble ol{padding-left:20px;margin:6px 0}
+.bubble li{margin-bottom:3px}
+.bubble code{background:#eceae3;padding:1px 5px;border-radius:3px;font-size:12px;font-family:ui-monospace,monospace}
+.bubble pre{background:#eceae3;padding:10px;border-radius:6px;overflow-x:auto;margin:6px 0;font-size:12px}
+.bubble pre code{padding:0;background:none}
+.bubble a{color:var(--accent);text-decoration:underline}
+.bubble blockquote{border-left:3px solid var(--accent);padding:2px 12px;margin:6px 0;color:var(--sub)}
+.bubble table{border-collapse:collapse;margin:8px 0;font-size:13px;width:100%}
+.bubble th,.bubble td{border:1px solid #ddd;padding:5px 9px;text-align:left}
+.bubble th{background:#eceae3;font-weight:600}
+.bubble hr{border:0;border-top:1px solid var(--border);margin:10px 0}
+
+/* The "teaser" answer: blur the bottom 80% so the user sees the start, but the rest is locked. */
+.msg.ai.teaser{position:relative}
+.msg.ai.teaser .bubble{position:relative;max-height:520px;overflow:hidden}
+.msg.ai.teaser .bubble::after{content:'';position:absolute;left:0;right:0;top:80px;bottom:0;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);background:linear-gradient(180deg,rgba(246,245,241,0) 0%,rgba(246,245,241,.55) 20%,rgba(246,245,241,.92) 60%,rgba(246,245,241,1) 100%);pointer-events:none;border-bottom-left-radius:12px;border-bottom-right-radius:12px}
+.msg.ai.teaser .bubble *{user-select:none}
+
 .typing{display:inline-flex;align-items:center;gap:4px;padding:6px 4px}
 .typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite}
 .typing span:nth-child(2){animation-delay:.15s}
@@ -92,17 +137,21 @@ main{max-width:880px;width:100%;margin:0 auto;padding:28px 20px 32px;flex:1;disp
 .send-btn:hover:not(:disabled){background:var(--accent-mid)}
 .send-btn:disabled{background:#bbb;cursor:not-allowed}
 
-/* Paywall card shown when free is exhausted */
-.paywall{margin:14px 18px 18px;background:linear-gradient(180deg,#fdfaf0 0%,#fff7e0 100%);border:1.5px solid #e8d28a;border-radius:12px;padding:18px 18px}
-.paywall-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gold)}
-.paywall h3{font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin-bottom:6px}
-.paywall p{font-size:13px;color:var(--sub);margin-bottom:14px}
-.paywall-cta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.pay-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px 18px;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+/* Paywall replaces composer once teaser is shown */
+.paywall{border-top:1px solid var(--border);background:linear-gradient(180deg,#fdfaf0 0%,#fff7e0 100%);padding:18px 20px}
+.paywall-row{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.paywall-left{flex:1;min-width:240px}
+.paywall-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gold);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.paywall h3{font-family:'Fraunces',serif;font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px}
+.paywall p{font-size:13px;color:var(--sub);max-width:480px}
+.pay-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px 22px;font-size:15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:10px;white-space:nowrap;box-shadow:0 4px 12px rgba(22,66,60,.25)}
 .pay-btn:hover{background:var(--accent-mid)}
-.pay-meta{font-size:12px;color:var(--muted)}
+.pay-btn .price{background:#fff;color:var(--accent);font-size:13px;padding:2px 8px;border-radius:5px;font-weight:700}
+.paywall-perks{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12px;color:var(--sub)}
+.paywall-perks span{display:inline-flex;align-items:center;gap:5px}
+.paywall-perks span::before{content:'✓';color:var(--accent);font-weight:700}
 
-/* Trust strip below chat */
+/* Trust strip */
 .trust{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
 .tr{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
 .tr-icon{font-size:18px;margin-bottom:4px}
@@ -110,13 +159,20 @@ main{max-width:880px;width:100%;margin:0 auto;padding:28px 20px 32px;flex:1;disp
 .tr-desc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
 @media(max-width:680px){.trust{grid-template-columns:1fr}}
 
-.disclaimer{font-size:11px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.5;max-width:560px;margin-left:auto;margin-right:auto}
+.use-cases{margin-top:18px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
+.use-cases h3{font-family:'Fraunces',serif;font-size:17px;font-weight:600;margin-bottom:10px}
+.uc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 18px}
+.uc{display:flex;gap:8px;font-size:13px;color:var(--sub);padding:4px 0}
+.uc-dot{color:var(--accent);font-weight:700;flex-shrink:0}
+@media(max-width:580px){.uc-grid{grid-template-columns:1fr}}
+
+.disclaimer{font-size:11px;color:var(--muted);text-align:center;margin-top:18px;line-height:1.5;max-width:580px;margin-left:auto;margin-right:auto}
 
 footer{border-top:1px solid var(--border);background:var(--white);padding:14px 24px;text-align:center;font-size:12px;color:var(--muted)}
 footer a{color:var(--muted);text-decoration:none;margin:0 6px}
 footer a:hover{color:var(--accent)}
 
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:11px 18px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:200}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:11px 18px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:200;text-align:center;max-width:90vw}
 .toast.show{opacity:.95}
 </style>
 </head>
@@ -139,19 +195,46 @@ footer a:hover{color:var(--accent)}
 
 <main>
   <div class="hero">
-    <div class="hero-tag">⚖️ AI Legal Chat · Dubai rental law</div>
-    <h1>Ask a Dubai <i>rental lawyer</i> — instantly.</h1>
-    <p>Get clear answers on deposit refunds, rent increases, eviction notices and RDC filings. Trained on UAE tenancy laws (Law 26/2007, Law 33/2008, Decree 43/2013, RERA rules). Two questions free, then AED 100 unlocks 30 minutes of chat.</p>
+    <div class="hero-tag">⚖️ AI Legal Chat · UAE tenancy law</div>
+    <h1>Your landlord just sent a notice? <i>Get a real answer in 60 seconds.</i></h1>
+    <p class="hero-sub">A licensed Dubai lawyer charges <b>AED 1,000–1,500 per hour</b> just to read your contract. Our AI assistant — trained on <b>Law 26/2007, Law 33/2008, Decree 43/2013</b> and the live RERA rent index — gives you a citation-backed answer and a concrete next step. <b>AED 100 for 30 minutes</b>. No appointments. No call-backs. No legal jargon you can't decode.</p>
+    <div class="hero-stats">
+      <div class="hs"><span class="hs-icon">⚡</span><span><b>~30 sec</b> per answer</span></div>
+      <div class="hs"><span class="hs-icon">📚</span><span>Cites <b>specific articles</b></span></div>
+      <div class="hs"><span class="hs-icon">🕒</span><span>Available <b>24/7</b></span></div>
+      <div class="hs"><span class="hs-icon">🔒</span><span><b>No account</b> needed</span></div>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="cmp bad">
+      <div class="cmp-label">Traditional law firm</div>
+      <div class="cmp-title">AED 1,500/hour · 3-day wait</div>
+      <ul>
+        <li>Book a slot, send documents, wait</li>
+        <li>Pay for the call before you know if it's worth it</li>
+        <li>Generic advice — they don't specialise in rentals</li>
+      </ul>
+    </div>
+    <div class="cmp good">
+      <div class="cmp-label">Ejari Helper AI Legal Chat</div>
+      <div class="cmp-title">AED 100 · 30-minute session · Right now</div>
+      <ul>
+        <li>Ask now, get a structured answer in seconds</li>
+        <li>Specific articles cited — no hand-waving</li>
+        <li>Built specifically for Dubai rental disputes</li>
+      </ul>
+    </div>
   </div>
 
   <div class="chat-wrap">
     <div class="chat-head">
       <div class="ch-left">
         <span class="ch-dot"></span>
-        <span class="ch-status">AI Legal Assistant · <b id="modeLabel">Free preview</b></span>
+        <span class="ch-status">AI Legal Assistant · <b id="modeLabel">Ready</b></span>
       </div>
       <div class="ch-right">
-        <span id="freeBadge" class="ch-badge free" hidden>2 free left</span>
+        <span id="teaserBadge" class="ch-badge teaser" hidden>Preview locked</span>
         <span id="timerBadge" class="ch-badge" hidden>⏱ <span class="ch-timer" id="timer">30:00</span></span>
       </div>
     </div>
@@ -159,14 +242,7 @@ footer a:hover{color:var(--accent)}
     <div class="messages" id="messages">
       <div class="msg ai">
         <div class="avatar ai">AI</div>
-        <div class="bubble">Hi — I help tenants and landlords in Dubai navigate rental disputes under UAE law.
-
-Tell me what's happening — for example:
-• "My landlord won't return my deposit"
-• "Can my rent be raised 20% this year?"
-• "I received a 12-month eviction notice — is it valid?"
-
-I'll explain your rights, the relevant law, and what to do next.</div>
+        <div class="bubble"><p>Hi — I help tenants and landlords in Dubai navigate rental disputes under UAE law.</p><p>Try a real question — for example:</p><ul><li><b>"My landlord won't return my AED 10,000 deposit"</b></li><li><b>"Can my rent be raised 15% this year?"</b></li><li><b>"I received a 12-month eviction notice — is it valid?"</b></li></ul><p>Your first answer is a free preview. To continue the conversation, unlock 30 minutes for AED 100.</p></div>
       </div>
     </div>
 
@@ -177,37 +253,58 @@ I'll explain your rights, the relevant law, and what to do next.</div>
       <div class="sg">How do I file at the RDC?</div>
     </div>
 
+    <form class="composer" id="composer">
+      <textarea id="input" placeholder="Describe your situation in 1–2 sentences…" rows="1" autocomplete="off"></textarea>
+      <button class="send-btn" type="submit" id="sendBtn">Ask →</button>
+    </form>
+
     <div class="paywall" id="paywall" hidden>
-      <div class="paywall-top">🔒 Free preview used</div>
-      <h3>Unlock 30 minutes with the AI legal expert</h3>
-      <p>Continue this conversation, ask follow-ups, get article citations and a step-by-step action plan for your case.</p>
-      <div class="paywall-cta">
-        <button class="pay-btn" id="payBtn">Unlock for AED 100 →</button>
-        <span class="pay-meta">Secure payment via Ziina · No account needed</span>
+      <div class="paywall-row">
+        <div class="paywall-left">
+          <div class="paywall-eyebrow">🔒 Preview blurred — unlock full answer</div>
+          <h3>Read the full citation-backed answer + ask follow-ups</h3>
+          <p>30 minutes of unlimited chat. Get the specific article, the exact procedure, and a step-by-step plan for your case.</p>
+        </div>
+        <button class="pay-btn" id="payBtn">Unlock <span class="price">AED 100</span></button>
+      </div>
+      <div class="paywall-perks">
+        <span>Full answer to your question</span>
+        <span>Unlimited follow-ups for 30 min</span>
+        <span>Article citations</span>
+        <span>Secure Ziina payment</span>
       </div>
     </div>
-
-    <form class="composer" id="composer">
-      <textarea id="input" placeholder="Type your question…" rows="1" autocomplete="off"></textarea>
-      <button class="send-btn" type="submit" id="sendBtn">Send →</button>
-    </form>
   </div>
 
   <div class="trust">
     <div class="tr">
       <div class="tr-icon">📚</div>
       <div class="tr-title">UAE law citations</div>
-      <div class="tr-desc">References to Law 26/2007, Law 33/2008, Decree 43/2013, RERA index — not guesses.</div>
+      <div class="tr-desc">Direct references to Law 26/2007, Law 33/2008, Decree 43/2013, and the live RERA rent index.</div>
     </div>
     <div class="tr">
       <div class="tr-icon">⏱</div>
       <div class="tr-title">Instant, 24/7</div>
-      <div class="tr-desc">No appointments, no AED 1,500/hour consultations. Get answers in under a minute.</div>
+      <div class="tr-desc">No appointments, no follow-up calls. Get a clear, structured answer in under a minute.</div>
     </div>
     <div class="tr">
       <div class="tr-icon">🎯</div>
-      <div class="tr-title">Action plan, not just info</div>
-      <div class="tr-desc">Every answer ends with a concrete next step you can take today — file, reply, gather evidence.</div>
+      <div class="tr-title">Action plan, not theory</div>
+      <div class="tr-desc">Every answer ends with a concrete step you can take today — file, reply, or gather evidence.</div>
+    </div>
+  </div>
+
+  <div class="use-cases">
+    <h3>What people use it for</h3>
+    <div class="uc-grid">
+      <div class="uc"><span class="uc-dot">→</span>Landlord refuses to return security deposit</div>
+      <div class="uc"><span class="uc-dot">→</span>Rent increase notice — check against RERA index</div>
+      <div class="uc"><span class="uc-dot">→</span>12-month eviction notice — verify if valid</div>
+      <div class="uc"><span class="uc-dot">→</span>Early termination — what penalties apply</div>
+      <div class="uc"><span class="uc-dot">→</span>Maintenance dispute — who pays for what</div>
+      <div class="uc"><span class="uc-dot">→</span>RDC filing — fee, evidence, timeline</div>
+      <div class="uc"><span class="uc-dot">→</span>Cheque bounce by tenant — landlord's remedies</div>
+      <div class="uc"><span class="uc-dot">→</span>Reviewing a tenancy contract before signing</div>
     </div>
   </div>
 
@@ -224,6 +321,8 @@ I'll explain your rights, the relevant law, and what to do next.</div>
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.11/dist/purify.min.js"></script>
 <script>
 (function(){
   const $ = (id) => document.getElementById(id);
@@ -234,35 +333,47 @@ I'll explain your rights, the relevant law, and what to do next.</div>
   const paywall = $('paywall');
   const payBtn = $('payBtn');
   const modeLabel = $('modeLabel');
-  const freeBadge = $('freeBadge');
+  const teaserBadge = $('teaserBadge');
   const timerBadge = $('timerBadge');
   const timerEl = $('timer');
   const suggestionsEl = $('suggestions');
   const toast = $('toast');
 
-  let history = [];          // [{role, content}]
-  let state = null;          // {mode, remaining_free, paid_until}
+  let history = [];
+  let state = null;
   let timerInterval = null;
+
+  if (window.marked) marked.setOptions({breaks:true, gfm:true});
+
+  function renderMarkdown(text){
+    if (!window.marked || !window.DOMPurify) return escapeHtml(text);
+    return DOMPurify.sanitize(marked.parse(text));
+  }
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
 
   function showToast(msg){
     toast.textContent = msg;
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2400);
+    setTimeout(() => toast.classList.remove('show'), 2800);
   }
 
-  function renderMessage(role, text){
+  function renderMessage(role, text, opts){
+    opts = opts || {};
     const wrap = document.createElement('div');
-    wrap.className = 'msg ' + role;
+    wrap.className = 'msg ' + role + (opts.teaser ? ' teaser' : '');
     const av = document.createElement('div');
     av.className = 'avatar ' + role;
     av.textContent = role === 'ai' ? 'AI' : 'You';
     const b = document.createElement('div');
     b.className = 'bubble';
-    b.textContent = text;
+    if (role === 'ai') b.innerHTML = renderMarkdown(text);
+    else b.textContent = text;
     wrap.appendChild(av); wrap.appendChild(b);
     messagesEl.appendChild(wrap);
     messagesEl.scrollTop = messagesEl.scrollHeight;
-    return b;
+    return wrap;
   }
 
   function renderTyping(){
@@ -275,31 +386,24 @@ I'll explain your rights, the relevant law, and what to do next.</div>
   }
   function removeTyping(){ const t = $('typing'); if (t) t.remove(); }
 
-  function updateUI(){
-    if (!state) return;
-    if (state.mode === 'paid'){
-      modeLabel.textContent = 'Premium · 30 min unlocked';
-      freeBadge.hidden = true;
-      timerBadge.hidden = false;
-      paywall.hidden = true;
-      composer.style.display = 'flex';
-      startTimer(state.paid_until);
-    } else if (state.mode === 'free'){
-      modeLabel.textContent = 'Free preview';
-      freeBadge.hidden = false;
-      freeBadge.textContent = state.remaining_free + ' free left';
-      timerBadge.hidden = true;
-      paywall.hidden = true;
-      composer.style.display = 'flex';
-      stopTimer();
-    } else {
-      modeLabel.textContent = 'Locked';
-      freeBadge.hidden = true;
-      timerBadge.hidden = true;
-      paywall.hidden = false;
-      composer.style.display = 'none';
-      stopTimer();
-    }
+  function lockComposerForPaywall(){
+    composer.style.display = 'none';
+    paywall.hidden = false;
+    teaserBadge.hidden = false;
+    modeLabel.textContent = 'Preview blurred';
+    suggestionsEl.style.display = 'none';
+    setTimeout(() => paywall.scrollIntoView({behavior:'smooth', block:'end'}), 80);
+  }
+
+  function unlockPaid(untilIso){
+    // Remove blur from any teaser bubbles
+    document.querySelectorAll('.msg.ai.teaser').forEach(el => el.classList.remove('teaser'));
+    paywall.hidden = true;
+    teaserBadge.hidden = true;
+    composer.style.display = 'flex';
+    timerBadge.hidden = false;
+    modeLabel.textContent = 'Premium · 30 min unlocked';
+    startTimer(untilIso);
   }
 
   function startTimer(untilIso){
@@ -309,7 +413,7 @@ I'll explain your rights, the relevant law, and what to do next.</div>
       if (remainMs <= 0){
         timerEl.textContent = '00:00';
         stopTimer();
-        showToast('Your 30 minutes are up. Refresh to start a new session.');
+        showToast('Your 30-minute session has ended. Refresh to start a new one.');
         composer.style.display = 'none';
         return;
       }
@@ -324,15 +428,19 @@ I'll explain your rights, the relevant law, and what to do next.</div>
 
   async function loadState(){
     try{
-      const r = await fetch('/legal-chat/state', {credentials: 'same-origin'});
+      const r = await fetch('/legal-chat/state', {credentials:'same-origin'});
       state = await r.json();
-      updateUI();
+      if (state.mode === 'paid' && state.paid_until){
+        unlockPaid(state.paid_until);
+      } else if (state.mode === 'locked'){
+        lockComposerForPaywall();
+      }
     } catch(e){}
   }
 
   async function sendMessage(text){
     if (!text.trim()) return;
-    history.push({role: 'user', content: text});
+    history.push({role:'user', content:text});
     renderMessage('user', text);
     suggestionsEl.style.display = 'none';
     sendBtn.disabled = true;
@@ -341,17 +449,16 @@ I'll explain your rights, the relevant law, and what to do next.</div>
     renderTyping();
     try{
       const r = await fetch('/legal-chat/message', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({messages: history}),
+        method:'POST',
+        credentials:'same-origin',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({messages:history}),
       });
       removeTyping();
       if (r.status === 402){
         const j = await r.json();
-        state = {mode: 'locked', remaining_free: 0, paid_until: null};
-        renderMessage('ai', j.message || 'Free preview is over.');
-        updateUI();
+        renderMessage('ai', j.message || '🔒 Free preview is over. Unlock to continue.');
+        lockComposerForPaywall();
         sendBtn.disabled = false;
         return;
       }
@@ -359,10 +466,15 @@ I'll explain your rights, the relevant law, and what to do next.</div>
       if (!j.ok){
         renderMessage('ai', 'Something went wrong: ' + (j.error || 'unknown error') + '. Please try again.');
       } else {
-        history.push({role: 'assistant', content: j.reply});
-        renderMessage('ai', j.reply);
-        state = {mode: j.mode, remaining_free: j.remaining_free, paid_until: j.paid_until};
-        updateUI();
+        history.push({role:'assistant', content:j.reply});
+        // First answer after free → teaser blur; otherwise full
+        const isTeaser = j.mode === 'locked';
+        renderMessage('ai', j.reply, {teaser:isTeaser});
+        if (isTeaser){
+          lockComposerForPaywall();
+        } else if (j.mode === 'paid' && j.paid_until){
+          unlockPaid(j.paid_until);
+        }
       }
     } catch(e){
       removeTyping();
@@ -372,15 +484,9 @@ I'll explain your rights, the relevant law, and what to do next.</div>
     input.focus();
   }
 
-  composer.addEventListener('submit', (e) => {
-    e.preventDefault();
-    sendMessage(input.value);
-  });
+  composer.addEventListener('submit', (e) => { e.preventDefault(); sendMessage(input.value); });
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey){
-      e.preventDefault();
-      sendMessage(input.value);
-    }
+    if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(input.value); }
   });
   input.addEventListener('input', () => {
     input.style.height = 'auto';
@@ -394,37 +500,34 @@ I'll explain your rights, the relevant law, and what to do next.</div>
 
   payBtn.addEventListener('click', async () => {
     payBtn.disabled = true;
+    const origHtml = payBtn.innerHTML;
     payBtn.textContent = 'Opening payment…';
     try{
-      const r = await fetch('/legal-chat/create-payment', {method: 'POST', credentials: 'same-origin'});
+      const r = await fetch('/legal-chat/create-payment', {method:'POST', credentials:'same-origin'});
       const j = await r.json();
       if (j.ok && j.redirect_url){
-        // Ziina success_url already points to our verify endpoint with intent_id
-        const sep = j.redirect_url.includes('?') ? '&' : '?';
         window.location.href = j.redirect_url;
       } else {
         showToast('Could not start payment. Try again.');
         payBtn.disabled = false;
-        payBtn.textContent = 'Unlock for AED 100 →';
+        payBtn.innerHTML = origHtml;
       }
     } catch(e){
       showToast('Network error');
       payBtn.disabled = false;
-      payBtn.textContent = 'Unlock for AED 100 →';
+      payBtn.innerHTML = origHtml;
     }
   });
 
-  // Banner messages from query string
   const qs = new URLSearchParams(location.search);
   if (qs.get('unlocked') === '1'){
     showToast('✓ Unlocked — 30 minutes of legal chat.');
-    history.unshift({role: 'assistant', content: 'Great — your 30-minute session is active. Ask me anything about your Dubai rental case.'});
   } else if (qs.get('cancelled') === '1'){
     showToast('Payment cancelled.');
   } else if (qs.get('failed') === '1'){
     showToast('Payment failed — please try again.');
   } else if (qs.get('pending') === '1'){
-    showToast('Payment is still processing. Please refresh in a moment.');
+    showToast('Payment is processing. Refresh in a moment.');
   }
 
   loadState();

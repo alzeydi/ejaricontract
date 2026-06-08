@@ -609,7 +609,7 @@ def terms():
 
 
 # ── Legal Chat (paid AI consultation on Dubai rental disputes) ─────────
-LEGAL_FREE_MESSAGES = 2
+LEGAL_FREE_MESSAGES = 1
 LEGAL_SESSION_MINUTES = 30
 LEGAL_PRICE_FILS = 10000  # 100 AED
 
