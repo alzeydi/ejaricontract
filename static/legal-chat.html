@@ -75,8 +75,16 @@ main{max-width:880px;width:100%;margin:0 auto;padding:28px 20px 32px;flex:1;disp
 .cmp li{margin-bottom:2px;color:var(--sub)}
 @media(max-width:580px){.compare{grid-template-columns:1fr}}
 
-.chat-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--r);display:flex;flex-direction:column;flex:1;min-height:480px;overflow:hidden;position:relative}
-.chat-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:#fbfbf9}
+.chat-cue{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--accent);color:#fff;border-radius:10px 10px 0 0;padding:11px 14px;font-size:13.5px;font-weight:600;letter-spacing:.1px;margin-bottom:-4px;position:relative;z-index:2}
+.chat-cue-dot{width:8px;height:8px;border-radius:50%;background:#7ee2c0;box-shadow:0 0 0 4px rgba(126,226,192,.28);flex-shrink:0;animation:pulse 1.8s ease-out infinite}
+.chat-cue-arrow{display:inline-block;font-size:18px;animation:bounce-y 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.25);opacity:.7}}
+@keyframes bounce-y{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+@media(max-width:520px){.chat-cue{font-size:12.5px;padding:10px 12px;gap:8px}}
+
+.chat-wrap{background:var(--white);border:2px solid var(--accent);border-radius:14px;display:flex;flex-direction:column;flex:1;min-height:480px;overflow:hidden;position:relative;box-shadow:0 12px 40px rgba(22,66,60,.18),0 2px 8px rgba(22,66,60,.06);scroll-margin-top:80px}
+.chat-wrap::before{content:'';position:absolute;inset:-2px;border-radius:14px;background:linear-gradient(135deg,rgba(22,66,60,.18),rgba(42,122,111,0) 40%);pointer-events:none;z-index:-1}
+.chat-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#eef4f3 0%,#fbfbf9 100%)}
 .ch-left{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--sub)}
 .ch-dot{width:8px;height:8px;border-radius:50%;background:#2e7d32;box-shadow:0 0 0 3px #2e7d3220}
 .ch-status b{color:var(--text);font-weight:600}
@@ -246,6 +254,12 @@ footer a:hover{color:var(--accent)}
     </div>
   </div>
 
+  <div class="chat-cue">
+    <span class="chat-cue-dot"></span>
+    Type your question in the chat below — the first answer is free
+    <span class="chat-cue-arrow">↓</span>
+  </div>
+
   <div class="chat-wrap">
     <div class="chat-head">
       <div class="ch-left">
@@ -284,7 +298,7 @@ footer a:hover{color:var(--accent)}
           <h3>Read the full citation-backed answer + ask follow-ups</h3>
           <p>30 minutes of unlimited chat. Get the specific article, the exact procedure, and a step-by-step plan for your case.</p>
         </div>
-        <button class="pay-btn" id="payBtn">Unlock <span class="price">AED 100</span></button>
+        <button class="pay-btn" id="payBtn">Continue chat <span class="price">AED 100</span></button>
       </div>
       <div class="paywall-perks">
         <span>Full answer to your question</span>
@@ -567,6 +581,7 @@ footer a:hover{color:var(--accent)}
     history.push({role:'user', content:text});
     renderMessage('user', text);
     suggestionsEl.style.display = 'none';
+    const cue = document.querySelector('.chat-cue'); if (cue) cue.style.display = 'none';
     sendBtn.disabled = true;
     input.value = '';
     input.style.height = 'auto';
