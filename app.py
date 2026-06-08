@@ -3,7 +3,7 @@
 
 import io, os, base64, json
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from flask import Flask, request, send_file, jsonify, send_from_directory, session, redirect
 from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -491,6 +491,10 @@ def robots_txt():
         'Disallow: /payment-success\n'
         'Disallow: /verify-payment\n'
         'Disallow: /create-payment\n'
+        'Disallow: /legal-chat/payment-success\n'
+        'Disallow: /legal-chat/create-payment\n'
+        'Disallow: /legal-chat/message\n'
+        'Disallow: /legal-chat/state\n'
         f'Sitemap: {base_url}/sitemap.xml\n'
     )
     return content, 200, {'Content-Type': 'text/plain'}
@@ -546,6 +550,11 @@ def sitemap_xml():
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>{base_url}/legal-chat</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>{base_url}/how-it-works</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -597,6 +606,165 @@ def terms():
         html = f.read()
     html = html.replace('__BASE_URL__', base_url)
     return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+
+
+# ── Legal Chat (paid AI consultation on Dubai rental disputes) ─────────
+LEGAL_FREE_MESSAGES = 2
+LEGAL_SESSION_MINUTES = 30
+LEGAL_PRICE_FILS = 10000  # 100 AED
+
+LEGAL_SYSTEM_PROMPT = (
+    "You are an AI legal assistant specialised in Dubai (UAE) residential and "
+    "commercial rental law. Your scope covers: tenancy contracts, Ejari "
+    "registration, security deposits, rent increases (RERA calculator and Decree "
+    "43 of 2013), eviction notices (12-month notarised notice under Law 26/2007 "
+    "as amended by Law 33/2008), maintenance obligations, early termination, and "
+    "filing cases at the Rental Dispute Settlement Centre (RDC, rdc.gov.ae).\n\n"
+    "Style: concise, structured, plain English. Cite the specific article/law "
+    "when relevant (e.g. \"Article 25(2) of Law 33/2008\"). Quote the RDC filing "
+    "fee as 3.5% of annual rent (min AED 500, max AED 20,000). Always end with a "
+    "clear next step the user can take today.\n\n"
+    "Boundaries: you provide legal information, not legal representation. For "
+    "complex cases or when monetary stakes are high, recommend the user files at "
+    "the RDC or consults a licensed advocate. Do NOT invent article numbers or "
+    "case law — if unsure, say so."
+)
+
+
+def _legal_access_state():
+    """Return (mode, remaining_free, paid_until_iso). mode ∈ paid|free|locked."""
+    now = datetime.now(timezone.utc)
+    paid_until_str = session.get('legal_paid_until')
+    if paid_until_str:
+        try:
+            paid_until = datetime.fromisoformat(paid_until_str)
+            if paid_until > now:
+                return 'paid', 0, paid_until_str
+        except Exception:
+            pass
+    used = int(session.get('legal_free_used', 0))
+    remaining = max(0, LEGAL_FREE_MESSAGES - used)
+    return ('free' if remaining > 0 else 'locked'), remaining, None
+
+
+@app.route('/legal-chat')
+def legal_chat_page():
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    with open(os.path.join(app.static_folder, 'legal-chat.html'), encoding='utf-8') as f:
+        html = f.read()
+    html = html.replace('__BASE_URL__', base_url)
+    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+
+
+@app.route('/legal-chat/state')
+def legal_chat_state():
+    mode, remaining, paid_until = _legal_access_state()
+    return jsonify({
+        'mode': mode,
+        'remaining_free': remaining,
+        'paid_until': paid_until,
+        'free_limit': LEGAL_FREE_MESSAGES,
+        'price_aed': LEGAL_PRICE_FILS // 100,
+        'session_minutes': LEGAL_SESSION_MINUTES,
+    })
+
+
+@app.route('/legal-chat/message', methods=['POST'])
+def legal_chat_message():
+    body = request.json or {}
+    messages = body.get('messages') or []
+    if not isinstance(messages, list) or not messages:
+        return jsonify({'error': 'No messages'}), 400
+
+    # Normalise + cap conversation length (last 20 turns)
+    safe = []
+    for m in messages[-20:]:
+        role = m.get('role')
+        content = (m.get('content') or '').strip()
+        if role in ('user', 'assistant') and content:
+            safe.append({'role': role, 'content': content[:4000]})
+    if not safe or safe[-1]['role'] != 'user':
+        return jsonify({'error': 'Last message must be from user'}), 400
+
+    mode, remaining, paid_until = _legal_access_state()
+    if mode == 'locked':
+        return jsonify({
+            'error': 'paywall',
+            'message': f'Free preview is over. Unlock {LEGAL_SESSION_MINUTES} minutes of expert chat for AED {LEGAL_PRICE_FILS // 100}.',
+        }), 402
+
+    try:
+        msg = claude.messages.create(
+            model='claude-opus-4-7',
+            max_tokens=900,
+            system=LEGAL_SYSTEM_PROMPT,
+            messages=safe,
+        )
+        reply = ''.join(b.text for b in msg.content if hasattr(b, 'text')).strip()
+    except Exception as e:
+        import traceback
+        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+
+    if mode == 'free':
+        session['legal_free_used'] = int(session.get('legal_free_used', 0)) + 1
+
+    new_mode, new_remaining, new_paid_until = _legal_access_state()
+    return jsonify({
+        'ok': True,
+        'reply': reply,
+        'mode': new_mode,
+        'remaining_free': new_remaining,
+        'paid_until': new_paid_until,
+    })
+
+
+@app.route('/legal-chat/create-payment', methods=['POST'])
+def legal_create_payment():
+    """Create Ziina payment intent for 100 AED legal chat unlock."""
+    try:
+        base_url = request.host_url.rstrip('/')
+        payload = {
+            'amount': LEGAL_PRICE_FILS,
+            'currency_code': 'AED',
+            'message': f'Ejari Helper — AI Legal Chat ({LEGAL_SESSION_MINUTES} min)',
+            'success_url': f'{base_url}/legal-chat/payment-success',
+            'cancel_url':  f'{base_url}/legal-chat?cancelled=1',
+            'failure_url': f'{base_url}/legal-chat?failed=1',
+            'allow_tips': False,
+            'operation_id': str(uuid.uuid4()),
+        }
+        resp = req_lib.post(f'{ZIINA_API}/payment_intent', json=payload, headers=ZIINA_HEADERS, timeout=10)
+        data = resp.json()
+        if resp.status_code not in (200, 201) or 'redirect_url' not in data:
+            return jsonify({'error': data.get('message', 'Ziina error'), 'raw': data}), 502
+        return jsonify({'ok': True, 'redirect_url': data['redirect_url'], 'intent_id': data.get('id', '')})
+    except Exception as e:
+        import traceback
+        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+
+
+@app.route('/legal-chat/payment-success')
+def legal_payment_success():
+    """Ziina redirect target — verify payment and grant a 30-min chat window."""
+    intent_id = request.args.get('intent_id', '')
+    if not intent_id:
+        return redirect('/legal-chat')
+    try:
+        resp = req_lib.get(f'{ZIINA_API}/payment_intent/{intent_id}', headers=ZIINA_HEADERS, timeout=10)
+        data = resp.json()
+        if data.get('status') == 'completed':
+            paid_until = datetime.now(timezone.utc) + timedelta(minutes=LEGAL_SESSION_MINUTES)
+            session['legal_paid_until'] = paid_until.isoformat()
+            session['legal_free_used'] = 0
+            _send_telegram(
+                f'💼 <b>Legal Chat unlocked</b>\n'
+                f'💵 AED {LEGAL_PRICE_FILS // 100}\n'
+                f'⏰ {datetime.now().strftime("%d %b %Y, %H:%M")}'
+            )
+            return redirect('/legal-chat?unlocked=1')
+        return redirect(f'/legal-chat?pending=1')
+    except Exception as e:
+        return f'Error verifying payment: {e}', 500
 
 
 @app.route('/how-it-works')
