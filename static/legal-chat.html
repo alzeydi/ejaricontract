@@ -375,7 +375,16 @@ footer a:hover{color:var(--accent)}
   const suggestionsEl = $('suggestions');
   const toast = $('toast');
 
-  let history = [];
+  const HISTORY_KEY = 'legalChatHistory';
+  function loadHistory(){
+    try{ return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+    catch(e){ return []; }
+  }
+  function saveHistory(){
+    try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-40))); }
+    catch(e){}
+  }
+  let history = loadHistory();
   let state = null;
   let timerInterval = null;
   let freeMode = false;
@@ -544,8 +553,11 @@ footer a:hover{color:var(--accent)}
   }
 
   function unlockPaid(untilIso){
-    // Remove blur from any teaser bubbles
+    // Remove blur from any teaser bubbles (both DOM and stored history)
     document.querySelectorAll('.msg.ai.teaser').forEach(el => el.classList.remove('teaser'));
+    let changed = false;
+    history.forEach(m => { if (m.teaser){ m.teaser = false; changed = true; } });
+    if (changed) saveHistory();
     paywall.hidden = true;
     teaserBadge.hidden = true;
     composer.style.display = 'flex';
@@ -662,8 +674,10 @@ footer a:hover{color:var(--accent)}
     pendingFiles = [];
     updateAttachUI();
     const userText = text || (sentFiles.length ? '(see attached file' + (sentFiles.length>1?'s':'') + ')' : '');
-    history.push({role:'user', content:userText});
-    renderMessage('user', userText, {files: sentFiles.map(f => ({name:f.name, mime_type:f.mime_type}))});
+    const userFilesMeta = sentFiles.map(f => ({name:f.name, mime_type:f.mime_type}));
+    history.push({role:'user', content:userText, files:userFilesMeta});
+    saveHistory();
+    renderMessage('user', userText, {files: userFilesMeta});
     suggestionsEl.style.display = 'none';
     const arr = document.getElementById('arrowCue'); if (arr) arr.style.display = 'none';
     if (modeLabel.textContent === 'Type your question below') modeLabel.textContent = 'Thinking…';
@@ -698,10 +712,11 @@ footer a:hover{color:var(--accent)}
       if (!j.ok){
         renderMessage('ai', 'Something went wrong: ' + (j.error || 'unknown error') + '. Please try again.');
       } else {
-        history.push({role:'assistant', content:j.reply});
         // First answer after free → teaser blur; otherwise full.
         // In free mode (LEGAL_FREE_MODE on backend), never blur or lock.
         const isTeaser = !freeMode && j.mode === 'locked';
+        history.push({role:'assistant', content:j.reply, teaser:isTeaser});
+        saveHistory();
         renderMessage('ai', j.reply, {teaser:isTeaser});
         if (freeMode){
           // No paywall, no timer — just stay in chat mode.
@@ -793,6 +808,17 @@ footer a:hover{color:var(--accent)}
     showToast('File top-up failed — please try again.');
   } else if (qs.get('files_pending') === '1'){
     showToast('Top-up is processing. Refresh in a moment.');
+  }
+
+  // Restore previously persisted conversation from localStorage
+  if (history.length){
+    suggestionsEl.style.display = 'none';
+    const arr = document.getElementById('arrowCue'); if (arr) arr.style.display = 'none';
+    history.forEach(m => {
+      renderMessage(m.role === 'assistant' ? 'ai' : 'user',
+                    m.content || '',
+                    {files: m.files, teaser: !!m.teaser});
+    });
   }
 
   loadState();
