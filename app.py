@@ -580,6 +580,8 @@ def robots_txt():
         'Disallow: /legal-chat/create-payment\n'
         'Disallow: /legal-chat/message\n'
         'Disallow: /legal-chat/state\n'
+        'Disallow: /legal-chat/files-payment\n'
+        'Disallow: /legal-chat/files-payment-success\n'
         f'Sitemap: {base_url}/sitemap.xml\n'
     )
     return content, 200, {'Content-Type': 'text/plain'}
@@ -698,6 +700,14 @@ LEGAL_FREE_MESSAGES = 1
 LEGAL_SESSION_MINUTES = 30
 LEGAL_PRICE_FILS = 10000  # 100 AED
 
+# File-upload quota: first 3 files in a session are free, then each
+# 50 AED top-up grants 3 more uploads.
+LEGAL_FILE_FREE_LIMIT = 3
+LEGAL_FILE_TOPUP_FILS = 5000   # 50 AED
+LEGAL_FILE_TOPUP_FILES = 3
+LEGAL_FILE_MAX_BYTES = 8 * 1024 * 1024  # 8 MB per file (base64-decoded)
+LEGAL_FILE_ALLOWED_MIME = {'application/pdf', 'image/jpeg', 'image/png'}
+
 LEGAL_SYSTEM_PROMPT = (
     "You are an AI legal assistant specialised in Dubai (UAE) residential and "
     "commercial rental law. Your scope covers: tenancy contracts, Ejari "
@@ -736,6 +746,17 @@ def _legal_access_state():
     return ('free' if remaining > 0 else 'locked'), remaining, None
 
 
+def _legal_files_state():
+    """Return (used, allowance, remaining) for file uploads in this session.
+    allowance grows by LEGAL_FILE_TOPUP_FILES each successful 50 AED top-up.
+    """
+    used = int(session.get('legal_files_used', 0))
+    extra = int(session.get('legal_files_extra', 0))
+    allowance = LEGAL_FILE_FREE_LIMIT + extra
+    remaining = max(0, allowance - used)
+    return used, allowance, remaining
+
+
 @app.route('/legal-chat')
 def legal_chat_page():
     base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
@@ -748,6 +769,7 @@ def legal_chat_page():
 @app.route('/legal-chat/state')
 def legal_chat_state():
     mode, remaining, paid_until = _legal_access_state()
+    files_used, files_allowance, files_remaining = _legal_files_state()
     return jsonify({
         'mode': mode,
         'remaining_free': remaining,
@@ -756,6 +778,16 @@ def legal_chat_state():
         'free_limit': LEGAL_FREE_MESSAGES,
         'price_aed': LEGAL_PRICE_FILS // 100,
         'session_minutes': LEGAL_SESSION_MINUTES,
+        'files': {
+            'used': files_used,
+            'allowance': files_allowance,
+            'remaining': files_remaining,
+            'free_limit': LEGAL_FILE_FREE_LIMIT,
+            'topup_aed': LEGAL_FILE_TOPUP_FILS // 100,
+            'topup_files': LEGAL_FILE_TOPUP_FILES,
+            'max_mb': LEGAL_FILE_MAX_BYTES // (1024 * 1024),
+            'allowed_ext': ['pdf', 'jpg', 'jpeg', 'png'],
+        },
     })
 
 
@@ -763,8 +795,11 @@ def legal_chat_state():
 def legal_chat_message():
     body = request.json or {}
     messages = body.get('messages') or []
+    files = body.get('files') or []
     if not isinstance(messages, list) or not messages:
         return jsonify({'error': 'No messages'}), 400
+    if not isinstance(files, list):
+        files = []
 
     # Normalise + cap conversation length (last 20 turns)
     safe = []
@@ -783,6 +818,51 @@ def legal_chat_message():
             'message': f'Free preview is over. Unlock {LEGAL_SESSION_MINUTES} minutes of expert chat for AED {LEGAL_PRICE_FILS // 100}.',
         }), 402
 
+    # Validate attached files
+    validated_files = []
+    if files:
+        files_used, files_allowance, files_remaining = _legal_files_state()
+        if len(files) > files_remaining:
+            return jsonify({
+                'error': 'file_paywall',
+                'message': (
+                    f'You have used {files_used} of {files_allowance} file uploads in this session. '
+                    f'Top up AED {LEGAL_FILE_TOPUP_FILS // 100} for {LEGAL_FILE_TOPUP_FILES} more uploads.'
+                ),
+                'files': {
+                    'used': files_used,
+                    'allowance': files_allowance,
+                    'remaining': files_remaining,
+                    'topup_aed': LEGAL_FILE_TOPUP_FILS // 100,
+                    'topup_files': LEGAL_FILE_TOPUP_FILES,
+                },
+            }), 402
+
+        for f in files:
+            if not isinstance(f, dict):
+                return jsonify({'error': 'Invalid file payload'}), 400
+            mime = (f.get('mime_type') or '').lower()
+            data = f.get('data') or ''
+            name = (f.get('name') or 'file')[:120]
+            if mime not in LEGAL_FILE_ALLOWED_MIME:
+                return jsonify({'error': f'Unsupported file type: {mime or "unknown"}. Allowed: PDF, JPG, PNG.'}), 400
+            try:
+                raw_len = len(base64.b64decode(data, validate=False))
+            except Exception:
+                return jsonify({'error': f'Could not decode file: {name}'}), 400
+            if raw_len > LEGAL_FILE_MAX_BYTES:
+                return jsonify({
+                    'error': f'File "{name}" is {raw_len // (1024*1024)} MB — limit is {LEGAL_FILE_MAX_BYTES // (1024*1024)} MB.'
+                }), 400
+            validated_files.append({'mime_type': mime, 'data': data, 'name': name})
+
+    # If files attached, replace the last user message content with a multimodal block list.
+    if validated_files:
+        last_text = safe[-1]['content']
+        blocks = [build_content_block(f) for f in validated_files]
+        blocks.append({'type': 'text', 'text': last_text or 'Please review the attached file(s).'})
+        safe[-1] = {'role': 'user', 'content': blocks}
+
     try:
         msg = claude.messages.create(
             model='claude-opus-4-7',
@@ -797,14 +877,22 @@ def legal_chat_message():
 
     if mode == 'free':
         session['legal_free_used'] = int(session.get('legal_free_used', 0)) + 1
+    if validated_files:
+        session['legal_files_used'] = int(session.get('legal_files_used', 0)) + len(validated_files)
 
     new_mode, new_remaining, new_paid_until = _legal_access_state()
+    files_used, files_allowance, files_remaining = _legal_files_state()
     return jsonify({
         'ok': True,
         'reply': reply,
         'mode': new_mode,
         'remaining_free': new_remaining,
         'paid_until': new_paid_until,
+        'files': {
+            'used': files_used,
+            'allowance': files_allowance,
+            'remaining': files_remaining,
+        },
     })
 
 
@@ -858,6 +946,60 @@ def legal_payment_success():
                 trustpilot_invite(email, name, reference_id=f'legal-{intent_id}', delay_days=3)
             return redirect('/legal-chat?unlocked=1')
         return redirect(f'/legal-chat?pending=1')
+    except Exception as e:
+        return f'Error verifying payment: {e}', 500
+
+
+@app.route('/legal-chat/files-payment', methods=['POST'])
+def legal_files_payment():
+    """Create Ziina payment intent for a 50 AED file-upload top-up (+3 files)."""
+    try:
+        base_url = request.host_url.rstrip('/')
+        payload = {
+            'amount': LEGAL_FILE_TOPUP_FILS,
+            'currency_code': 'AED',
+            'message': f'Ejari Helper — Legal Chat file uploads (+{LEGAL_FILE_TOPUP_FILES})',
+            'success_url': f'{base_url}/legal-chat/files-payment-success',
+            'cancel_url':  f'{base_url}/legal-chat?files_cancelled=1',
+            'failure_url': f'{base_url}/legal-chat?files_failed=1',
+            'allow_tips': False,
+            'operation_id': str(uuid.uuid4()),
+        }
+        resp = req_lib.post(f'{ZIINA_API}/payment_intent', json=payload, headers=ZIINA_HEADERS, timeout=10)
+        data = resp.json()
+        if resp.status_code not in (200, 201) or 'redirect_url' not in data:
+            return jsonify({'error': data.get('message', 'Ziina error'), 'raw': data}), 502
+        return jsonify({'ok': True, 'redirect_url': data['redirect_url'], 'intent_id': data.get('id', '')})
+    except Exception as e:
+        import traceback
+        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+
+
+@app.route('/legal-chat/files-payment-success')
+def legal_files_payment_success():
+    """Ziina redirect target — verify payment and grant +3 file uploads."""
+    intent_id = request.args.get('intent_id', '')
+    if not intent_id:
+        return redirect('/legal-chat')
+    try:
+        resp = req_lib.get(f'{ZIINA_API}/payment_intent/{intent_id}', headers=ZIINA_HEADERS, timeout=10)
+        data = resp.json()
+        if data.get('status') == 'completed':
+            # Prevent the same intent from granting credits twice
+            granted = set(session.get('legal_files_intents', []))
+            if intent_id not in granted:
+                session['legal_files_extra'] = int(session.get('legal_files_extra', 0)) + LEGAL_FILE_TOPUP_FILES
+                granted.add(intent_id)
+                session['legal_files_intents'] = list(granted)
+            email, _name = _ziina_customer_info(data)
+            _send_telegram(
+                f'📎 <b>Legal Chat file top-up</b>\n'
+                f'💵 AED {LEGAL_FILE_TOPUP_FILS // 100} · +{LEGAL_FILE_TOPUP_FILES} uploads\n'
+                f'📧 {email or "(no email)"}\n'
+                f'⏰ {datetime.now().strftime("%d %b %Y, %H:%M")}'
+            )
+            return redirect('/legal-chat?files_unlocked=1')
+        return redirect('/legal-chat?files_pending=1')
     except Exception as e:
         return f'Error verifying payment: {e}', 500
 

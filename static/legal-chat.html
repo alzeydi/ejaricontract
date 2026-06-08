@@ -120,12 +120,26 @@ main{max-width:880px;width:100%;margin:0 auto;padding:28px 20px 32px;flex:1;disp
 .sg{font-size:12px;color:var(--sub);background:var(--white);border:1px solid var(--border);padding:7px 12px;border-radius:18px;cursor:pointer;transition:all .15s}
 .sg:hover{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
 
-.composer{border-top:1px solid var(--border);padding:12px 14px;background:var(--white);display:flex;gap:10px;align-items:flex-end}
+.composer{border-top:1px solid var(--border);padding:12px 14px;background:var(--white);display:flex;flex-direction:column;gap:8px}
+.composer-row{display:flex;gap:10px;align-items:flex-end}
 .composer textarea{flex:1;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;line-height:1.5;resize:none;outline:none;min-height:44px;max-height:160px;background:#fbfbf9}
 .composer textarea:focus{border-color:var(--accent);background:var(--white)}
 .send-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:0 18px;height:44px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;flex-shrink:0}
 .send-btn:hover:not(:disabled){background:var(--accent-mid)}
 .send-btn:disabled{background:#bbb;cursor:not-allowed}
+.attach-btn{background:var(--white);color:var(--accent);border:1px solid var(--border);border-radius:10px;height:44px;width:44px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.attach-btn:hover:not(:disabled){background:var(--accent-bg);border-color:var(--accent)}
+.attach-btn:disabled{opacity:.45;cursor:not-allowed}
+.attach-meta{font-size:11px;color:var(--muted);padding:0 4px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.attach-meta b{color:var(--accent);font-weight:600}
+.attachments{display:flex;flex-wrap:wrap;gap:6px}
+.att-chip{display:inline-flex;align-items:center;gap:6px;background:var(--accent-bg);border:1px solid rgba(42,122,111,.2);color:var(--accent);font-size:12px;padding:4px 8px 4px 10px;border-radius:14px;max-width:100%}
+.att-chip span{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.att-chip button{background:none;border:none;color:var(--accent);font-size:14px;cursor:pointer;line-height:1;padding:0 2px;font-weight:700}
+.att-chip button:hover{color:var(--red)}
+.msg-files{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;font-size:11.5px;opacity:.85}
+.msg-files span{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.18);padding:2px 7px;border-radius:10px}
+.msg.ai .msg-files span{background:rgba(0,0,0,.05)}
 
 /* Paywall replaces composer once teaser is shown */
 .paywall{border-top:1px solid var(--border);background:linear-gradient(180deg,#fdfaf0 0%,#fff7e0 100%);padding:18px 20px}
@@ -224,9 +238,34 @@ footer a:hover{color:var(--accent)}
     </div>
 
     <form class="composer" id="composer">
-      <textarea id="input" placeholder="Describe your situation in 1–2 sentences…" rows="1" autocomplete="off"></textarea>
-      <button class="send-btn" type="submit" id="sendBtn">Ask →</button>
+      <div class="attachments" id="attachments" hidden></div>
+      <div class="composer-row">
+        <button type="button" class="attach-btn" id="attachBtn" title="Attach PDF, JPG or PNG" aria-label="Attach file">📎</button>
+        <input type="file" id="fileInput" accept="application/pdf,image/jpeg,image/jpg,image/png" multiple hidden>
+        <textarea id="input" placeholder="Describe your situation in 1–2 sentences…" rows="1" autocomplete="off"></textarea>
+        <button class="send-btn" type="submit" id="sendBtn">Ask →</button>
+      </div>
+      <div class="attach-meta" id="attachMeta">
+        <span>PDF, JPG, PNG · up to 8 MB each</span>
+        <span id="attachQuota"></span>
+      </div>
     </form>
+
+    <div class="paywall" id="filesPaywall" hidden>
+      <div class="paywall-row">
+        <div class="paywall-left">
+          <div class="paywall-eyebrow">📎 File upload limit reached</div>
+          <h3>Top up to attach more documents</h3>
+          <p>You've used your 3 free file uploads for this session. Pay AED 50 to attach <b>3 more</b> PDFs or images (contracts, IDs, notices, photos).</p>
+        </div>
+        <button class="pay-btn" id="filesPayBtn">Add 3 uploads <span class="price">AED 50</span></button>
+      </div>
+      <div class="paywall-perks">
+        <span>PDF, JPG, PNG supported</span>
+        <span>Up to 8 MB per file</span>
+        <span>Secure Ziina payment</span>
+      </div>
+    </div>
 
     <div class="paywall" id="paywall" hidden>
       <div class="paywall-row">
@@ -340,6 +379,15 @@ footer a:hover{color:var(--accent)}
   let state = null;
   let timerInterval = null;
   let freeMode = false;
+  let pendingFiles = [];     // [{name, mime_type, data, size}]
+  let filesInfo = {used:0, allowance:3, remaining:3, free_limit:3, topup_aed:50, topup_files:3, max_mb:8};
+  const attachBtn = $('attachBtn');
+  const fileInput = $('fileInput');
+  const attachmentsEl = $('attachments');
+  const attachQuotaEl = $('attachQuota');
+  const filesPaywall = $('filesPaywall');
+  const filesPayBtn = $('filesPayBtn');
+  const ALLOWED_MIMES = ['application/pdf','image/jpeg','image/png','image/jpg'];
 
   if (window.marked) marked.setOptions({breaks:true, gfm:true});
 
@@ -368,11 +416,113 @@ footer a:hover{color:var(--accent)}
     b.className = 'bubble';
     if (role === 'ai') b.innerHTML = renderMarkdown(text);
     else b.textContent = text;
+    if (opts.files && opts.files.length){
+      const fl = document.createElement('div');
+      fl.className = 'msg-files';
+      opts.files.forEach(f => {
+        const s = document.createElement('span');
+        s.textContent = (f.mime_type === 'application/pdf' ? '📄 ' : '🖼 ') + f.name;
+        fl.appendChild(s);
+      });
+      b.appendChild(fl);
+    }
     wrap.appendChild(av); wrap.appendChild(b);
     messagesEl.appendChild(wrap);
     messagesEl.scrollTop = messagesEl.scrollHeight;
     return wrap;
   }
+
+  function updateAttachUI(){
+    // Render selected files as removable chips
+    if (pendingFiles.length === 0){
+      attachmentsEl.hidden = true;
+      attachmentsEl.innerHTML = '';
+    } else {
+      attachmentsEl.hidden = false;
+      attachmentsEl.innerHTML = '';
+      pendingFiles.forEach((f, i) => {
+        const chip = document.createElement('div');
+        chip.className = 'att-chip';
+        chip.innerHTML = '<span>' + (f.mime_type === 'application/pdf' ? '📄 ' : '🖼 ') + escapeHtml(f.name) + '</span><button type="button" aria-label="Remove" data-i="'+i+'">×</button>';
+        attachmentsEl.appendChild(chip);
+      });
+    }
+    // Quota label
+    if (freeMode){
+      attachQuotaEl.textContent = '';
+    } else {
+      const remaining = Math.max(0, filesInfo.remaining - pendingFiles.length);
+      attachQuotaEl.innerHTML = remaining > 0
+        ? 'Uploads left: <b>' + remaining + ' / ' + filesInfo.allowance + '</b>'
+        : '<b>No uploads left</b> — AED ' + filesInfo.topup_aed + ' for ' + filesInfo.topup_files + ' more';
+    }
+    attachBtn.disabled = !freeMode && (filesInfo.remaining - pendingFiles.length) <= 0;
+  }
+
+  attachmentsEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-i]');
+    if (!btn) return;
+    const i = parseInt(btn.dataset.i, 10);
+    pendingFiles.splice(i, 1);
+    updateAttachUI();
+  });
+
+  function fileToBase64(file){
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => {
+        const s = String(r.result || '');
+        const idx = s.indexOf(',');
+        resolve(idx >= 0 ? s.slice(idx + 1) : s);
+      };
+      r.onerror = () => reject(r.error);
+      r.readAsDataURL(file);
+    });
+  }
+
+  attachBtn.addEventListener('click', () => {
+    if (attachBtn.disabled){
+      showFilesPaywall();
+      return;
+    }
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', async () => {
+    const files = Array.from(fileInput.files || []);
+    fileInput.value = '';
+    if (!files.length) return;
+    const maxBytes = (filesInfo.max_mb || 8) * 1024 * 1024;
+    for (const f of files){
+      const mime = (f.type || '').toLowerCase();
+      if (!ALLOWED_MIMES.includes(mime)){
+        showToast('Only PDF, JPG and PNG are allowed.');
+        continue;
+      }
+      if (f.size > maxBytes){
+        showToast('"' + f.name + '" is too large (max ' + filesInfo.max_mb + ' MB).');
+        continue;
+      }
+      const remaining = filesInfo.remaining - pendingFiles.length;
+      if (!freeMode && remaining <= 0){
+        showFilesPaywall();
+        break;
+      }
+      try {
+        const data = await fileToBase64(f);
+        pendingFiles.push({name: f.name, mime_type: mime, data: data, size: f.size});
+      } catch (e){
+        showToast('Could not read "' + f.name + '".');
+      }
+    }
+    updateAttachUI();
+  });
+
+  function showFilesPaywall(){
+    filesPaywall.hidden = false;
+    setTimeout(() => filesPaywall.scrollIntoView({behavior:'smooth', block:'end'}), 80);
+  }
+  function hideFilesPaywall(){ filesPaywall.hidden = true; }
 
   function renderTyping(){
     const wrap = document.createElement('div');
@@ -481,6 +631,8 @@ footer a:hover{color:var(--accent)}
       const r = await fetch('/legal-chat/state', {credentials:'same-origin'});
       state = await r.json();
       freeMode = !!state.free_mode;
+      if (state.files) filesInfo = Object.assign(filesInfo, state.files);
+      updateAttachUI();
       if (freeMode){
         // Server says payments are off — hide all paywall/timer chrome.
         paywall.hidden = true;
@@ -499,9 +651,19 @@ footer a:hover{color:var(--accent)}
   }
 
   async function sendMessage(text){
-    if (!text.trim()) return;
-    history.push({role:'user', content:text});
-    renderMessage('user', text);
+    text = (text || '').trim();
+    if (!text && pendingFiles.length === 0) return;
+    // Pre-flight quota check
+    if (!freeMode && pendingFiles.length > filesInfo.remaining){
+      showFilesPaywall();
+      return;
+    }
+    const sentFiles = pendingFiles.slice();
+    pendingFiles = [];
+    updateAttachUI();
+    const userText = text || (sentFiles.length ? '(see attached file' + (sentFiles.length>1?'s':'') + ')' : '');
+    history.push({role:'user', content:userText});
+    renderMessage('user', userText, {files: sentFiles.map(f => ({name:f.name, mime_type:f.mime_type}))});
     suggestionsEl.style.display = 'none';
     const arr = document.getElementById('arrowCue'); if (arr) arr.style.display = 'none';
     if (modeLabel.textContent === 'Type your question below') modeLabel.textContent = 'Thinking…';
@@ -514,17 +676,25 @@ footer a:hover{color:var(--accent)}
         method:'POST',
         credentials:'same-origin',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({messages:history}),
+        body:JSON.stringify({messages:history, files: sentFiles.map(f => ({name:f.name, mime_type:f.mime_type, data:f.data}))}),
       });
       removeTyping();
       if (r.status === 402){
         const j = await r.json();
-        renderMessage('ai', j.message || '🔒 Free preview is over. Unlock to continue.');
-        lockComposerForPaywall();
+        if (j.error === 'file_paywall'){
+          if (j.files) filesInfo = Object.assign(filesInfo, j.files);
+          updateAttachUI();
+          renderMessage('ai', j.message || '📎 Upload limit reached.');
+          showFilesPaywall();
+        } else {
+          renderMessage('ai', j.message || '🔒 Free preview is over. Unlock to continue.');
+          lockComposerForPaywall();
+        }
         sendBtn.disabled = false;
         return;
       }
       const j = await r.json();
+      if (j && j.files) { filesInfo = Object.assign(filesInfo, j.files); updateAttachUI(); }
       if (!j.ok){
         renderMessage('ai', 'Something went wrong: ' + (j.error || 'unknown error') + '. Please try again.');
       } else {
@@ -584,6 +754,27 @@ footer a:hover{color:var(--accent)}
     }
   });
 
+  filesPayBtn.addEventListener('click', async () => {
+    filesPayBtn.disabled = true;
+    const orig = filesPayBtn.innerHTML;
+    filesPayBtn.textContent = 'Opening payment…';
+    try{
+      const r = await fetch('/legal-chat/files-payment', {method:'POST', credentials:'same-origin'});
+      const j = await r.json();
+      if (j.ok && j.redirect_url){
+        window.location.href = j.redirect_url;
+      } else {
+        showToast('Could not start payment. Try again.');
+        filesPayBtn.disabled = false;
+        filesPayBtn.innerHTML = orig;
+      }
+    } catch(e){
+      showToast('Network error');
+      filesPayBtn.disabled = false;
+      filesPayBtn.innerHTML = orig;
+    }
+  });
+
   const qs = new URLSearchParams(location.search);
   if (qs.get('unlocked') === '1'){
     showToast('✓ Unlocked — 30 minutes of legal chat.');
@@ -593,6 +784,15 @@ footer a:hover{color:var(--accent)}
     showToast('Payment failed — please try again.');
   } else if (qs.get('pending') === '1'){
     showToast('Payment is processing. Refresh in a moment.');
+  } else if (qs.get('files_unlocked') === '1'){
+    showToast('✓ +3 file uploads added.');
+    hideFilesPaywall();
+  } else if (qs.get('files_cancelled') === '1'){
+    showToast('File top-up cancelled.');
+  } else if (qs.get('files_failed') === '1'){
+    showToast('File top-up failed — please try again.');
+  } else if (qs.get('files_pending') === '1'){
+    showToast('Top-up is processing. Refresh in a moment.');
   }
 
   loadState();
