@@ -843,5 +843,30 @@ footer a:hover{color:var(--accent)}
   loadState();
 })();
 </script>
+<script>
+(function(){
+  var TOPICS = {
+    'deposit': "My landlord is refusing to return my security deposit. What are my rights under Dubai law?",
+    'rent-increase': "My landlord wants to raise my rent. How do I check if the increase is legal under the RERA rental index?",
+    'eviction': "I received an eviction notice from my landlord. What should I do and what are my rights?",
+    'rdc': "How do I file a case at the Rental Dispute Centre (RDC) in Dubai? What documents do I need?",
+    'tenancy-contract': "I have a question about my Dubai tenancy contract — can you review my situation?",
+    'lease-termination': "I need to break my lease early in Dubai. What are the penalties and my options?",
+    'maintenance': "My landlord is refusing to fix urgent maintenance issues. What can I do?",
+    'rera': "How does the RERA rental index work and how do I use it for my situation?"
+  };
+  try {
+    var topic = new URLSearchParams(window.location.search).get('topic');
+    if (!topic || !TOPICS[topic]) return;
+    var input = document.getElementById('input');
+    if (!input) return;
+    input.value = TOPICS[topic];
+    input.dispatchEvent(new Event('input', {bubbles: true}));
+    var sug = document.getElementById('suggestions');
+    if (sug) sug.style.display = 'none';
+    setTimeout(function(){ input.focus(); input.setSelectionRange(input.value.length, input.value.length); }, 100);
+  } catch(e) {}
+})();
+</script>
 </body>
 </html>
