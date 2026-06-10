@@ -136,6 +136,7 @@ main{max-width:880px;width:100%;margin:0 auto;padding:28px 20px 32px;flex:1;disp
 @keyframes bounce{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
 
 .suggestions{display:flex;flex-wrap:wrap;gap:8px;padding:4px 18px 14px}
+.sg-label{width:100%;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:2px}
 .sg{font-size:12px;color:var(--sub);background:var(--white);border:1px solid var(--border);padding:7px 12px;border-radius:18px;cursor:pointer;transition:all .15s}
 .sg:hover{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
 
@@ -205,6 +206,91 @@ footer a:hover{color:var(--accent)}
 
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:11px 18px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:200;text-align:center;max-width:90vw}
 .toast.show{opacity:.95}
+
+/* ─── Mobile optimization (≤700px) ─────────────────────────────── */
+@media (max-width:700px){
+  body{font-size:14.5px}
+  nav{height:54px;padding:0 14px;position:-webkit-sticky;position:sticky}
+  .nav-inner{gap:8px}
+  .brand-name{font-size:15px}
+  .brand-sub{display:none}
+  .nav-link{font-size:12px;padding:5px 8px}
+  .nav-right{gap:4px}
+
+  main{padding:16px 12px 20px}
+
+  .hero{margin-bottom:12px}
+  .hero h1{font-size:22px;line-height:1.2;letter-spacing:-.3px}
+  .hero-sub{font-size:13.5px;line-height:1.45}
+
+  .chat-wrap{border-radius:10px;border-width:1px;margin-top:10px;min-height:auto;box-shadow:0 4px 14px rgba(22,66,60,.08)}
+  .chat-head{padding:9px 12px;font-size:12px;gap:6px}
+  .chat-head .ch-status{font-size:12px}
+  .ch-badge{font-size:10.5px;padding:2.5px 7px}
+
+  .messages{padding:14px 12px 4px;gap:11px;min-height:240px}
+  .msg{max-width:96%;gap:8px}
+  .avatar{width:26px;height:26px;font-size:10px}
+  .bubble{padding:10px 13px;font-size:14.5px;line-height:1.55;border-radius:10px}
+  .bubble h1{font-size:16px}
+  .bubble h2{font-size:14.5px}
+  .bubble h3{font-size:13.5px}
+
+  .suggestions{padding:4px 12px 12px;gap:6px}
+  .sg-label{font-size:11.5px;margin-bottom:0}
+  .sg{font-size:12.5px;padding:8px 12px;line-height:1.3}
+
+  .composer{padding:10px 10px;gap:6px;position:-webkit-sticky;position:sticky;bottom:0}
+  .composer-row{gap:7px}
+  /* font-size:16px is critical to prevent iOS Safari from zooming the page on focus */
+  .composer textarea{font-size:16px;padding:11px 12px;min-height:46px;border-radius:10px}
+  .send-btn{padding:0 14px;height:46px;font-size:13px;min-width:64px}
+  .attach-btn{height:46px;width:46px;font-size:17px}
+  .attach-meta{font-size:10.5px;flex-wrap:wrap;gap:4px}
+
+  .paywall{padding:16px 14px}
+  .paywall-row{flex-direction:column;align-items:stretch;gap:12px}
+  .paywall-left{min-width:0}
+  .paywall h3{font-size:16px;line-height:1.25}
+  .paywall p{font-size:12.5px;line-height:1.45}
+  .pay-btn{width:100%;justify-content:center;padding:14px 18px;font-size:15px}
+  .paywall-perks{gap:8px 12px;margin-top:10px;font-size:11.5px}
+
+  .rate-card{padding:18px 16px}
+  .rate-card h3{font-size:17px}
+  .stars button{font-size:30px;padding:4px 6px}
+
+  .trust-row{gap:6px;margin-top:12px}
+  .tr-pill{font-size:11px;padding:5px 9px}
+
+  .disclaimer{font-size:11px;margin-top:14px;padding:0 8px}
+
+  footer{padding:12px 14px;font-size:11.5px;line-height:1.6}
+  footer a{display:inline-block;margin:2px 4px}
+
+  .toast{bottom:18px;font-size:12.5px;padding:9px 14px;max-width:92vw}
+}
+
+/* ─── Compact phones (≤380px) ─────────────────────────────── */
+@media (max-width:380px){
+  main{padding:14px 10px 18px}
+  .hero h1{font-size:20px}
+  .hero-sub{font-size:13px}
+  .messages{padding:12px 10px 2px}
+  .bubble{padding:9px 11px;font-size:14px}
+  .composer{padding:9px 8px}
+  .composer textarea{padding:10px 11px}
+  .send-btn{padding:0 12px;min-width:58px;font-size:12.5px}
+  .attach-btn{width:42px;height:42px}
+  .send-btn,.composer textarea{height:44px;min-height:44px}
+  .sg{font-size:12px;padding:7px 11px}
+  .nav-link{font-size:11.5px;padding:5px 7px}
+}
+
+/* iOS Safari 100vh fix — use dynamic viewport units when available */
+@supports(min-height:100dvh){
+  body{min-height:100dvh}
+}
 </style>
 </head>
 <body>
@@ -226,8 +312,8 @@ footer a:hover{color:var(--accent)}
 
 <main>
   <div class="hero">
-    <h1 id="heroH1"><span id="heroProblem">Your landlord just sent a notice?</span> <i id="heroPromise">Get a real answer in 60 seconds.</i></h1>
-    <p class="hero-sub">Citation-backed answers on Dubai rental disputes. <b>AED 100 for 30 minutes</b> of chat.</p>
+    <h1 id="heroH1"><span id="heroProblem">Any question about your Dubai rental?</span> <i id="heroPromise">Get a cited answer in 60 seconds.</i></h1>
+    <p class="hero-sub">Ask about <b>anything</b> — deposits, eviction, rent hikes, contracts, subletting, maintenance, Ejari, noise, RDC filings. <b>AED 100 for 30 minutes</b> of unlimited chat.</p>
   </div>
 
   <div class="chat-wrap">
@@ -245,14 +331,19 @@ footer a:hover{color:var(--accent)}
     <div class="messages" id="messages">
       <div class="msg ai">
         <div class="avatar ai">AI</div>
-        <div class="bubble"><p>Hi 👋 Ask me about your Dubai rental situation — deposits, rent increases, eviction notices, RDC filings. I'll cite the exact law and tell you what to do next.</p><p style="margin-top:8px;font-size:13px;opacity:.85">🌐 I understand any language — English, العربية, 中文, Filipino/Tagalog, हिन्दी, Русский, Français, Español, اردو and more. Just write in whatever language you're comfortable with.</p></div>
+        <div class="bubble"><p><b>Ask me literally anything about your Dubai rental situation.</b> 👇</p><p style="margin-top:6px">Deposits, rent increases, eviction, subletting, maintenance, broken AC, noisy neighbours, RDC filings, contract clauses, early termination, missing Ejari, illegal fees — whatever you're dealing with. I cite the exact Dubai law and tell you what to do next, step by step.</p><p style="margin-top:8px;font-size:13px;opacity:.85">🌐 Write in any language — English, العربية, 中文, Filipino/Tagalog, हिन्दी, Русский, Français, Español, اردو and more.</p></div>
       </div>
     </div>
 
     <div class="suggestions" id="suggestions">
+      <div class="sg-label">💡 Or pick one example — but feel free to ask your own question:</div>
       <div class="sg">My landlord is keeping my AED 10,000 deposit</div>
       <div class="sg">Landlord wants a 15% rent increase — is it legal?</div>
       <div class="sg">Eviction notice received — what are my rights?</div>
+      <div class="sg">Can I sublet my apartment in Dubai?</div>
+      <div class="sg">My AC has been broken for 2 weeks, landlord ignoring</div>
+      <div class="sg">How do I break my lease early without penalty?</div>
+      <div class="sg">Landlord is asking for cash, no Ejari — is this legal?</div>
       <div class="sg">How do I file at the RDC?</div>
     </div>
 
@@ -261,7 +352,7 @@ footer a:hover{color:var(--accent)}
       <div class="composer-row">
         <button type="button" class="attach-btn" id="attachBtn" title="Attach PDF, JPG or PNG" aria-label="Attach file">📎</button>
         <input type="file" id="fileInput" accept="application/pdf,image/jpeg,image/jpg,image/png" multiple hidden>
-        <textarea id="input" placeholder="Describe your situation in 1–2 sentences…" rows="1" autocomplete="off"></textarea>
+        <textarea id="input" placeholder="Ask anything about your Dubai rental — in your own words…" rows="1" autocomplete="off"></textarea>
         <button class="send-btn" type="submit" id="sendBtn">Ask →</button>
       </div>
       <div class="attach-meta" id="attachMeta">
@@ -360,6 +451,8 @@ footer a:hover{color:var(--accent)}
   // at random on each page load — gives us informal A/B data via
   // GA events, no server changes required.
   const HEROS = [
+    ['Any question about your Dubai rental?',       'Get a cited answer in 60 seconds.'],
+    ['Stuck with a Dubai rental problem?',          'Ask anything — get a real answer.'],
     ['Your landlord just sent a notice?',           'Get a real answer in 60 seconds.'],
     ['Deposit not coming back?',                    'Know your rights in under a minute.'],
     ['Asked for a 15% rent hike?',                  'Check if it’s even legal.'],
@@ -370,6 +463,8 @@ footer a:hover{color:var(--accent)}
     ['Ejari rejected your contract?',               'Find the exact fix in seconds.'],
     ['Renewal terms changed last minute?',          'Know what they can and can’t do.'],
     ['Being blamed for damage that wasn’t yours?', 'Build your case before the RDC hearing.'],
+    ['Confused about a clause in your lease?',      'Get it explained in plain English.'],
+    ['Whatever your Dubai rental issue is —',       'Ask the AI lawyer right now.'],
   ];
   try {
     const pick = HEROS[Math.floor(Math.random() * HEROS.length)];
