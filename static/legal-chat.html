@@ -784,6 +784,17 @@ footer a:hover{color:var(--accent)}
       showFilesPaywall();
       return;
     }
+    // Google Ads micro-conversion: first real message in this session.
+    // Set FIRST_MSG_CONV_LABEL once the secondary conversion is created in Google Ads UI.
+    try {
+      if (!sessionStorage.getItem('gads_first_msg_fired')) {
+        sessionStorage.setItem('gads_first_msg_fired', '1');
+        var FIRST_MSG_CONV_LABEL = 'AW-18223357108/jdTVCPyl-7wcELS5yfFD';
+        if (FIRST_MSG_CONV_LABEL && window.gtag) {
+          gtag('event', 'conversion', { 'send_to': FIRST_MSG_CONV_LABEL });
+        }
+      }
+    } catch(e) {}
     const sentFiles = pendingFiles.slice();
     pendingFiles = [];
     updateAttachUI();
