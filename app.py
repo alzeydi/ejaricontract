@@ -229,15 +229,6 @@ def save_rating(stars):
     except Exception:
         pass
 
-def rating_json_fragment():
-    """Return aggregateRating JSON fragment for schema injection (empty until 3+ reviews)."""
-    r = load_ratings()
-    if r['count'] < 3:
-        return ''
-    avg = round(r['total'] / r['count'], 1)
-    count = r['count']
-    return f', "aggregateRating": {{"@type": "AggregateRating", "ratingValue": "{avg}", "ratingCount": "{count}"}}'
-
 # ── Routes ─────────────────────────────────────────────────────────────
 
 @app.before_request
@@ -261,7 +252,6 @@ def index():
     with open(os.path.join(app.static_folder, 'index.html'), encoding='utf-8') as f:
         html = f.read()
     html = html.replace('__BASE_URL__', base_url)
-    html = html.replace('__RATING_JSON__', rating_json_fragment())
     return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
 
 @app.route('/rate', methods=['POST'])
