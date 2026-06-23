@@ -558,6 +558,7 @@ function openZiinaCheckout(embeddedUrl, opts){
   let state = null;
   let timerInterval = null;
   let freeMode = false;
+  let ziinaEmbedded = false;  // inline widget when true, hosted redirect otherwise
   let pendingFiles = [];     // [{name, mime_type, data, size}]
   let filesInfo = {used:0, allowance:3, remaining:3, free_limit:3, topup_aed:50, topup_files:3, max_mb:8};
   const attachBtn = $('attachBtn');
@@ -813,6 +814,7 @@ function openZiinaCheckout(embeddedUrl, opts){
       const r = await fetch('/legal-chat/state', {credentials:'same-origin'});
       state = await r.json();
       freeMode = !!state.free_mode;
+      ziinaEmbedded = !!state.ziina_embedded;
       if (state.files) filesInfo = Object.assign(filesInfo, state.files);
       updateAttachUI();
       if (freeMode){
@@ -936,7 +938,13 @@ function openZiinaCheckout(embeddedUrl, opts){
     try{
       const r = await fetch('/legal-chat/create-payment', {method:'POST', credentials:'same-origin'});
       const j = await r.json();
-      if (!(j.ok && j.embedded_url)) throw new Error('start');
+      if (!j.ok) throw new Error('start');
+
+      // Hosted (redirect) checkout — works on an unverified account.
+      if (!ziinaEmbedded || !j.embedded_url){
+        window.location.href = j.redirect_url;
+        return;
+      }
 
       try{
         await openZiinaCheckout(j.embedded_url);
@@ -977,7 +985,13 @@ function openZiinaCheckout(embeddedUrl, opts){
     try{
       const r = await fetch('/legal-chat/files-payment', {method:'POST', credentials:'same-origin'});
       const j = await r.json();
-      if (!(j.ok && j.embedded_url)) throw new Error('start');
+      if (!j.ok) throw new Error('start');
+
+      // Hosted (redirect) checkout — works on an unverified account.
+      if (!ziinaEmbedded || !j.embedded_url){
+        window.location.href = j.redirect_url;
+        return;
+      }
 
       try{
         await openZiinaCheckout(j.embedded_url);

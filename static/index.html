@@ -972,12 +972,14 @@ function openZiinaCheckout(embeddedUrl, opts={}){
 
 let ext = {}, cvHeld = false;
 let FREE_MODE = false;
+let ZIINA_EMBEDDED = false;
 
 // Load server config and apply mode
 (async () => {
   try {
     const cfg = await fetch('/config').then(r => r.json());
     FREE_MODE = !!cfg.free_mode;
+    ZIINA_EMBEDDED = !!cfg.ziina_embedded;
   } catch(_) {}
   if (FREE_MODE) {
     const pb = $('payBlock');
@@ -1045,12 +1047,31 @@ async function doPay(){
       body: JSON.stringify({})
     });
     const data = await resp.json();
-    if(!data.ok || !data.embedded_url) throw new Error(data.error||'Payment creation failed');
+    if(!data.ok) throw new Error(data.error||'Payment creation failed');
 
     intentId = data.intent_id;
     sessionStorage.setItem('ejari_intent_id', intentId);
 
-    // Open the Ziina widget inline — no redirect.
+    // Hosted (redirect) checkout — works on an unverified account.
+    // Used until the embedded widget is approved (ZIINA_EMBEDDED flag).
+    if(!ZIINA_EMBEDDED || !data.embedded_url){
+      // Page reloads on return, so persist the files before leaving.
+      const slots=[
+        {id:'fTEID',lbl:'TENANT_EMIRATES_ID'},{id:'fLEID',lbl:'LESSOR_EMIRATES_ID'},
+        {id:'fTD',lbl:'TITLE_DEED'},{id:'fEJ',lbl:'PREVIOUS_EJARI'}
+      ];
+      const savedFiles=[];
+      for(const {id,lbl} of slots){
+        const file=$(id).files[0];
+        if(file) savedFiles.push({label:lbl,data:await b64(file),mime_type:mtype(file),name:file.name});
+      }
+      if(savedFiles.length) sessionStorage.setItem('ejari_files',JSON.stringify(savedFiles));
+      $('payTxt').textContent='Redirecting to payment…';
+      window.location.href = data.redirect_url;
+      return;
+    }
+
+    // Embedded checkout — pay inline in an iframe modal, no redirect.
     $('payTxt').textContent='Opening payment…';
     try{
       await openZiinaCheckout(data.embedded_url);

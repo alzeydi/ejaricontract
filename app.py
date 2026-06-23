@@ -30,6 +30,13 @@ FREE_MODE = os.environ.get('FREE_MODE', 'false').lower() in ('1', 'true', 'yes')
 # LEGAL_FREE_MODE=false (default) → users pay 100 AED for a 30-minute session
 LEGAL_FREE_MODE = os.environ.get('LEGAL_FREE_MODE', 'false').lower() in ('1', 'true', 'yes')
 
+# ZIINA_EMBEDDED=true  → pay inline via the embedded checkout widget (needs a
+#                        verified business profile + whitelisted domain at Ziina).
+# ZIINA_EMBEDDED=false (default) → use Ziina's hosted page via redirect, which
+#                        works on an unverified/individual account. Flip to true
+#                        once the trade license + embedded checkout are approved.
+ZIINA_EMBEDDED = os.environ.get('ZIINA_EMBEDDED', 'false').lower() in ('1', 'true', 'yes')
+
 def get_template_size():
     r = PdfReader(TEMPLATE_PDF)
     p = r.pages[0]
@@ -765,6 +772,7 @@ def legal_chat_state():
         'remaining_free': remaining,
         'paid_until': paid_until,
         'free_mode': LEGAL_FREE_MODE,
+        'ziina_embedded': ZIINA_EMBEDDED,
         'free_limit': LEGAL_FREE_MESSAGES,
         'price_aed': LEGAL_PRICE_FILS // 100,
         'session_minutes': LEGAL_SESSION_MINUTES,
@@ -1082,7 +1090,7 @@ def health():
 
 @app.route('/config')
 def config():
-    return jsonify({'free_mode': FREE_MODE, 'legal_free_mode': LEGAL_FREE_MODE})
+    return jsonify({'free_mode': FREE_MODE, 'legal_free_mode': LEGAL_FREE_MODE, 'ziina_embedded': ZIINA_EMBEDDED})
 
 
 def build_content_block(f):
