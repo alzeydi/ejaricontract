@@ -903,12 +903,51 @@ def legal_create_payment():
         }
         resp = req_lib.post(f'{ZIINA_API}/payment_intent', json=payload, headers=ZIINA_HEADERS, timeout=10)
         data = resp.json()
-        if resp.status_code not in (200, 201) or 'redirect_url' not in data:
+        if resp.status_code not in (200, 201) or 'embedded_url' not in data:
             return jsonify({'error': data.get('message', 'Ziina error'), 'raw': data}), 502
-        return jsonify({'ok': True, 'redirect_url': data['redirect_url'], 'intent_id': data.get('id', '')})
+        return jsonify({
+            'ok': True,
+            'embedded_url': data['embedded_url'],
+            'redirect_url': data.get('redirect_url', ''),
+            'intent_id': data.get('id', ''),
+        })
     except Exception as e:
         import traceback
         return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+
+
+def _grant_legal_session(intent_id, data):
+    """Mark a verified, completed intent as a fresh 30-minute legal-chat session."""
+    paid_until = datetime.now(timezone.utc) + timedelta(minutes=LEGAL_SESSION_MINUTES)
+    session['legal_paid_until'] = paid_until.isoformat()
+    session['legal_free_used'] = 0
+    email, name = _ziina_customer_info(data)
+    _send_telegram(
+        f'💼 <b>Legal Chat unlocked</b>\n'
+        f'💵 AED {LEGAL_PRICE_FILS // 100}\n'
+        f'📧 {email or "(no email)"}\n'
+        f'⏰ {datetime.now().strftime("%d %b %Y, %H:%M")}'
+    )
+    if email:
+        trustpilot_invite(email, name, reference_id=f'legal-{intent_id}', delay_days=3)
+    return paid_until
+
+
+@app.route('/legal-chat/verify-payment', methods=['POST'])
+def legal_verify_payment():
+    """Embedded-checkout callback — verify the intent and grant a 30-min window."""
+    try:
+        intent_id = (request.json or {}).get('intent_id', '')
+        if not intent_id:
+            return jsonify({'paid': False, 'error': 'No intent_id'}), 400
+        resp = req_lib.get(f'{ZIINA_API}/payment_intent/{intent_id}', headers=ZIINA_HEADERS, timeout=10)
+        data = resp.json()
+        if data.get('status') == 'completed':
+            paid_until = _grant_legal_session(intent_id, data)
+            return jsonify({'paid': True, 'paid_until': paid_until.isoformat()})
+        return jsonify({'paid': False, 'status': data.get('status', '')})
+    except Exception as e:
+        return jsonify({'paid': False, 'error': str(e)}), 500
 
 
 @app.route('/legal-chat/payment-success')
@@ -921,19 +960,7 @@ def legal_payment_success():
         resp = req_lib.get(f'{ZIINA_API}/payment_intent/{intent_id}', headers=ZIINA_HEADERS, timeout=10)
         data = resp.json()
         if data.get('status') == 'completed':
-            paid_until = datetime.now(timezone.utc) + timedelta(minutes=LEGAL_SESSION_MINUTES)
-            session['legal_paid_until'] = paid_until.isoformat()
-            session['legal_free_used'] = 0
-            email, name = _ziina_customer_info(data)
-            _send_telegram(
-                f'💼 <b>Legal Chat unlocked</b>\n'
-                f'💵 AED {LEGAL_PRICE_FILS // 100}\n'
-                f'📧 {email or "(no email)"}\n'
-                f'⏰ {datetime.now().strftime("%d %b %Y, %H:%M")}'
-            )
-            # Fire-and-forget Trustpilot invitation (3 days after the session)
-            if email:
-                trustpilot_invite(email, name, reference_id=f'legal-{intent_id}', delay_days=3)
+            _grant_legal_session(intent_id, data)
             return redirect(f'/legal-chat?unlocked=1&tid={intent_id}')
         return redirect(f'/legal-chat?pending=1')
     except Exception as e:
@@ -957,12 +984,50 @@ def legal_files_payment():
         }
         resp = req_lib.post(f'{ZIINA_API}/payment_intent', json=payload, headers=ZIINA_HEADERS, timeout=10)
         data = resp.json()
-        if resp.status_code not in (200, 201) or 'redirect_url' not in data:
+        if resp.status_code not in (200, 201) or 'embedded_url' not in data:
             return jsonify({'error': data.get('message', 'Ziina error'), 'raw': data}), 502
-        return jsonify({'ok': True, 'redirect_url': data['redirect_url'], 'intent_id': data.get('id', '')})
+        return jsonify({
+            'ok': True,
+            'embedded_url': data['embedded_url'],
+            'redirect_url': data.get('redirect_url', ''),
+            'intent_id': data.get('id', ''),
+        })
     except Exception as e:
         import traceback
         return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+
+
+def _grant_legal_files(intent_id, data):
+    """Grant +N uploads for a verified, completed top-up intent (idempotent)."""
+    granted = set(session.get('legal_files_intents', []))
+    if intent_id not in granted:
+        session['legal_files_extra'] = int(session.get('legal_files_extra', 0)) + LEGAL_FILE_TOPUP_FILES
+        granted.add(intent_id)
+        session['legal_files_intents'] = list(granted)
+        email, _name = _ziina_customer_info(data)
+        _send_telegram(
+            f'📎 <b>Legal Chat file top-up</b>\n'
+            f'💵 AED {LEGAL_FILE_TOPUP_FILS // 100} · +{LEGAL_FILE_TOPUP_FILES} uploads\n'
+            f'📧 {email or "(no email)"}\n'
+            f'⏰ {datetime.now().strftime("%d %b %Y, %H:%M")}'
+        )
+
+
+@app.route('/legal-chat/files-verify-payment', methods=['POST'])
+def legal_files_verify_payment():
+    """Embedded-checkout callback — verify the top-up intent and grant +3 uploads."""
+    try:
+        intent_id = (request.json or {}).get('intent_id', '')
+        if not intent_id:
+            return jsonify({'paid': False, 'error': 'No intent_id'}), 400
+        resp = req_lib.get(f'{ZIINA_API}/payment_intent/{intent_id}', headers=ZIINA_HEADERS, timeout=10)
+        data = resp.json()
+        if data.get('status') == 'completed':
+            _grant_legal_files(intent_id, data)
+            return jsonify({'paid': True, 'added': LEGAL_FILE_TOPUP_FILES})
+        return jsonify({'paid': False, 'status': data.get('status', '')})
+    except Exception as e:
+        return jsonify({'paid': False, 'error': str(e)}), 500
 
 
 @app.route('/legal-chat/files-payment-success')
@@ -975,19 +1040,7 @@ def legal_files_payment_success():
         resp = req_lib.get(f'{ZIINA_API}/payment_intent/{intent_id}', headers=ZIINA_HEADERS, timeout=10)
         data = resp.json()
         if data.get('status') == 'completed':
-            # Prevent the same intent from granting credits twice
-            granted = set(session.get('legal_files_intents', []))
-            if intent_id not in granted:
-                session['legal_files_extra'] = int(session.get('legal_files_extra', 0)) + LEGAL_FILE_TOPUP_FILES
-                granted.add(intent_id)
-                session['legal_files_intents'] = list(granted)
-            email, _name = _ziina_customer_info(data)
-            _send_telegram(
-                f'📎 <b>Legal Chat file top-up</b>\n'
-                f'💵 AED {LEGAL_FILE_TOPUP_FILS // 100} · +{LEGAL_FILE_TOPUP_FILES} uploads\n'
-                f'📧 {email or "(no email)"}\n'
-                f'⏰ {datetime.now().strftime("%d %b %Y, %H:%M")}'
-            )
+            _grant_legal_files(intent_id, data)
             return redirect('/legal-chat?files_unlocked=1')
         return redirect('/legal-chat?files_pending=1')
     except Exception as e:
@@ -1179,14 +1232,17 @@ def create_payment():
         resp = req_lib.post(f'{ZIINA_API}/payment_intent', json=payload, headers=ZIINA_HEADERS, timeout=10)
         data = resp.json()
 
-        if resp.status_code not in (200, 201) or 'redirect_url' not in data:
+        if resp.status_code not in (200, 201) or 'embedded_url' not in data:
             return jsonify({'error': data.get('message', 'Ziina error'), 'raw': data}), 502
 
-        # Fix the success_url placeholder — Ziina doesn't template {id}, so we pass it manually
         intent_id = data.get('id', '')
-        redirect = data['redirect_url']
 
-        return jsonify({'ok': True, 'redirect_url': redirect, 'intent_id': intent_id})
+        return jsonify({
+            'ok': True,
+            'embedded_url': data['embedded_url'],
+            'redirect_url': data.get('redirect_url', ''),
+            'intent_id': intent_id,
+        })
 
     except Exception as e:
         import traceback
