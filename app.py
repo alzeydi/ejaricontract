@@ -4,7 +4,7 @@
 import io, os, base64, json
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
-from flask import Flask, request, send_file, jsonify, send_from_directory, session, redirect
+from flask import Flask, request, send_file, jsonify, send_from_directory, session, redirect, Response
 from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 from reportlab.pdfgen import canvas
@@ -1212,6 +1212,25 @@ ZIINA_HEADERS = {'Authorization': f'Bearer {ZIINA_API_KEY}', 'Content-Type': 'ap
 # In-memory store of paid and used payment_intent ids (replace with DB in production)
 paid_intents = set()
 used_intents = set()  # intent_ids that have already been used for extraction
+
+
+# Apple Pay domain verification — required by Ziina embedded checkout.
+# Ziina/Apple gives you a verification string; provide it either via the
+# APPLE_PAY_DOMAIN_FILE env var or a file in the repo root named
+# apple-developer-merchantid-domain-association (no extension).
+_APPLE_PAY_FILE = Path(__file__).resolve().parent / 'apple-developer-merchantid-domain-association'
+
+
+@app.route('/.well-known/apple-developer-merchantid-domain-association')
+@app.route('/.well-known/apple-developer-merchantid-domain-association.txt')
+def apple_pay_domain_association():
+    """Serve the Apple Pay domain-association file for Ziina embedded checkout."""
+    content = os.environ.get('APPLE_PAY_DOMAIN_FILE', '')
+    if not content and _APPLE_PAY_FILE.exists():
+        content = _APPLE_PAY_FILE.read_text().strip()
+    if not content:
+        return 'Apple Pay domain association not configured', 404
+    return Response(content, mimetype='text/plain')
 
 
 @app.route('/create-payment', methods=['POST'])
