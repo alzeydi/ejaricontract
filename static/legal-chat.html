@@ -290,6 +290,15 @@ footer a:hover{color:var(--accent)}
 @supports(min-height:100dvh){
   body{min-height:100dvh}
 }
+
+/* ZIINA EMBEDDED CHECKOUT */
+.ziina-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(20,20,25,.6);backdrop-filter:blur(3px);padding:16px;animation:ziFade .18s ease}
+@keyframes ziFade{from{opacity:0}to{opacity:1}}
+.ziina-modal{position:relative;width:450px;max-width:100%;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden;animation:ziPop .2s ease}
+@keyframes ziPop{from{transform:translateY(12px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.ziina-frame{display:block;width:100%;height:820px;max-height:88vh;border:0}
+.ziina-close{position:absolute;top:8px;right:10px;z-index:2;width:30px;height:30px;border:0;border-radius:50%;background:rgba(0,0,0,.06);color:#333;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ziina-close:hover{background:rgba(0,0,0,.12)}
 </style>
 </head>
 <body>
@@ -441,6 +450,42 @@ footer a:hover{color:var(--accent)}
 
 <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.11/dist/purify.min.js"></script>
+<script>
+// ── Ziina embedded checkout ─────────────────────────────────────────
+// Opens the Ziina payment widget in an in-page iframe modal (no redirect).
+// Resolves on COMPLETED, rejects on FAILED/CANCELED or when the user closes it.
+function openZiinaCheckout(embeddedUrl, opts){
+  opts = opts || {};
+  return new Promise(function(resolve, reject){
+    var locale = opts.locale || (document.documentElement.lang === 'ar' ? 'ar' : 'en');
+    var sep = embeddedUrl.indexOf('?') >= 0 ? '&' : '?';
+    var overlay = document.createElement('div');
+    overlay.className = 'ziina-overlay';
+    overlay.innerHTML =
+      '<div class="ziina-modal">'+
+        '<button class="ziina-close" type="button" aria-label="Close">&times;</button>'+
+        '<iframe class="ziina-frame" src="'+embeddedUrl+sep+'version=v1&locale='+locale+'" allow="payment" frameborder="0"></iframe>'+
+      '</div>';
+    document.body.appendChild(overlay);
+    var prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    var settled = false;
+    function cleanup(){ window.removeEventListener('message', onMsg); overlay.remove(); document.body.style.overflow = prevOverflow; }
+    function onMsg(event){
+      if(event.origin !== 'https://pay.ziina.com') return;
+      var d = event.data || {};
+      if(d.type !== 'PAYMENT_STATUS_CHANGE') return;
+      var status = (d.data && d.data.status) || '';
+      if(status === 'COMPLETED'){ settled = true; cleanup(); resolve({status:status}); }
+      else if(status === 'FAILED'){ settled = true; cleanup(); reject(new Error('failed')); }
+      else if(status === 'CANCELED'){ settled = true; cleanup(); reject(new Error('cancelled')); }
+    }
+    window.addEventListener('message', onMsg);
+    overlay.querySelector('.ziina-close').addEventListener('click', function(){ if(!settled){ cleanup(); reject(new Error('closed')); } });
+    overlay.addEventListener('click', function(e){ if(e.target === overlay && !settled){ cleanup(); reject(new Error('closed')); } });
+  });
+}
+</script>
 <script>
 (function(){
   const $ = (id) => document.getElementById(id);
@@ -891,15 +936,35 @@ footer a:hover{color:var(--accent)}
     try{
       const r = await fetch('/legal-chat/create-payment', {method:'POST', credentials:'same-origin'});
       const j = await r.json();
-      if (j.ok && j.redirect_url){
-        window.location.href = j.redirect_url;
+      if (!(j.ok && j.embedded_url)) throw new Error('start');
+
+      try{
+        await openZiinaCheckout(j.embedded_url);
+      }catch(e){
+        if(e.message==='failed')        showToast('Payment failed — please try again.');
+        else if(e.message==='cancelled') showToast('Payment cancelled.');
+        payBtn.disabled = false;
+        payBtn.innerHTML = origHtml;
+        return;
+      }
+
+      payBtn.textContent = 'Confirming…';
+      const v = await fetch('/legal-chat/verify-payment', {
+        method:'POST', credentials:'same-origin',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({intent_id: j.intent_id})
+      });
+      const vj = await v.json();
+      if (vj.paid && vj.paid_until){
+        showToast('✓ Unlocked — 30 minutes of legal chat.');
+        unlockPaid(vj.paid_until);
       } else {
-        showToast('Could not start payment. Try again.');
+        showToast('Payment is processing. Refresh in a moment.');
         payBtn.disabled = false;
         payBtn.innerHTML = origHtml;
       }
     } catch(e){
-      showToast('Network error');
+      showToast('Could not start payment. Try again.');
       payBtn.disabled = false;
       payBtn.innerHTML = origHtml;
     }
@@ -912,15 +977,37 @@ footer a:hover{color:var(--accent)}
     try{
       const r = await fetch('/legal-chat/files-payment', {method:'POST', credentials:'same-origin'});
       const j = await r.json();
-      if (j.ok && j.redirect_url){
-        window.location.href = j.redirect_url;
+      if (!(j.ok && j.embedded_url)) throw new Error('start');
+
+      try{
+        await openZiinaCheckout(j.embedded_url);
+      }catch(e){
+        if(e.message==='failed')        showToast('File top-up failed — please try again.');
+        else if(e.message==='cancelled') showToast('File top-up cancelled.');
+        filesPayBtn.disabled = false;
+        filesPayBtn.innerHTML = orig;
+        return;
+      }
+
+      filesPayBtn.textContent = 'Confirming…';
+      const v = await fetch('/legal-chat/files-verify-payment', {
+        method:'POST', credentials:'same-origin',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({intent_id: j.intent_id})
+      });
+      const vj = await v.json();
+      if (vj.paid){
+        showToast('✓ +3 file uploads added.');
+        hideFilesPaywall();
+        filesPayBtn.disabled = false;
+        filesPayBtn.innerHTML = orig;
       } else {
-        showToast('Could not start payment. Try again.');
+        showToast('Top-up is processing. Refresh in a moment.');
         filesPayBtn.disabled = false;
         filesPayBtn.innerHTML = orig;
       }
     } catch(e){
-      showToast('Network error');
+      showToast('Could not start payment. Try again.');
       filesPayBtn.disabled = false;
       filesPayBtn.innerHTML = orig;
     }

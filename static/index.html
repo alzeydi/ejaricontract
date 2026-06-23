@@ -313,6 +313,15 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .footer-meta a{font-size:11px;color:var(--muted);text-decoration:none}
 .footer-meta a:hover{color:var(--accent)}
 .footer-copy{font-size:11px;color:var(--muted)}
+
+/* ZIINA EMBEDDED CHECKOUT */
+.ziina-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(20,20,25,.6);backdrop-filter:blur(3px);padding:16px;animation:ziFade .18s ease}
+@keyframes ziFade{from{opacity:0}to{opacity:1}}
+.ziina-modal{position:relative;width:450px;max-width:100%;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden;animation:ziPop .2s ease}
+@keyframes ziPop{from{transform:translateY(12px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.ziina-frame{display:block;width:100%;height:820px;max-height:88vh;border:0}
+.ziina-close{position:absolute;top:8px;right:10px;z-index:2;width:30px;height:30px;border:0;border-radius:50%;background:rgba(0,0,0,.06);color:#333;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ziina-close:hover{background:rgba(0,0,0,.12)}
 </style>
 <script type="application/ld+json">
 {
@@ -927,6 +936,40 @@ const PAY_URL     = '/create-payment';
 const VERIFY_URL  = '/verify-payment';
 const EXT_URL = '/extract';
 
+// ── Ziina embedded checkout ─────────────────────────────────────────
+// Opens the Ziina payment widget in an in-page iframe modal (no redirect).
+// Resolves on COMPLETED, rejects on FAILED/CANCELED or when the user closes it.
+function openZiinaCheckout(embeddedUrl, opts={}){
+  return new Promise((resolve, reject)=>{
+    const locale = opts.locale || (document.documentElement.lang === 'ar' ? 'ar' : 'en');
+    const sep = embeddedUrl.includes('?') ? '&' : '?';
+    const overlay = document.createElement('div');
+    overlay.className = 'ziina-overlay';
+    overlay.innerHTML =
+      '<div class="ziina-modal">'+
+        '<button class="ziina-close" type="button" aria-label="Close">&times;</button>'+
+        '<iframe class="ziina-frame" src="'+embeddedUrl+sep+'version=v1&locale='+locale+'" allow="payment" frameborder="0"></iframe>'+
+      '</div>';
+    document.body.appendChild(overlay);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    let settled = false;
+    function cleanup(){ window.removeEventListener('message', onMsg); overlay.remove(); document.body.style.overflow = prevOverflow; }
+    function onMsg(event){
+      if(event.origin !== 'https://pay.ziina.com') return;
+      const d = event.data || {};
+      if(d.type !== 'PAYMENT_STATUS_CHANGE') return;
+      const status = (d.data && d.data.status) || '';
+      if(status === 'COMPLETED'){ settled = true; cleanup(); resolve({status}); }
+      else if(status === 'FAILED'){ settled = true; cleanup(); reject(new Error('failed')); }
+      else if(status === 'CANCELED'){ settled = true; cleanup(); reject(new Error('cancelled')); }
+    }
+    window.addEventListener('message', onMsg);
+    overlay.querySelector('.ziina-close').addEventListener('click', ()=>{ if(!settled){ cleanup(); reject(new Error('closed')); } });
+    overlay.addEventListener('click', e=>{ if(e.target === overlay && !settled){ cleanup(); reject(new Error('closed')); } });
+  });
+}
+
 let ext = {}, cvHeld = false;
 let FREE_MODE = false;
 
@@ -996,34 +1039,40 @@ async function doPay(){
   $('payTxt').textContent='Creating payment…';
 
   try{
-    // Save uploaded files to sessionStorage BEFORE redirect (page will reload on return)
-    const slots=[
-      {id:'fTEID',lbl:'TENANT_EMIRATES_ID'},{id:'fLEID',lbl:'LESSOR_EMIRATES_ID'},
-      {id:'fTD',lbl:'TITLE_DEED'},{id:'fEJ',lbl:'PREVIOUS_EJARI'}
-    ];
-    const savedFiles=[];
-    for(const {id,lbl} of slots){
-      const file=$(id).files[0];
-      if(file){
-        const data=await b64(file);
-        savedFiles.push({label:lbl,data,mime_type:mtype(file),name:file.name});
-      }
-    }
-    if(savedFiles.length) sessionStorage.setItem('ejari_files',JSON.stringify(savedFiles));
-
     const resp = await fetch(PAY_URL, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({})
     });
     const data = await resp.json();
-    if(!data.ok) throw new Error(data.error||'Payment creation failed');
+    if(!data.ok || !data.embedded_url) throw new Error(data.error||'Payment creation failed');
 
     intentId = data.intent_id;
     sessionStorage.setItem('ejari_intent_id', intentId);
 
-    $('payTxt').textContent='Redirecting to payment…';
-    window.location.href = data.redirect_url;
+    // Open the Ziina widget inline — no redirect.
+    $('payTxt').textContent='Opening payment…';
+    try{
+      await openZiinaCheckout(data.embedded_url);
+    }catch(e){
+      btn.disabled=false;
+      $('payTxt').textContent='Pay 30 AED & Extract →';
+      if(e.message==='failed')    toast('Payment failed — please try again','fail');
+      else if(e.message==='cancelled') toast('Payment cancelled','fail');
+      return; // user closed the widget — nothing else to do
+    }
+
+    // Payment completed in the widget — confirm with backend, then extract.
+    $('payTxt').textContent='Confirming payment…';
+    try{
+      await fetch(VERIFY_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({intent_id: intentId})
+      });
+    }catch(_){ /* backend webhook is the safety net */ }
+
+    await paidOK();
 
   }catch(err){
     toast('Payment error: '+err.message, 'fail');
@@ -1036,19 +1085,31 @@ async function paidOK(){
   $('payBlock').style.display='none';
   $('payConfirm').classList.add('on');
 
-  // Restore file names in the upload UI
-  const saved=JSON.parse(sessionStorage.getItem('ejari_files')||'[]');
-  const uiMap={TENANT_EMIRATES_ID:['bTEID','sTEID'],LESSOR_EMIRATES_ID:['bLEID','sLEID'],TITLE_DEED:['bTD','sTD'],PREVIOUS_EJARI:['bEJ','sEJ']};
-  saved.forEach(f=>{
-    const ids=uiMap[f.label];
-    if(ids){$(ids[0]).classList.add('has-file');$(ids[1]).textContent='✓ '+f.name;}
-  });
+  // Page never reloaded (embedded checkout) — read files straight from the inputs.
+  const slots=[
+    {id:'fTEID',lbl:'TENANT_EMIRATES_ID'},{id:'fLEID',lbl:'LESSOR_EMIRATES_ID'},
+    {id:'fTD',lbl:'TITLE_DEED'},{id:'fEJ',lbl:'PREVIOUS_EJARI'}
+  ];
+  let files=[];
+  for(const {id,lbl} of slots){
+    const file=$(id).files[0];
+    if(file) files.push({label:lbl,data:await b64(file),mime_type:mtype(file),name:file.name});
+  }
 
-  if(saved.length){
-    // Auto-run OCR with saved files — no need to re-upload
-    await runOCRWithData(saved);
+  // Fallback for the legacy redirect flow, where files live in sessionStorage.
+  if(!files.length){
+    const saved=JSON.parse(sessionStorage.getItem('ejari_files')||'[]');
+    const uiMap={TENANT_EMIRATES_ID:['bTEID','sTEID'],LESSOR_EMIRATES_ID:['bLEID','sLEID'],TITLE_DEED:['bTD','sTD'],PREVIOUS_EJARI:['bEJ','sEJ']};
+    saved.forEach(f=>{
+      const ids=uiMap[f.label];
+      if(ids){$(ids[0]).classList.add('has-file');$(ids[1]).textContent='✓ '+f.name;}
+    });
+    files=saved;
+  }
+
+  if(files.length){
+    await runOCRWithData(files);
   }else{
-    // No saved files (edge case) — show manual button
     $('payConfirmSub').textContent='Upload documents below and click Extract';
     $('ocrBtn').style.display='flex';
   }
