@@ -566,7 +566,7 @@ main{max-width:1080px;padding:26px 24px 80px}
           <div class="svc-feats"><span class="svc-feat">AI auto-fill</span><span class="svc-feat">DLD official format</span><span class="svc-feat">No account</span></div>
           <div class="svc-sp"></div>
           <div class="svc-price"><span class="svc-old">30 AED</span><span class="svc-new">15</span><span class="svc-cur">AED · one-time</span></div>
-          <a class="svc-cta a" href="#start">Start your contract →</a>
+          <a class="svc-cta a" href="#start" onclick="openUpload(event)">Start your contract →</a>
         </div>
 
         <!-- Service 02 — AI rental lawyer -->
@@ -584,8 +584,8 @@ main{max-width:1080px;padding:26px 24px 80px}
       </div>
     </section>
 
-    <!-- CONTRACT FLOW: upload · pay · extract -->
-    <section id="start" class="upload-sec">
+    <!-- CONTRACT FLOW: upload · pay · extract (hidden until 'Start your contract') -->
+    <section id="start" class="upload-sec" style="display:none">
       <div class="upload-sec-head">
         <div class="section-icon">📄</div>
         <div>
@@ -1117,6 +1117,13 @@ function step(n){
     else if(i===n){d.className='s-dot active';d.textContent=i+1;l.className='s-lbl active';}
     else{d.className='s-dot idle';d.textContent=i+1;l.className='s-lbl';}
   });
+}
+
+function openUpload(e){
+  if(e) e.preventDefault();
+  const s=$('start');
+  s.style.display='block';
+  s.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function go(id){
