@@ -23,11 +23,11 @@ TEMPLATE_PDF = os.path.join(os.path.dirname(__file__), 'template.pdf')
 claude = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from env
 
 # FREE_MODE=true  → no payment required; AI extraction is free
-# FREE_MODE=false (default) → users must pay 30 AED via Ziina before extraction
+# FREE_MODE=false (default) → users must pay 15 AED via Ziina before extraction
 FREE_MODE = os.environ.get('FREE_MODE', 'false').lower() in ('1', 'true', 'yes')
 
 # LEGAL_FREE_MODE=true  → /legal-chat is unlimited and free (paywall hidden)
-# LEGAL_FREE_MODE=false (default) → users pay 100 AED for a 30-minute session
+# LEGAL_FREE_MODE=false (default) → users pay 50 AED for a 30-minute session
 LEGAL_FREE_MODE = os.environ.get('LEGAL_FREE_MODE', 'false').lower() in ('1', 'true', 'yes')
 
 # ZIINA_EMBEDDED=true  → pay inline via the embedded checkout widget (needs a
@@ -695,12 +695,12 @@ def terms():
 # ── Legal Chat (paid AI consultation on Dubai rental disputes) ─────────
 LEGAL_FREE_MESSAGES = 1
 LEGAL_SESSION_MINUTES = 30
-LEGAL_PRICE_FILS = 10000  # 100 AED
+LEGAL_PRICE_FILS = 5000  # 50 AED (50% launch discount, was 100 AED)
 
 # File-upload quota: first 3 files in a session are free, then each
-# 50 AED top-up grants 3 more uploads.
+# 25 AED top-up grants 3 more uploads.
 LEGAL_FILE_FREE_LIMIT = 3
-LEGAL_FILE_TOPUP_FILS = 5000   # 50 AED
+LEGAL_FILE_TOPUP_FILS = 2500   # 25 AED (50% launch discount, was 50 AED)
 LEGAL_FILE_TOPUP_FILES = 3
 LEGAL_FILE_MAX_BYTES = 8 * 1024 * 1024  # 8 MB per file (base64-decoded)
 LEGAL_FILE_ALLOWED_MIME = {'application/pdf', 'image/jpeg', 'image/png'}
@@ -1247,7 +1247,7 @@ def create_payment():
     try:
         base_url = request.host_url.rstrip('/')
         payload = {
-            'amount': 3000,          # 30 AED in fils
+            'amount': 1500,          # 15 AED in fils (50% launch discount, was 30 AED)
             'currency_code': 'AED',
             'message': 'Ejari Helper — AI document extraction',
             'success_url': f'{base_url}/?paid=1',

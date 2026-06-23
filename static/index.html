@@ -15,12 +15,12 @@
 <meta name="trustpilot-one-time-domain-verification-id" content="cd4a1f4f-8b0c-493c-8b1d-6d2c6a9be925"/>
 <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <title>Ejari Contract Online — Dubai Tenancy | Ejari Helper</title>
-<meta name="description" content="Fill your Dubai tenancy contract online in minutes. Upload Emirates IDs & Title Deed — AI auto-fills a DLD-format Ejari contract PDF. 30 AED, no account needed.">
+<meta name="description" content="Fill your Dubai tenancy contract online in minutes. Upload Emirates IDs & Title Deed — AI auto-fills a DLD-format Ejari contract PDF. 15 AED, no account needed.">
 <link rel="canonical" href="__BASE_URL__/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="__BASE_URL__/">
 <meta property="og:title" content="Ejari Contract Online — Dubai Tenancy Contract | Ejari Helper">
-<meta property="og:description" content="Fill your Dubai tenancy contract online in minutes. AI auto-fills a DLD Ejari PDF from your documents. 30 AED · No account needed.">
+<meta property="og:description" content="Fill your Dubai tenancy contract online in minutes. AI auto-fills a DLD Ejari PDF from your documents. 15 AED · No account needed.">
 <meta property="og:site_name" content="Ejari Helper">
 <meta property="og:image" content="__BASE_URL__/static/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -28,7 +28,7 @@
 <meta property="og:image:alt" content="Ejari Helper — Dubai tenancy contracts in minutes">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Ejari Contract Online — Dubai Tenancy Contract | Ejari Helper">
-<meta name="twitter:description" content="Fill your Dubai tenancy contract online in minutes. AI auto-fills a DLD Ejari PDF from your documents. 30 AED · No account needed.">
+<meta name="twitter:description" content="Fill your Dubai tenancy contract online in minutes. AI auto-fills a DLD Ejari PDF from your documents. 15 AED · No account needed.">
 <meta name="twitter:image" content="__BASE_URL__/static/og-image.png">
 <meta name="theme-color" content="#16423c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -336,7 +336,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       "operatingSystem": "Web",
       "offers": {
         "@type": "Offer",
-        "price": "30",
+        "price": "15",
         "priceCurrency": "AED",
         "availability": "https://schema.org/InStock"
       },
@@ -348,7 +348,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       "name": "How to fill a Dubai tenancy contract online for Ejari registration",
       "description": "Generate a pre-filled DLD unified tenancy contract PDF for Ejari registration in Dubai using AI.",
       "totalTime": "PT5M",
-      "estimatedCost": {"@type": "MonetaryAmount", "currency": "AED", "value": "30"},
+      "estimatedCost": {"@type": "MonetaryAmount", "currency": "AED", "value": "15"},
       "step": [
         {
           "@type": "HowToStep", "position": 1,
@@ -358,7 +358,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
         {
           "@type": "HowToStep", "position": 2,
           "name": "Pay and extract",
-          "text": "Pay 30 AED via Apple Pay, Google Pay, or card. AI reads your documents and pre-fills the Dubai tenancy contract."
+          "text": "Pay 15 AED via Apple Pay, Google Pay, or card. AI reads your documents and pre-fills the Dubai tenancy contract."
         },
         {
           "@type": "HowToStep", "position": 3,
@@ -565,12 +565,12 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
               <div class="pay-desc">One-time · no subscription · no account</div>
             </div>
             <div class="pay-price">
-              <div class="pay-old">35 AED</div>
-              <div class="pay-new">30</div>
+              <div class="pay-old">30 AED</div>
+              <div class="pay-new">15</div>
               <div class="pay-cur">AED</div>
             </div>
           </div>
-          <button class="btn btn-dark" id="payBtn" onclick="doPay()" disabled><span id="payTxt">Pay 30 AED &amp; Extract →</span></button>
+          <button class="btn btn-dark" id="payBtn" onclick="doPay()" disabled><span id="payTxt">Pay 15 AED &amp; Extract →</span></button>
           <div id="payHint" style="text-align:center;font-size:12px;color:var(--muted);margin-top:8px">Upload 3 required documents to continue</div>
           <div class="trust" style="margin-top:9px">
             <span>🔒 Ziina</span><span class="trust-sep">·</span>
@@ -584,7 +584,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
         <div class="pay-confirm" id="payConfirm">
           <div class="pay-confirm-icon">✅</div>
           <div>
-            <div class="pay-confirm-title">Payment confirmed — 30 AED</div>
+            <div class="pay-confirm-title">Payment confirmed — 15 AED</div>
             <div class="pay-confirm-sub" id="payConfirmSub">Analysing your documents with AI…</div>
           </div>
         </div>
@@ -1079,7 +1079,7 @@ async function doPay(){
       await openZiinaCheckout(data.embedded_url);
     }catch(e){
       btn.disabled=false;
-      $('payTxt').textContent='Pay 30 AED & Extract →';
+      $('payTxt').textContent='Pay 15 AED & Extract →';
       if(e.message==='failed')    toast('Payment failed — please try again','fail');
       else if(e.message==='cancelled') toast('Payment cancelled','fail');
       return; // user closed the widget — nothing else to do
@@ -1100,7 +1100,7 @@ async function doPay(){
   }catch(err){
     toast('Payment error: '+err.message, 'fail');
     btn.disabled=false;
-    $('payTxt').textContent='Pay 30 AED & Extract →';
+    $('payTxt').textContent='Pay 15 AED & Extract →';
   }
 }
 
@@ -1205,7 +1205,7 @@ window.addEventListener('pageshow', function(e){
     const txt=$('payTxt');
     if(btn && txt && (txt.textContent.includes('Redirecting') || txt.textContent.includes('Creating payment'))){
       btn.disabled=false;
-      txt.textContent='Pay 30 AED & Extract →';
+      txt.textContent='Pay 15 AED & Extract →';
     }
   }
 });
