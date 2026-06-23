@@ -529,10 +529,8 @@ main{max-width:1080px;padding:26px 24px 80px}
       <span class="brand-name">Ejari Helper</span>
     </a>
     <div class="nav-right">
-      <a href="/how-it-works" class="nav-link nav-hide-mobile">How it works</a>
-      <a href="#guides" class="nav-link nav-hide-mobile">Guides</a>
-      <a href="/legal-chat" class="nav-link">Ask AI Lawyer</a>
-      <a href="#start" class="nav-cta">Start now</a>
+      <a href="/how-it-works" class="nav-link">How Ejari works</a>
+      <a href="#guides" class="nav-link">Guides</a>
     </div>
   </div>
 </nav>
@@ -540,7 +538,7 @@ main{max-width:1080px;padding:26px 24px 80px}
 <main>
 
   <!-- Progress (kept outside s1 so it persists on Complete/Download screens) -->
-  <div class="steps" id="stepsBar" style="margin:14px 0 0">
+  <div class="steps" id="stepsBar" style="margin:14px 0 0;display:none">
     <div class="s-item"><div class="s-dot active" id="d0">1</div><span class="s-lbl active" id="l0">Upload</span></div>
     <div class="s-line"></div>
     <div class="s-item"><div class="s-dot idle" id="d1">2</div><span class="s-lbl" id="l1">Complete</span></div>
@@ -555,7 +553,6 @@ main{max-width:1080px;padding:26px 24px 80px}
     <!-- HERO: two equal services -->
     <section class="svc-hero">
       <div class="svc-head">
-        <div class="badge-pill"><span class="pdot"></span> AI-powered · Dubai tenancy</div>
         <h1>Two ways we handle<br><span class="grad">your Dubai tenancy</span></h1>
         <p class="sub">Generate a ready-to-register Ejari contract, or get instant answers from an AI rental lawyer — pick whatever you need.</p>
       </div>
@@ -1125,6 +1122,8 @@ function step(n){
 function go(id){
   ['s1','s2'].forEach(s=>{$(s).style.display='none';});
   $(id).style.display='block';
+  // Progress stepper belongs to the flow — show it only once we leave the landing.
+  $('stepsBar').style.display = id==='s1' ? 'none' : 'flex';
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
