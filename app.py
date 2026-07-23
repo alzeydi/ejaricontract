@@ -586,80 +586,53 @@ def robots_txt():
 @app.route('/sitemap.xml')
 def sitemap_xml():
     base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
-    xml = f'''<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>{base_url}/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>{base_url}/guide/ejari-registration</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>{base_url}/guide/dewa-activation</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>{base_url}/guide/rental-dispute</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>{base_url}/guide/ejari-renewal</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>{base_url}/guide/tenancy-contract-dubai</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>{base_url}/guide/dewa-premises-number</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>{base_url}/guide/dewa-transfer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>{base_url}/guide/ejari-cancellation</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>{base_url}/legal-chat</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>{base_url}/how-it-works</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>{base_url}/privacy</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>{base_url}/terms</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
-  </url>
-</urlset>'''
+
+    def hreflang_links(slug):
+        """xhtml:link alternates for guides that exist in EN + AR."""
+        en = f'{base_url}/guide/{slug}'
+        ar = f'{base_url}/ar/guide/{slug}'
+        return (f'\n    <xhtml:link rel="alternate" hreflang="en" href="{en}"/>'
+                f'\n    <xhtml:link rel="alternate" hreflang="ar" href="{ar}"/>'
+                f'\n    <xhtml:link rel="alternate" hreflang="x-default" href="{en}"/>')
+
+    # (path, changefreq, priority, hreflang-slug-or-None)
+    entries = [
+        ('/', 'weekly', '1.0', None),
+        ('/guide/ejari-registration', 'monthly', '0.8', None),
+        ('/guide/dewa-activation', 'monthly', '0.7', None),
+        ('/guide/rental-dispute', 'monthly', '0.7', 'rental-dispute'),
+        ('/guide/ejari-renewal', 'monthly', '0.8', 'ejari-renewal'),
+        ('/guide/tenancy-contract-dubai', 'monthly', '0.8', None),
+        ('/guide/dewa-premises-number', 'monthly', '0.6', 'dewa-premises-number'),
+        ('/guide/dewa-transfer', 'monthly', '0.8', None),
+        ('/guide/ejari-cancellation', 'monthly', '0.7', None),
+        ('/ar/guide/rental-dispute', 'monthly', '0.7', 'rental-dispute'),
+        ('/ar/guide/ejari-renewal', 'monthly', '0.8', 'ejari-renewal'),
+        ('/ar/guide/dewa-premises-number', 'monthly', '0.6', 'dewa-premises-number'),
+        ('/legal-chat', 'weekly', '0.9', None),
+        ('/how-it-works', 'monthly', '0.9', None),
+        ('/privacy', 'yearly', '0.5', None),
+        ('/terms', 'yearly', '0.5', None),
+    ]
+    urls = ''
+    for path, freq, prio, slug in entries:
+        urls += (f'\n  <url>\n    <loc>{base_url}{path}</loc>'
+                 f'{hreflang_links(slug) if slug else ""}'
+                 f'\n    <changefreq>{freq}</changefreq>'
+                 f'\n    <priority>{prio}</priority>\n  </url>')
+    xml = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+           'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+           f'{urls}\n</urlset>')
     return xml, 200, {'Content-Type': 'application/xml'}
 
 
 _GUIDE_SLUGS = {'ejari-registration', 'dewa-activation', 'rental-dispute',
                 'ejari-renewal', 'dewa-premises-number', 'tenancy-contract-dubai',
                 'dewa-transfer', 'ejari-cancellation'}
+
+# Guides that also exist in Arabic under /ar/guide/<slug>
+_AR_GUIDE_SLUGS = {'rental-dispute', 'ejari-renewal', 'dewa-premises-number'}
 
 @app.route('/guide/<slug>')
 def guide(slug):
@@ -668,6 +641,19 @@ def guide(slug):
         return redirect('/', 302)
     base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
     guide_path = os.path.join(app.static_folder, 'guide', f'{slug}.html')
+    with open(guide_path, encoding='utf-8') as f:
+        html = f.read()
+    html = html.replace('__BASE_URL__', base_url)
+    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+
+
+@app.route('/ar/guide/<slug>')
+def guide_ar(slug):
+    if slug not in _AR_GUIDE_SLUGS:
+        from flask import redirect
+        return redirect('/', 302)
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    guide_path = os.path.join(app.static_folder, 'ar', 'guide', f'{slug}.html')
     with open(guide_path, encoding='utf-8') as f:
         html = f.read()
     html = html.replace('__BASE_URL__', base_url)
@@ -1068,6 +1054,17 @@ def download_template():
     """Serve the blank DLD tenancy contract form for manual filling."""
     return send_file(TEMPLATE_PDF, mimetype='application/pdf',
                      as_attachment=True, download_name='dld-tenancy-contract.pdf')
+
+
+TEMPLATE_DOCX = os.path.join(os.path.dirname(__file__), 'dld-tenancy-contract.docx')
+
+@app.route('/download/dld-tenancy-contract.docx')
+def download_template_docx():
+    """Serve the editable Word version of the DLD tenancy contract."""
+    return send_file(
+        TEMPLATE_DOCX,
+        mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        as_attachment=True, download_name='dld-tenancy-contract.docx')
 
 
 @app.route('/health')
