@@ -562,6 +562,19 @@ def admin_leads():
         conn.close()
 
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory('static', 'favicon.ico',
+                               mimetype='image/x-icon', max_age=2592000)
+
+
+@app.route('/apple-touch-icon.png')
+@app.route('/apple-touch-icon-precomposed.png')
+def apple_touch_icon():
+    return send_from_directory('static', 'apple-touch-icon.png',
+                               mimetype='image/png', max_age=2592000)
+
+
 @app.route('/robots.txt')
 def robots_txt():
     base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
