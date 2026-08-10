@@ -635,6 +635,11 @@ def sitemap_xml():
         ('/guide/dewa-premises-number', 'monthly', '0.6', guide_pair('dewa-premises-number')),
         ('/guide/dewa-transfer', 'monthly', '0.8', None),
         ('/guide/ejari-cancellation', 'monthly', '0.7', None),
+        ('/tools/rent-increase-calculator', 'monthly', '0.8', None),
+        ('/guide/security-deposit-refund-dubai', 'monthly', '0.8', None),
+        ('/guide/rent-increase-dubai', 'monthly', '0.8', None),
+        ('/guide/eviction-notice-dubai', 'monthly', '0.8', None),
+        ('/guide/ejari-fine', 'monthly', '0.7', None),
         ('/ar/guide/rental-dispute', 'monthly', '0.7', guide_pair('rental-dispute')),
         ('/ar/guide/ejari-renewal', 'monthly', '0.8', guide_pair('ejari-renewal')),
         ('/ar/guide/dewa-premises-number', 'monthly', '0.6', guide_pair('dewa-premises-number')),
@@ -659,7 +664,19 @@ def sitemap_xml():
 
 _GUIDE_SLUGS = {'ejari-registration', 'dewa-activation', 'rental-dispute',
                 'ejari-renewal', 'dewa-premises-number', 'tenancy-contract-dubai',
-                'dewa-transfer', 'ejari-cancellation'}
+                'dewa-transfer', 'ejari-cancellation',
+                'security-deposit-refund-dubai', 'rent-increase-dubai',
+                'eviction-notice-dubai', 'ejari-fine'}
+
+_TOOL_SLUGS = {'rent-increase-calculator'}
+
+
+@app.route('/tools/<slug>')
+def tool(slug):
+    if slug not in _TOOL_SLUGS:
+        from flask import redirect
+        return redirect('/', 302)
+    return render_page('tools', f'{slug}.html')
 
 # Guides that also exist in Arabic under /ar/guide/<slug>
 _AR_GUIDE_SLUGS = {'rental-dispute', 'ejari-renewal', 'dewa-premises-number'}

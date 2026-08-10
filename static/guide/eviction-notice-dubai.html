@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18223357108"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-18223357108');
+  // GA4 — measurement ID injected server-side from GA4_MEASUREMENT_ID env var (see README.md).
+  var GA4_ID = '__GA4_ID__';
+  if (/^G-[A-Z0-9]+$/.test(GA4_ID)) gtag('config', GA4_ID, (location.search.indexOf('_ga_debug=1') > -1) ? {debug_mode: true} : {});
+  // GA4 key-event helper. Each event below must be marked as a Key Event in GA4 admin — see README.md.
+  function ehEvent(name, params){ try { gtag('event', name, params || {}); } catch(e) {} }
+  // Delegated tracking: template downloads everywhere; guide/tool → product CTA clicks.
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a) return;
+    var href = a.getAttribute('href') || '';
+    if (href.indexOf('/download/') === 0){
+      ehEvent('template_downloaded', {file_name: href.split('/').pop(), source_page: location.pathname});
+    } else if (a.hasAttribute('data-cta')){
+      ehEvent('cta_click', {source_page: location.pathname, cta_target: a.getAttribute('data-cta')});
+    } else if ((location.pathname.indexOf('/guide/') === 0 || location.pathname.indexOf('/ar/guide/') === 0 || location.pathname.indexOf('/tools/') === 0) &&
+               (href === '/' || href.indexOf('/legal-chat') === 0 || href.indexOf('/ar/legal-chat') === 0 || href.indexOf('/#') === 0)){
+      ehEvent('cta_click', {source_page: location.pathname, cta_target: href});
+    }
+  }, true);
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<title>Eviction Notice Dubai: 12-Month Rule & Tenant Rights 2026</title>
+<meta name="description" content="Dubai eviction law 2026: the 12-month notarised notice, 4 valid grounds, what makes a notice void, and the 2-year compensation rule. Know your rights.">
+<link rel="canonical" href="__BASE_URL__/guide/eviction-notice-dubai">
+<link rel="alternate" hreflang="en" href="__BASE_URL__/guide/eviction-notice-dubai">
+<link rel="alternate" hreflang="x-default" href="__BASE_URL__/guide/eviction-notice-dubai">
+<meta property="og:type" content="article">
+<meta property="og:url" content="__BASE_URL__/guide/eviction-notice-dubai">
+<meta property="og:title" content="Eviction Notice in Dubai — The 12-Month Rule and Your Rights">
+<meta property="og:description" content="Notary or registered mail only, 4 legal grounds, and the Article 26 compensation rule if the landlord re-rents. Full tenant playbook.">
+<meta property="og:site_name" content="Ejari Helper">
+<meta property="og:image" content="__BASE_URL__/static/og-image.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ejari Helper — Dubai tenancy contracts in minutes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Eviction Notice in Dubai — The 12-Month Rule and Your Rights">
+<meta name="twitter:description" content="Notary or registered mail only, 4 legal grounds, and the Article 26 compensation rule if the landlord re-rents. Full tenant playbook.">
+<meta name="twitter:image" content="__BASE_URL__/static/og-image.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "Article", "headline": "Eviction Notice in Dubai: The 12-Month Rule and Your Rights", "description": "When a Dubai landlord can evict, the 12-month notarised notice requirement, defective-notice checks, and tenant compensation rights.", "author": {"@type": "Organization", "name": "Ejari Helper"}, "publisher": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/"}, "mainEntityOfPage": "__BASE_URL__/guide/eviction-notice-dubai", "dateModified": "2026-08-10"}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "__BASE_URL__/"}, {"@type": "ListItem", "position": 2, "name": "Guides", "item": "__BASE_URL__/#guides"}, {"@type": "ListItem", "position": 3, "name": "Eviction Notice Rules"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How much notice does a landlord have to give for eviction in Dubai?", "acceptedAnswer": {"@type": "Answer", "text": "For eviction at the end of the tenancy, 12 months written notice served through a notary public or by registered mail (Article 25(2) of Law No. 33 of 2008). The notice must state one of the four legal grounds: sale of the property, the landlord's own or first-degree relatives' personal use, demolition, or renovation that cannot be done while occupied."}}, {"@type": "Question", "name": "Is an eviction notice by email or WhatsApp valid in Dubai?", "acceptedAnswer": {"@type": "Answer", "text": "No. The 12-month eviction notice must be served through a notary public or by registered mail. Email, WhatsApp or a plain letter does not satisfy Article 25(2), and the RDC routinely dismisses eviction claims based on informal notices."}}, {"@type": "Question", "name": "What are the valid grounds for eviction in Dubai?", "acceptedAnswer": {"@type": "Answer", "text": "At contract end (with 12-month notarised notice): sale of the property, personal use by the landlord or first-degree relatives, demolition or reconstruction, or comprehensive renovation impossible while occupied. During the contract (Article 25(1)): non-payment within 30 days of a formal demand, unauthorised subletting, illegal or immoral use, dangerous structural condition, or unpermitted alterations damaging the property."}}, {"@type": "Question", "name": "Can I be evicted for refusing a rent increase?", "acceptedAnswer": {"@type": "Answer", "text": "No. Refusing an above-cap or un-notified rent increase is not a ground for eviction. If the landlord retaliates with an eviction threat, the threat only works through the 12-month notarised route on one of the four legal grounds."}}, {"@type": "Question", "name": "What happens if the landlord evicts me for 'personal use' and then re-rents?", "acceptedAnswer": {"@type": "Answer", "text": "If the landlord evicts on the personal-use ground and then rents the property to someone else within 2 years (3 years for commercial leases), you can claim compensation at the Rental Dispute Centre for the eviction's costs and damages (Article 26, Law No. 33 of 2008)."}}, {"@type": "Question", "name": "What should I do when I receive an eviction notice?", "acceptedAnswer": {"@type": "Answer", "text": "Check three things: was it served via notary or registered mail, does it give a full 12 months, and does it state a valid ground? If any element is missing, the notice is defective — respond in writing and, if the landlord persists, contest it at the RDC. If the notice is valid, use the 12 months to negotiate or plan the move; you owe rent as normal until the end."}}]}
+</script>
+<style>
+:root{--bg:#fbfaf7;--white:#fff;--text:#1a1a1a;--sub:#55554f;--muted:#86867e;--border:#e7e6df;--accent:#16423c;--accent-bright:#2fd18d;--grad:linear-gradient(135deg,#1f8f66,#16423c);--grad-bright:linear-gradient(135deg,#2fd18d,#1f8f66);--accent-bg:#eaf2ec;--accent-mid:#1f8f66;--red:#c0392b;--red-bg:#fdf2f2;--blue:#1a4f8a;--blue-bg:#eef3fa;--gold:#b8860b;--gold-bg:#fdfaf0;--r:10px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+nav{background:rgba(251,250,247,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border);min-height:62px;display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:780px;width:100%;margin:0 auto;display:flex;align-items:center;gap:16px}
+.brand-name{display:inline-flex;align-items:center;gap:10px;font-size:17px;font-weight:800;color:var(--accent);letter-spacing:-.01em;text-decoration:none}.brand-name::before{content:'';width:32px;height:32px;border-radius:9px;flex-shrink:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none'%3E%3Cpath d='M4 11l8-6 8 6' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M6 10v9h12v-9' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M9.4 14.3l1.9 2 3.4-3.5' stroke='%235be0a8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/19px no-repeat,linear-gradient(135deg,#1f8f66,#16423c);box-shadow:0 4px 14px rgba(22,66,60,.28)}
+.nav-sep{color:var(--border)}
+.nav-cur{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+main{max-width:720px;margin:0 auto;padding:32px 20px 80px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.bc{font-size:12px;color:var(--muted);margin-bottom:20px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.bc a{color:var(--muted)}
+.bc a:hover{color:var(--accent);text-decoration:none}
+.bc-sep{color:var(--border)}
+.guide-badge{font-size:11px;font-weight:600;color:var(--accent-mid);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.guide-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:30px;font-weight:800;color:var(--accent);letter-spacing:-.02em;line-height:1.25;margin-bottom:8px}
+.guide-meta{font-size:12px;color:var(--muted);margin-bottom:12px}
+.guide-intro{font-size:14px;color:var(--sub);margin-bottom:28px;line-height:1.7}
+.fc{display:flex;flex-direction:column}
+.fc-conn{display:flex;flex-direction:column;align-items:center;gap:0;padding:2px 0}
+.fc-conn-line{width:2px;height:16px;background:var(--border)}
+.fc-conn-arr{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--border)}
+.fc-conn-label{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);padding:2px 0}
+.fc-node{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:16px 18px}
+.fc-node-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.fc-title{font-size:14px;font-weight:600;color:var(--text)}
+.fc-body{font-size:13px;color:var(--sub);line-height:1.6;padding-left:32px}
+.fc-body ul{padding-left:16px;margin-top:4px}
+.fc-body ol{padding-left:16px;margin-top:4px}
+.fc-body li{margin-bottom:3px}
+.fc-node.step{border-left:4px solid var(--accent)}
+.fc-num{width:22px;height:22px;background:var(--accent);color:white;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-node.decision{border-left:4px solid var(--gold);background:var(--gold-bg)}
+.fc-dicon{width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-branch{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fc-branch-item{border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;background:var(--white)}
+.fc-branch-item.yes{border-color:#a5c8a5;background:#f6fbf6}
+.fc-branch-item.no{border-color:#e8bebe;background:#fdf5f5}
+.fc-branch-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.fc-branch-tag.yes{color:#2e7d32}
+.fc-branch-tag.no{color:var(--red)}
+.fc-branch-title{font-size:13px;font-weight:600;color:var(--text)}
+.fc-branch-desc{font-size:12px;color:var(--sub);margin-top:4px;line-height:1.5}
+.fc-node.success{border-left:4px solid #2e7d32;background:#f1f8f1}
+.fc-sicon{width:22px;height:22px;background:#2e7d32;color:white;border-radius:50%;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-node.warn{border-left:4px solid var(--red);background:var(--red-bg)}
+.fc-wicon{width:22px;height:22px;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-node.info{border-left:4px solid var(--blue);background:var(--blue-bg)}
+.fc-iicon{width:22px;height:22px;background:var(--blue);color:white;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-note{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:10px 12px;font-size:12px;color:var(--sub);margin-top:10px;line-height:1.6}
+.fc-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+.fc-table td{padding:6px 8px;border-bottom:1px solid var(--bg);color:var(--sub);vertical-align:top}
+.fc-table td:first-child{font-weight:500;color:var(--text);width:55%}
+.fc-table tr:last-child td{border-bottom:none}
+.fc-tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:8px}
+.fc-tag.green{background:#e8f5e9;color:#2e7d32}
+.fc-tag.blue{background:var(--blue-bg);color:var(--blue)}
+.fc-tag.amber{background:var(--gold-bg);color:var(--gold)}
+.guide-cta{background:linear-gradient(120deg,#16423c,#0f322c);color:white;border-radius:18px;padding:30px 28px;margin-top:36px;text-align:center;box-shadow:0 16px 40px rgba(22,66,60,.18)}
+.guide-cta-title{font-size:16px;font-weight:600;margin-bottom:6px}
+.guide-cta-desc{font-size:13px;opacity:.85;margin-bottom:16px;line-height:1.5}
+.guide-cta-btn{display:inline-block;background:linear-gradient(135deg,#2fd18d,#1f8f66);color:#04140d;font-size:13.5px;font-weight:800;padding:12px 26px;border-radius:10px;text-decoration:none;box-shadow:0 6px 20px rgba(46,200,140,.35)}
+.related{margin-top:32px}
+.related-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.rc{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px;text-decoration:none;display:block;box-shadow:0 2px 10px rgba(22,66,60,.05);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.rc:hover{border-color:#cfe6d8;text-decoration:none;transform:translateY(-3px);box-shadow:0 14px 34px rgba(22,66,60,.12)}
+.rc-icon{font-size:18px;margin-bottom:6px}
+.rc-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.rc-desc{font-size:11px;color:var(--muted)}
+.site-footer{background:var(--white);border-top:1px solid var(--border);padding:24px;margin-top:48px}
+.site-footer-inner{max-width:780px;margin:0 auto;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.footer-copy{font-size:11px;color:var(--muted)}
+.footer-copy a{color:var(--muted)}
+@media(max-width:540px){
+  .fc-branch{grid-template-columns:1fr}
+  .guide-title{font-size:22px}
+}
+.dld-dl{background:var(--white);border:1.5px solid var(--accent);border-radius:var(--r);padding:16px 18px;margin-bottom:24px}
+.dld-dl-row{display:flex;align-items:center;gap:14px}
+.dld-dl-icon{font-size:28px;flex-shrink:0}
+.dld-dl-body{flex:1;min-width:0}
+.dld-dl-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.dld-dl-desc{font-size:12px;color:var(--sub);line-height:1.5}
+.dld-dl-btn{background:var(--accent);color:#fff;font-size:13px;font-weight:600;padding:9px 16px;border-radius:7px;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.dld-dl-btn:hover{opacity:.9;text-decoration:none}
+.dld-dl-note{font-size:12px;color:var(--sub);margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);line-height:1.55}
+.dld-dl-note a{color:var(--accent);font-weight:600}
+@media(max-width:540px){.dld-dl-row{flex-wrap:wrap}.dld-dl-btn{width:100%;text-align:center}}
+.faq{margin-top:36px}
+.faq-title{font-size:18px;font-weight:800;color:var(--accent);letter-spacing:-.01em;margin-bottom:12px}
+.faq-item{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:10px}
+.faq-q{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
+.faq-a{font-size:13px;color:var(--sub);line-height:1.65;margin:0}
+
+.lang-sw{margin-inline-start:auto;display:inline-flex;border:1.5px solid var(--border);border-radius:999px;overflow:hidden;flex-shrink:0;background:var(--white)}
+.lang-sw a{padding:5px 12px;font-size:12px;font-weight:700;color:var(--sub);text-decoration:none;line-height:1.4}
+.lang-sw a.on{background:var(--accent);color:#fff}
+.lang-sw a:hover{text-decoration:none}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner" style="justify-content:space-between">
+    <a class="brand-name" href="/" style="flex-shrink:0">Ejari Helper</a>
+    <a href="/legal-chat" style="font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(42,122,111,.25);padding:6px 12px;border-radius:6px;text-decoration:none;white-space:nowrap">⚖️ Ask AI Lawyer</a>
+  </div>
+</nav>
+
+<main>
+
+  <nav class="bc" aria-label="Breadcrumb">
+    <a href="/">Home</a><span class="bc-sep">›</span>
+    <a href="/#guides">Guides</a><span class="bc-sep">›</span>
+    <span>Eviction Notice Rules</span>
+  </nav>
+
+  <div class="guide-badge">Disputes & Rights · Dubai</div>
+  <h1 class="guide-title">Eviction notice in Dubai:<br>the 12-month rule and your rights</h1>
+  <div class="guide-meta">Updated August 2026 · Law 26/2007 as amended by Law 33/2008 · Notarised notice required</div>
+  <p class="guide-intro"><strong>Can your landlord evict you?</strong> Only with <strong>12 months written notice served through a notary public or registered mail</strong>, and only on four legal grounds: sale, personal use, demolition, or major renovation (Article 25(2), Law No. 33 of 2008). A WhatsApp message, email or verbal demand is not a valid eviction notice — and an invalid notice can be contested at the Rental Dispute Centre. This guide covers both eviction routes, what makes a notice defective, and the compensation rule landlords hope you never read.</p>
+
+  <div class="fc">
+
+    <div class="fc-node info">
+      <div class="fc-node-head">
+        <div class="fc-iicon">i</div>
+        <h2 class="fc-title">The two eviction routes under Dubai law</h2>
+      </div>
+      <div class="fc-body">
+        <table class="fc-table">
+          <tr><td><strong>At contract end — Art. 25(2)</strong></td><td>Requires <strong>12-month notice via notary or registered mail</strong>, stating one of 4 grounds: ① sale of the property, ② personal use by the landlord or first-degree relatives (only if they own no suitable alternative), ③ demolition/reconstruction, ④ comprehensive renovation impossible while occupied (with permits attached).</td></tr>
+          <tr><td><strong>During the contract — Art. 25(1)</strong></td><td>No 12-month notice, but strict grounds: rent unpaid <strong>30 days after a formal demand</strong>, unauthorised subletting, illegal/immoral use, structural danger, unpermitted damaging alterations, or breach of contract/law not remedied after notice.</td></tr>
+        </table>
+        <div class="fc-note">Everything else — "my cousin is moving in next month", "I want a higher rent", "you complained too much" — is <strong>not</strong> a lawful basis to make you leave.</div>
+      </div>
+    </div>
+
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+
+    <div class="fc-node step">
+      <div class="fc-node-head">
+        <div class="fc-num">✓</div>
+        <h2 class="fc-title">Received a notice? Check these three things</h2>
+      </div>
+      <div class="fc-body">
+        <ol>
+          <li><strong>Service method.</strong> Notary public or registered mail only. Email, WhatsApp, SMS or hand-delivered letters do not count.</li>
+          <li><strong>The full 12 months.</strong> The clock runs from when the notice is served, and eviction can only take effect at or after the contract's expiry. A "3 months to vacate" demand is void.</li>
+          <li><strong>A valid, stated ground.</strong> The notice must name one of the four Article 25(2) grounds. For renovation/demolition it needs the supporting permits; for sale, evidence of intent to sell.</li>
+        </ol>
+        Any missing element makes the notice <strong>defective</strong> — reply in writing pointing out the defect, keep paying rent as normal, and contest at the <a href="/guide/rental-dispute">Rental Dispute Centre</a> if the landlord escalates. Meanwhile your tenancy simply renews on its legal terms — including the <a href="/guide/rent-increase-dubai">rent increase caps</a>.
+      </div>
+    </div>
+
+    <div class="guide-cta" style="margin:26px 0;background:linear-gradient(180deg,#16423c 0%,#0f322c 100%);color:#fff;border:none">
+    <div class="guide-cta-title" style="color:#fff">⚖️ Holding an eviction notice right now?</div>
+    <div class="guide-cta-desc" style="color:#dfe9e6">Send the details to the AI rental lawyer — it checks service method, timing and grounds against Law 33/2008, and tells you whether the notice stands. AED 50 vs AED 1,500/hr at a firm — <strong style="color:#fff">first question free</strong>.</div>
+    <a href="/legal-chat" class="guide-cta-btn" style="background:#fff;color:#16423c" data-cta="eviction-legal-chat">Check my notice →</a>
+  </div>
+
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+
+    <div class="fc-node warn">
+      <div class="fc-node-head">
+        <div class="fc-wicon">⚠️</div>
+        <h2 class="fc-title">The 2-year compensation rule (Article 26)</h2>
+      </div>
+      <div class="fc-body">
+        If the landlord evicts you for <strong>personal use</strong> and then re-rents the property to another tenant within <strong>2 years</strong> (3 for commercial), you are entitled to claim <strong>compensation</strong> at the RDC for the costs and damage the eviction caused — moving costs, rent difference, and more. Keep the eviction notice and watch the listing sites; a fresh rental ad for your old unit is the evidence.
+        <div class="fc-note">Deposit still unpaid after the move? That is a separate, fast RDC claim — see <a href="/guide/security-deposit-refund-dubai">getting your security deposit back</a>.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <section class="faq">
+    <h2 class="faq-title">Frequently asked questions</h2>
+    <div class="faq-item">
+      <h3 class="faq-q">How much notice does a landlord have to give for eviction in Dubai?</h3>
+      <p class="faq-a">For eviction at the end of the tenancy, 12 months written notice served through a notary public or by registered mail (Article 25(2) of Law No. 33 of 2008). The notice must state one of the four legal grounds: sale of the property, the landlord's own or first-degree relatives' personal use, demolition, or renovation that cannot be done while occupied.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">Is an eviction notice by email or WhatsApp valid in Dubai?</h3>
+      <p class="faq-a">No. The 12-month eviction notice must be served through a notary public or by registered mail. Email, WhatsApp or a plain letter does not satisfy Article 25(2), and the RDC routinely dismisses eviction claims based on informal notices.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">What are the valid grounds for eviction in Dubai?</h3>
+      <p class="faq-a">At contract end (with 12-month notarised notice): sale of the property, personal use by the landlord or first-degree relatives, demolition or reconstruction, or comprehensive renovation impossible while occupied. During the contract (Article 25(1)): non-payment within 30 days of a formal demand, unauthorised subletting, illegal or immoral use, dangerous structural condition, or unpermitted alterations damaging the property.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">Can I be evicted for refusing a rent increase?</h3>
+      <p class="faq-a">No. Refusing an above-cap or un-notified rent increase is not a ground for eviction. If the landlord retaliates with an eviction threat, the threat only works through the 12-month notarised route on one of the four legal grounds.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">What happens if the landlord evicts me for 'personal use' and then re-rents?</h3>
+      <p class="faq-a">If the landlord evicts on the personal-use ground and then rents the property to someone else within 2 years (3 years for commercial leases), you can claim compensation at the Rental Dispute Centre for the eviction's costs and damages (Article 26, Law No. 33 of 2008).</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">What should I do when I receive an eviction notice?</h3>
+      <p class="faq-a">Check three things: was it served via notary or registered mail, does it give a full 12 months, and does it state a valid ground? If any element is missing, the notice is defective — respond in writing and, if the landlord persists, contest it at the RDC. If the notice is valid, use the 12 months to negotiate or plan the move; you owe rent as normal until the end.</p>
+    </div>
+  </section>
+
+  <div class="related">
+    <div class="related-title">Related guides</div>
+    <div class="related-grid">
+      <a href="/guide/rental-dispute" class="rc">
+        <div class="rc-icon">⚖️</div>
+        <div class="rc-title">File an RDC case</div>
+        <div class="rc-desc">Fees, timeline, hearing process</div>
+      </a>
+      <a href="/guide/rent-increase-dubai" class="rc">
+        <div class="rc-icon">📈</div>
+        <div class="rc-title">Rent increase rules</div>
+        <div class="rc-desc">Caps, notice period, how to dispute</div>
+      </a>
+      <a href="/guide/security-deposit-refund-dubai" class="rc">
+        <div class="rc-icon">💰</div>
+        <div class="rc-title">Deposit refund</div>
+        <div class="rc-desc">Get your security deposit back</div>
+      </a>
+      <a href="/guide/tenancy-contract-dubai" class="rc">
+        <div class="rc-icon">📄</div>
+        <div class="rc-title">Tenancy contract</div>
+        <div class="rc-desc">DLD format and required fields</div>
+      </a>
+    </div>
+  </div>
+
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <span class="footer-copy">© 2026 Ejari Helper · Dubai, UAE</span>
+    <span style="color:var(--border)">·</span>
+    <span class="footer-copy"><a href="/how-it-works">How it works</a></span>
+    <span style="color:var(--border)">·</span>
+    <span class="footer-copy"><a href="/privacy">Privacy</a></span>
+    <span style="color:var(--border)">·</span>
+    <span class="footer-copy"><a href="/terms">Terms</a></span>
+    <span style="color:var(--border)">·</span>
+    <span class="footer-copy"><a href="/">← Back to Ejari Helper</a></span>
+    <span style="color:var(--border)">·</span>
+    <span class="footer-copy" lang="ar" dir="rtl"><a href="/ar/guide/rental-dispute">المنازعات الإيجارية</a> · <a href="/ar/guide/ejari-renewal">تجديد إيجاري</a> · <a href="/ar/guide/dewa-premises-number">رقم المبنى ديوا</a> · <a href="/ar/legal-chat">المحامي الذكي للإيجارات</a></span>
+  </div>
+</footer>
+</body>
+</html>
