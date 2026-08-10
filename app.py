@@ -238,6 +238,23 @@ def save_rating(stars):
 
 # ── Routes ─────────────────────────────────────────────────────────────
 
+def render_page(*rel_path):
+    """Serve a static HTML page with __BASE_URL__ and __GA4_ID__ injected.
+
+    GA4_MEASUREMENT_ID (a G-XXXXXXXXXX id) comes from the environment; when
+    unset the placeholder stays as-is and the front-end guard skips the
+    gtag('config') call, so pages work without GA4 configured.
+    """
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    ga4_id = os.environ.get('GA4_MEASUREMENT_ID', '')
+    with open(os.path.join(app.static_folder, *rel_path), encoding='utf-8') as f:
+        html = f.read()
+    html = html.replace('__BASE_URL__', base_url)
+    if ga4_id:
+        html = html.replace('__GA4_ID__', ga4_id)
+    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+
+
 @app.before_request
 def redirect_canonical():
     """Force canonical host (no www) AND canonical scheme (https) in a single 301.
@@ -255,11 +272,7 @@ def redirect_canonical():
 
 @app.route('/')
 def index():
-    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
-    with open(os.path.join(app.static_folder, 'index.html'), encoding='utf-8') as f:
-        html = f.read()
-    html = html.replace('__BASE_URL__', base_url)
-    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+    return render_page('index.html')
 
 @app.route('/rate', methods=['POST'])
 def rate():
@@ -652,12 +665,7 @@ def guide(slug):
     if slug not in _GUIDE_SLUGS:
         from flask import redirect
         return redirect('/', 302)
-    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
-    guide_path = os.path.join(app.static_folder, 'guide', f'{slug}.html')
-    with open(guide_path, encoding='utf-8') as f:
-        html = f.read()
-    html = html.replace('__BASE_URL__', base_url)
-    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+    return render_page('guide', f'{slug}.html')
 
 
 @app.route('/ar/guide/<slug>')
@@ -665,30 +673,17 @@ def guide_ar(slug):
     if slug not in _AR_GUIDE_SLUGS:
         from flask import redirect
         return redirect('/', 302)
-    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
-    guide_path = os.path.join(app.static_folder, 'ar', 'guide', f'{slug}.html')
-    with open(guide_path, encoding='utf-8') as f:
-        html = f.read()
-    html = html.replace('__BASE_URL__', base_url)
-    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+    return render_page('ar', 'guide', f'{slug}.html')
 
 
 @app.route('/privacy')
 def privacy():
-    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
-    with open(os.path.join(app.static_folder, 'privacy.html'), encoding='utf-8') as f:
-        html = f.read()
-    html = html.replace('__BASE_URL__', base_url)
-    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+    return render_page('privacy.html')
 
 
 @app.route('/terms')
 def terms():
-    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
-    with open(os.path.join(app.static_folder, 'terms.html'), encoding='utf-8') as f:
-        html = f.read()
-    html = html.replace('__BASE_URL__', base_url)
-    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+    return render_page('terms.html')
 
 
 # ── Legal Chat (paid AI consultation on Dubai rental disputes) ─────────
@@ -755,11 +750,7 @@ def _legal_files_state():
 
 @app.route('/legal-chat')
 def legal_chat_page():
-    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
-    with open(os.path.join(app.static_folder, 'legal-chat.html'), encoding='utf-8') as f:
-        html = f.read()
-    html = html.replace('__BASE_URL__', base_url)
-    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+    return render_page('legal-chat.html')
 
 
 @app.route('/legal-chat/state')
@@ -1056,11 +1047,7 @@ def legal_files_payment_success():
 
 @app.route('/how-it-works')
 def how_it_works():
-    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
-    with open(os.path.join(app.static_folder, 'how-it-works.html'), encoding='utf-8') as f:
-        html = f.read()
-    html = html.replace('__BASE_URL__', base_url)
-    return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+    return render_page('how-it-works.html')
 
 @app.route('/download/dld-tenancy-contract.pdf')
 def download_template():
@@ -1291,7 +1278,7 @@ def payment_success():
     """Ziina redirects here after successful payment. Verify and mark as paid."""
     intent_id = request.args.get('intent_id', '')
     if not intent_id:
-        return send_from_directory('static', 'index.html')
+        return redirect('/')
 
     try:
         # Verify with Ziina API that payment is actually completed

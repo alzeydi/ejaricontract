@@ -8,6 +8,25 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'AW-18223357108');
+  // GA4 — measurement ID injected server-side from GA4_MEASUREMENT_ID env var (see README.md).
+  var GA4_ID = '__GA4_ID__';
+  if (/^G-[A-Z0-9]+$/.test(GA4_ID)) gtag('config', GA4_ID, (location.search.indexOf('_ga_debug=1') > -1) ? {debug_mode: true} : {});
+  // GA4 key-event helper. Each event below must be marked as a Key Event in GA4 admin — see README.md.
+  function ehEvent(name, params){ try { gtag('event', name, params || {}); } catch(e) {} }
+  // Delegated tracking: template downloads everywhere; guide/tool → product CTA clicks.
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a) return;
+    var href = a.getAttribute('href') || '';
+    if (href.indexOf('/download/') === 0){
+      ehEvent('template_downloaded', {file_name: href.split('/').pop(), source_page: location.pathname});
+    } else if (a.hasAttribute('data-cta')){
+      ehEvent('cta_click', {source_page: location.pathname, cta_target: a.getAttribute('data-cta')});
+    } else if ((location.pathname.indexOf('/guide/') === 0 || location.pathname.indexOf('/ar/guide/') === 0 || location.pathname.indexOf('/tools/') === 0) &&
+               (href === '/' || href.indexOf('/legal-chat') === 0 || href.indexOf('/ar/legal-chat') === 0 || href.indexOf('/#') === 0)){
+      ehEvent('cta_click', {source_page: location.pathname, cta_target: href});
+    }
+  }, true);
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
