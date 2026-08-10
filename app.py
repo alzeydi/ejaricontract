@@ -613,37 +613,41 @@ def robots_txt():
 def sitemap_xml():
     base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
 
-    def hreflang_links(slug):
-        """xhtml:link alternates for guides that exist in EN + AR."""
-        en = f'{base_url}/guide/{slug}'
-        ar = f'{base_url}/ar/guide/{slug}'
+    def hreflang_links(en_path, ar_path):
+        """xhtml:link alternates for pages that exist in EN + AR."""
+        en = f'{base_url}{en_path}'
+        ar = f'{base_url}{ar_path}'
         return (f'\n    <xhtml:link rel="alternate" hreflang="en" href="{en}"/>'
                 f'\n    <xhtml:link rel="alternate" hreflang="ar" href="{ar}"/>'
                 f'\n    <xhtml:link rel="alternate" hreflang="x-default" href="{en}"/>')
 
-    # (path, changefreq, priority, hreflang-slug-or-None)
+    def guide_pair(slug):
+        return (f'/guide/{slug}', f'/ar/guide/{slug}')
+
+    # (path, changefreq, priority, (en_path, ar_path) or None)
     entries = [
         ('/', 'weekly', '1.0', None),
         ('/guide/ejari-registration', 'monthly', '0.8', None),
         ('/guide/dewa-activation', 'monthly', '0.7', None),
-        ('/guide/rental-dispute', 'monthly', '0.7', 'rental-dispute'),
-        ('/guide/ejari-renewal', 'monthly', '0.8', 'ejari-renewal'),
+        ('/guide/rental-dispute', 'monthly', '0.7', guide_pair('rental-dispute')),
+        ('/guide/ejari-renewal', 'monthly', '0.8', guide_pair('ejari-renewal')),
         ('/guide/tenancy-contract-dubai', 'monthly', '0.8', None),
-        ('/guide/dewa-premises-number', 'monthly', '0.6', 'dewa-premises-number'),
+        ('/guide/dewa-premises-number', 'monthly', '0.6', guide_pair('dewa-premises-number')),
         ('/guide/dewa-transfer', 'monthly', '0.8', None),
         ('/guide/ejari-cancellation', 'monthly', '0.7', None),
-        ('/ar/guide/rental-dispute', 'monthly', '0.7', 'rental-dispute'),
-        ('/ar/guide/ejari-renewal', 'monthly', '0.8', 'ejari-renewal'),
-        ('/ar/guide/dewa-premises-number', 'monthly', '0.6', 'dewa-premises-number'),
-        ('/legal-chat', 'weekly', '0.9', None),
+        ('/ar/guide/rental-dispute', 'monthly', '0.7', guide_pair('rental-dispute')),
+        ('/ar/guide/ejari-renewal', 'monthly', '0.8', guide_pair('ejari-renewal')),
+        ('/ar/guide/dewa-premises-number', 'monthly', '0.6', guide_pair('dewa-premises-number')),
+        ('/legal-chat', 'weekly', '0.9', ('/legal-chat', '/ar/legal-chat')),
+        ('/ar/legal-chat', 'weekly', '0.8', ('/legal-chat', '/ar/legal-chat')),
         ('/how-it-works', 'monthly', '0.9', None),
         ('/privacy', 'yearly', '0.5', None),
         ('/terms', 'yearly', '0.5', None),
     ]
     urls = ''
-    for path, freq, prio, slug in entries:
+    for path, freq, prio, pair in entries:
         urls += (f'\n  <url>\n    <loc>{base_url}{path}</loc>'
-                 f'{hreflang_links(slug) if slug else ""}'
+                 f'{hreflang_links(*pair) if pair else ""}'
                  f'\n    <changefreq>{freq}</changefreq>'
                  f'\n    <priority>{prio}</priority>\n  </url>')
     xml = ('<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -751,6 +755,12 @@ def _legal_files_state():
 @app.route('/legal-chat')
 def legal_chat_page():
     return render_page('legal-chat.html')
+
+
+@app.route('/ar/legal-chat')
+def legal_chat_ar_page():
+    """Arabic landing for the AI rental lawyer (rental-disputes focus)."""
+    return render_page('ar', 'legal-chat.html')
 
 
 @app.route('/legal-chat/state')

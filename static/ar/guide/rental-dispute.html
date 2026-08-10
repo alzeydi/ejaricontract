@@ -158,13 +158,20 @@ a:hover{text-decoration:underline}
   .fc-branch{grid-template-columns:1fr}
   .guide-title{font-size:22px}
 }
+
+.lang-sw{margin-inline-start:auto;display:inline-flex;border:1.5px solid var(--border);border-radius:999px;overflow:hidden;flex-shrink:0;background:var(--white)}
+.lang-sw a{padding:5px 12px;font-size:12px;font-weight:700;color:var(--sub);text-decoration:none;line-height:1.4}
+.lang-sw a.on{background:var(--accent);color:#fff}
+.lang-sw a:hover{text-decoration:none}
+@media(max-width:540px){.lang-sw a{padding:4px 9px;font-size:11px}}
 </style>
 </head>
 <body>
 <nav>
   <div class="nav-inner" style="justify-content:space-between">
     <a class="brand-name" href="/" style="flex-shrink:0">Ejari Helper</a>
-    <a href="/legal-chat" style="font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(42,122,111,.25);padding:6px 12px;border-radius:6px;text-decoration:none;white-space:nowrap">⚖️ اسأل المحامي الذكي</a>
+    <div class="lang-sw" role="navigation" aria-label="Language"><a href="/guide/rental-dispute" class="lang-opt" hreflang="en">EN</a><a href="/ar/guide/rental-dispute" class="lang-opt on" lang="ar" hreflang="ar">عربي</a></div>
+    <a href="/ar/legal-chat" style="font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(42,122,111,.25);padding:6px 12px;border-radius:6px;text-decoration:none;white-space:nowrap">⚖️ اسأل المحامي الذكي</a>
   </div>
 </nav>
 
@@ -213,7 +220,7 @@ a:hover{text-decoration:underline}
       </div>
       <div class="fc-body">
         قبل رفع القضية إلى المركز، أرسل إخطاراً كتابياً إلى الطرف الآخر تشرح فيه المشكلة وما تطلبه، مع مهلة معقولة للرد. البريد الإلكتروني أو واتساب مقبولان — احتفظ بلقطات الشاشة وإثباتات التسليم لكل شيء. وتذكّر التزامات المالك أيضاً: أي تغيير في الإيجار يتطلب <strong>إخطاراً كتابياً قبل 90 يوماً</strong>، والإخلاء بسبب البيع أو الاستخدام الشخصي يتطلب <strong>إخطاراً موثقاً لدى الكاتب العدل قبل 12 شهراً</strong>.
-        <div class="fc-note">هذه الخطوة تُظهر للمحكّم أنك حاولت حل المشكلة ودياً — وفي حالات كثيرة يكفي الإخطار وحده للحصول على استجابة. لست متأكداً كيف ينطبق القانون على حالتك؟ <a href="/legal-chat">اسأل المساعد القانوني الذكي</a> قبل أن تدفع رسوم رفع القضية.</div>
+        <div class="fc-note">هذه الخطوة تُظهر للمحكّم أنك حاولت حل المشكلة ودياً — وفي حالات كثيرة يكفي الإخطار وحده للحصول على استجابة. لست متأكداً كيف ينطبق القانون على حالتك؟ <a href="/ar/legal-chat">اسأل المساعد القانوني الذكي</a> قبل أن تدفع رسوم رفع القضية.</div>
       </div>
     </div>
 
@@ -254,7 +261,7 @@ a:hover{text-decoration:underline}
         <ul>
           <li><strong>الهوية الإماراتية</strong> (ونسخة من جواز سفر الطرف الآخر إن توفرت)</li>
           <li><strong>عقد الإيجار</strong> — موقّعاً وبصيغة دائرة الأراضي والأملاك</li>
-          <li><strong>شهادة إيجاري</strong> — بتسجيل ساري المفعول؛ إذا لم يُسجّل عقدك من الأساس فابدأ بـ<a href="/guide/ejari-registration">تسجيل إيجاري</a> أولاً، وإذا انتهت صلاحيته <a href="/guide/ejari-renewal">فجدّد إيجاري</a> قبل التقديم، لأن انتهاء إيجاري يمنع رفع القضايا في المركز</li>
+          <li><strong>شهادة إيجاري</strong> — بتسجيل ساري المفعول؛ إذا لم يُسجّل عقدك من الأساس فابدأ بـ<a href="/guide/ejari-registration">تسجيل إيجاري</a> أولاً، وإذا انتهت صلاحيته <a href="/ar/guide/ejari-renewal">فجدّد إيجاري</a> قبل التقديم، لأن انتهاء إيجاري يمنع رفع القضايا في المركز</li>
           <li><strong>إثباتات الدفع</strong> — إيصالات الإيجار ونسخ الشيكات والتحويلات البنكية</li>
           <li><strong>سجلات المراسلات</strong> — رسائل البريد الإلكتروني وواتساب والخطابات وإخطارك الكتابي من الخطوة 1</li>
           <li><strong>الصور ومقاطع الفيديو</strong> — لنزاعات الصيانة والأضرار</li>
@@ -368,7 +375,7 @@ a:hover{text-decoration:underline}
           <tr><td>أقل من السوق بنسبة 31–40%</td><td><strong>بحد أقصى 15%</strong></td></tr>
           <tr><td>أقل من السوق بأكثر من 40%</td><td><strong>بحد أقصى 20%</strong></td></tr>
         </table>
-        <div class="fc-note">يجب على المالك أيضاً توجيه <strong>إخطار كتابي قبل 90 يوماً</strong> من سريان أي زيادة (القانون رقم 33 لسنة 2008، المادة 13(2)) — وأي إخطار أقل من 90 يوماً يجعل الزيادة غير نافذة. النصوص الكاملة للقانون رقم 26 لسنة 2007 والقانون رقم 33 لسنة 2008 والمرسوم رقم 43 لسنة 2013 متاحة على <a href="https://dlp.dubai.gov.ae/" target="_blank" rel="noopener">بوابة تشريعات دبي</a>. وتجد توقيت التجديد وقاعدة التسعين يوماً مشروحة في <a href="/guide/ejari-renewal">دليل تجديد إيجاري</a>.</div>
+        <div class="fc-note">يجب على المالك أيضاً توجيه <strong>إخطار كتابي قبل 90 يوماً</strong> من سريان أي زيادة (القانون رقم 33 لسنة 2008، المادة 13(2)) — وأي إخطار أقل من 90 يوماً يجعل الزيادة غير نافذة. النصوص الكاملة للقانون رقم 26 لسنة 2007 والقانون رقم 33 لسنة 2008 والمرسوم رقم 43 لسنة 2013 متاحة على <a href="https://dlp.dubai.gov.ae/" target="_blank" rel="noopener">بوابة تشريعات دبي</a>. وتجد توقيت التجديد وقاعدة التسعين يوماً مشروحة في <a href="/ar/guide/ejari-renewal">دليل تجديد إيجاري</a>.</div>
       </div>
     </div>
 
@@ -433,7 +440,7 @@ a:hover{text-decoration:underline}
   <div class="guide-cta" style="background:linear-gradient(180deg,#16423c 0%,#0f322c 100%);color:#fff;border:none">
     <div class="guide-cta-title" style="color:#fff">⚖️ لست متأكداً كيف تنطبق القوانين على قضيتك؟</div>
     <div class="guide-cta-desc" style="color:#dfe9e6">اسأل مساعدنا القانوني الذكي — المدرَّب على القانون 26/2007 والقانون 33/2008 والمرسوم 43/2013 وقواعد ريرا. احصل على إجابة موثقة بالمواد القانونية وخطوة تالية واضحة في أقل من دقيقة. <strong style="color:#fff">اسأل سؤالاً واحداً مجاناً</strong> كمعاينة، ثم 50 درهماً تفتح لك 30 دقيقة من المحادثة غير المحدودة.</div>
-    <a href="/legal-chat" class="guide-cta-btn" style="background:#fff;color:#16423c">ابدأ المحادثة القانونية الذكية ←</a>
+    <a href="/ar/legal-chat" class="guide-cta-btn" style="background:#fff;color:#16423c">ابدأ المحادثة القانونية الذكية ←</a>
   </div>
 
   <div class="guide-cta">
@@ -455,7 +462,7 @@ a:hover{text-decoration:underline}
         <div class="rc-title">تسجيل إيجاري</div>
         <div class="rc-desc">دليل التسجيل خطوة بخطوة</div>
       </a>
-      <a href="/guide/ejari-renewal" class="rc">
+      <a href="/ar/guide/ejari-renewal" class="rc">
         <div class="rc-icon">🔄</div>
         <div class="rc-title">تجديد إيجاري</div>
         <div class="rc-desc">خطوات التجديد والرسوم والمواعيد</div>

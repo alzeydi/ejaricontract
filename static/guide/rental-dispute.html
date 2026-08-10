@@ -158,12 +158,19 @@ a:hover{text-decoration:underline}
   .fc-branch{grid-template-columns:1fr}
   .guide-title{font-size:22px}
 }
+
+.lang-sw{margin-inline-start:auto;display:inline-flex;border:1.5px solid var(--border);border-radius:999px;overflow:hidden;flex-shrink:0;background:var(--white)}
+.lang-sw a{padding:5px 12px;font-size:12px;font-weight:700;color:var(--sub);text-decoration:none;line-height:1.4}
+.lang-sw a.on{background:var(--accent);color:#fff}
+.lang-sw a:hover{text-decoration:none}
+@media(max-width:540px){.lang-sw a{padding:4px 9px;font-size:11px}}
 </style>
 </head>
 <body>
 <nav>
   <div class="nav-inner" style="justify-content:space-between">
     <a class="brand-name" href="/" style="flex-shrink:0">Ejari Helper</a>
+    <div class="lang-sw" role="navigation" aria-label="Language"><a href="/guide/rental-dispute" class="lang-opt on" hreflang="en">EN</a><a href="/ar/guide/rental-dispute" class="lang-opt" lang="ar" hreflang="ar">عربي</a></div>
     <a href="/legal-chat" style="font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(42,122,111,.25);padding:6px 12px;border-radius:6px;text-decoration:none;white-space:nowrap">⚖️ Ask AI Lawyer</a>
   </div>
 </nav>
@@ -481,6 +488,8 @@ a:hover{text-decoration:underline}
     <span class="footer-copy"><a href="/terms">Terms</a></span>
     <span style="color:var(--border)">·</span>
     <span class="footer-copy"><a href="/">← Back to Ejari Helper</a></span>
+    <span style="color:var(--border)">·</span>
+    <span class="footer-copy" lang="ar" dir="rtl"><a href="/ar/guide/rental-dispute">المنازعات الإيجارية</a> · <a href="/ar/guide/ejari-renewal">تجديد إيجاري</a> · <a href="/ar/guide/dewa-premises-number">رقم المبنى ديوا</a> · <a href="/ar/legal-chat">المحامي الذكي للإيجارات</a></span>
   </div>
 </footer>
 </body>

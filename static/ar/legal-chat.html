@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18223357108"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-18223357108');
+  // GA4 — measurement ID injected server-side from GA4_MEASUREMENT_ID env var (see README.md).
+  var GA4_ID = '__GA4_ID__';
+  if (/^G-[A-Z0-9]+$/.test(GA4_ID)) gtag('config', GA4_ID, (location.search.indexOf('_ga_debug=1') > -1) ? {debug_mode: true} : {});
+  // GA4 key-event helper. Each event below must be marked as a Key Event in GA4 admin — see README.md.
+  function ehEvent(name, params){ try { gtag('event', name, params || {}); } catch(e) {} }
+  // Delegated tracking: template downloads everywhere; guide/tool → product CTA clicks.
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a) return;
+    var href = a.getAttribute('href') || '';
+    if (href.indexOf('/download/') === 0){
+      ehEvent('template_downloaded', {file_name: href.split('/').pop(), source_page: location.pathname});
+    } else if (a.hasAttribute('data-cta')){
+      ehEvent('cta_click', {source_page: location.pathname, cta_target: a.getAttribute('data-cta')});
+    } else if ((location.pathname.indexOf('/guide/') === 0 || location.pathname.indexOf('/ar/guide/') === 0 || location.pathname.indexOf('/tools/') === 0) &&
+               (href === '/' || href.indexOf('/legal-chat') === 0 || href.indexOf('/ar/legal-chat') === 0 || href.indexOf('/#') === 0)){
+      ehEvent('cta_click', {source_page: location.pathname, cta_target: href});
+    }
+  }, true);
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<title>محامي إيجارات ذكي في دبي — منازعات إيجارية | Ejari Helper</title>
+<meta name="description" content="استشارة قانونية فورية بالذكاء الاصطناعي حول المنازعات الإيجارية في دبي: التأمين، زيادة الإيجار، الإخلاء، قضايا RDC. جلسة 30 دقيقة بـ 50 درهماً فقط.">
+<meta name="geo.region" content="AE-DU">
+<meta name="geo.placename" content="Dubai">
+<link rel="canonical" href="__BASE_URL__/ar/legal-chat">
+<link rel="alternate" hreflang="en" href="__BASE_URL__/legal-chat">
+<link rel="alternate" hreflang="ar" href="__BASE_URL__/ar/legal-chat">
+<link rel="alternate" hreflang="x-default" href="__BASE_URL__/legal-chat">
+<meta property="og:type" content="website">
+<meta property="og:url" content="__BASE_URL__/ar/legal-chat">
+<meta property="og:title" content="محامي إيجارات ذكي في دبي — إجابات فورية على المنازعات الإيجارية">
+<meta property="og:description" content="اسأل المحامي الذكي عن نزاعك الإيجاري في دبي واحصل على إجابة مدعومة بالمواد القانونية خلال 60 ثانية. 50 درهماً لجلسة 30 دقيقة.">
+<meta property="og:site_name" content="Ejari Helper">
+<meta property="og:locale" content="ar_AE">
+<meta property="og:image" content="__BASE_URL__/static/og-image.png?v=2">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="محامي إيجارات ذكي في دبي — منازعات إيجارية">
+<meta name="twitter:description" content="إجابات قانونية فورية على المنازعات الإيجارية في دبي. 50 درهماً / 30 دقيقة.">
+<meta name="twitter:image" content="__BASE_URL__/static/og-image.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Service","name":"محامي إيجارات ذكي في دبي","alternateName":"AI Rental Lawyer Dubai","serviceType":"استشارات قانونية إيجارية بالذكاء الاصطناعي","description":"مساعد قانوني ذكي متخصص في قانون الإيجارات في دبي: المنازعات الإيجارية، استرداد مبلغ التأمين، زيادات الإيجار وفق مؤشر ريرا، إشعارات الإخلاء، ورفع القضايا في مركز فض المنازعات الإيجارية (RDC). إجابات مدعومة بمواد القانون رقم 26 لسنة 2007 والقانون رقم 33 لسنة 2008 والمرسوم رقم 43 لسنة 2013.","provider":{"@type":"Organization","name":"Ejari Helper","url":"__BASE_URL__/"},"areaServed":{"@type":"City","name":"Dubai"},"availableLanguage":["ar","en"],"url":"__BASE_URL__/ar/legal-chat","offers":{"@type":"Offer","price":"50","priceCurrency":"AED","description":"جلسة استشارة 30 دقيقة"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"الرئيسية","item":"__BASE_URL__/"},{"@type":"ListItem","position":2,"name":"المحامي الذكي للإيجارات"}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"كيف أرفع قضية منازعات إيجارية في دبي؟","acceptedAnswer":{"@type":"Answer","text":"تُرفع القضية في مركز فض المنازعات الإيجارية (RDC) التابع لدائرة الأراضي والأملاك، إلكترونياً عبر موقع rdc.gov.ae أو في مقر المركز. تحتاج شهادة إيجاري سارية، وعقد الإيجار، والمراسلات مع الطرف الآخر. رسوم رفع القضية 3.5% من قيمة الإيجار السنوي (بحد أدنى 500 درهم وأقصى 20,000 درهم)، وتُحدد الجلسة عادة خلال 7–15 يوماً."}},{"@type":"Question","name":"ماذا أفعل إذا رفض المالك إعادة مبلغ التأمين؟","acceptedAnswer":{"@type":"Answer","text":"أرسل مطالبة كتابية للمالك أولاً مع إثبات حالة العقار عند التسليم. إذا لم يستجب خلال مدة معقولة، يمكنك رفع قضية في مركز فض المنازعات الإيجارية. لا يجوز للمالك حجز التأمين إلا مقابل أضرار فعلية تتجاوز الاستخدام الطبيعي أو مستحقات غير مدفوعة."}},{"@type":"Question","name":"هل يستطيع المالك زيادة الإيجار كما يشاء؟","acceptedAnswer":{"@type":"Answer","text":"لا. زيادات الإيجار في دبي محكومة بالمرسوم رقم 43 لسنة 2013 ومؤشر ريرا للإيجارات: إذا كان إيجارك ضمن 10% من متوسط السوق فلا تجوز أي زيادة، وتتدرج الزيادات المسموحة من 5% إلى 20% كحد أقصى. كما يجب إخطارك كتابياً قبل 90 يوماً من انتهاء العقد."}},{"@type":"Question","name":"متى يحق للمالك إخلائي من العقار؟","acceptedAnswer":{"@type":"Answer","text":"للإخلاء بعد انتهاء العقد، يجب على المالك إرسال إشعار موثق عبر كاتب العدل أو بالبريد المسجل قبل 12 شهراً، ولأسباب محددة فقط: البيع، أو السكن الشخصي له أو لأقارب الدرجة الأولى، أو الهدم وإعادة البناء، أو الترميم الشامل. الإشعار غير الموثق أو بدون سبب قانوني يمكن الطعن فيه أمام RDC."}},{"@type":"Question","name":"كم تكلفة الاستشارة مع المحامي الذكي؟","acceptedAnswer":{"@type":"Answer","text":"50 درهماً لجلسة 30 دقيقة غير محدودة الأسئلة، مقارنة بنحو 1,500 درهم للساعة لدى مكاتب المحاماة في دبي. أول سؤال مجاني لتجربة الخدمة، ويمكنك الكتابة بالعربية أو الإنجليزية أو أي لغة أخرى."}},{"@type":"Question","name":"هل الإجابات مبنية على القانون الإماراتي فعلاً؟","acceptedAnswer":{"@type":"Answer","text":"نعم. المساعد الذكي متخصص في قانون الإيجارات في دبي ويستشهد بالمادة القانونية المحددة في كل إجابة: القانون رقم 26 لسنة 2007 وتعديلاته بالقانون رقم 33 لسنة 2008، والمرسوم رقم 43 لسنة 2013 بشأن زيادات الإيجار. الخدمة معلومات قانونية وليست تمثيلاً قانونياً — للقضايا المعقدة ننصح بمحامٍ مرخص."}}]}
+</script>
+<style>
+:root{--bg:#fbfaf7;--white:#fff;--text:#1a1a1a;--sub:#55554f;--muted:#86867e;--border:#e7e6df;--accent:#16423c;--accent-bright:#2fd18d;--grad:linear-gradient(135deg,#1f8f66,#16423c);--accent-bg:#eaf2ec;--accent-mid:#1f8f66;--red:#c0392b;--red-bg:#fdf2f2;--blue:#1a4f8a;--blue-bg:#eef3fa;--gold:#b8860b;--gold-bg:#fdfaf0;--r:10px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans Arabic','Plus Jakarta Sans',sans-serif;font-size:14.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+nav{background:rgba(251,250,247,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border);min-height:62px;display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:780px;width:100%;margin:0 auto;display:flex;align-items:center;gap:16px}
+.brand-name{display:inline-flex;align-items:center;gap:10px;font-size:17px;font-weight:800;color:var(--accent);text-decoration:none}
+.brand-name::before{content:'';width:32px;height:32px;border-radius:9px;flex-shrink:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none'%3E%3Cpath d='M4 11l8-6 8 6' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M6 10v9h12v-9' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M9.4 14.3l1.9 2 3.4-3.5' stroke='%235be0a8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/19px no-repeat,linear-gradient(135deg,#1f8f66,#16423c);box-shadow:0 4px 14px rgba(22,66,60,.28)}
+.lang-sw{margin-inline-start:auto;display:inline-flex;border:1.5px solid var(--border);border-radius:999px;overflow:hidden;flex-shrink:0;background:var(--white)}
+.lang-sw a{padding:5px 12px;font-size:12px;font-weight:700;color:var(--sub);text-decoration:none;line-height:1.4}
+.lang-sw a.on{background:var(--accent);color:#fff}
+.lang-sw a:hover{text-decoration:none}
+@media(max-width:540px){.lang-sw a{padding:4px 9px;font-size:11px}}
+main{max-width:720px;margin:0 auto;padding:32px 20px 80px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.bc{font-size:12px;color:var(--muted);margin-bottom:20px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.bc a{color:var(--muted)}
+.bc-sep{color:var(--border)}
+.guide-badge{font-size:11px;font-weight:600;color:var(--accent-mid);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+h1{font-size:29px;font-weight:800;color:var(--accent);line-height:1.35;margin-bottom:10px}
+.guide-meta{font-size:12px;color:var(--muted);margin-bottom:14px}
+.lead{font-size:15px;color:var(--sub);margin-bottom:26px;line-height:1.85}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:34px}
+.btn-main{display:inline-block;background:linear-gradient(135deg,#2fd18d,#1f8f66);color:#04140d;font-size:15px;font-weight:800;padding:14px 30px;border-radius:11px;text-decoration:none;box-shadow:0 6px 20px rgba(46,200,140,.35)}
+.btn-main:hover{text-decoration:none;opacity:.93}
+.btn-ghost{display:inline-block;background:var(--white);border:1.5px solid var(--border);color:var(--accent);font-size:14px;font-weight:700;padding:13px 22px;border-radius:11px;text-decoration:none}
+.btn-ghost:hover{text-decoration:none;border-color:var(--accent-mid)}
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:14px}
+.card h2{font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px}
+.card h3{font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:4px}
+.card p,.card li{font-size:13.5px;color:var(--sub)}
+.card ul,.card ol{padding-inline-start:20px;margin-top:6px}
+.card li{margin-bottom:5px}
+section{margin-top:34px}
+.sec-title{font-size:20px;font-weight:800;color:var(--accent);margin-bottom:14px}
+.topics{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.topic{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 16px}
+.topic .t-icon{font-size:20px;margin-bottom:6px}
+.topic .t-title{font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:3px}
+.topic .t-desc{font-size:12px;color:var(--sub);line-height:1.6}
+@media(max-width:540px){.topics{grid-template-columns:1fr}h1{font-size:23px}}
+table.fees{width:100%;border-collapse:collapse;font-size:13px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden}
+table.fees th{background:var(--accent-bg);color:var(--accent);font-weight:700;text-align:start;padding:10px 14px;border-bottom:1.5px solid var(--border)}
+table.fees td{padding:10px 14px;border-bottom:1px solid var(--bg);color:var(--sub);vertical-align:top}
+table.fees tr:last-child td{border-bottom:none}
+.steps{counter-reset:st;display:flex;flex-direction:column;gap:12px}
+.step-item{background:var(--white);border:1.5px solid var(--border);border-inline-start:4px solid var(--accent);border-radius:var(--r);padding:14px 18px;display:flex;gap:14px;align-items:flex-start}
+.step-num{width:26px;height:26px;background:var(--accent);color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-body h3{font-size:14.5px;font-weight:700;margin-bottom:3px}
+.step-body p{font-size:13px;color:var(--sub)}
+.cta-box{background:linear-gradient(120deg,#16423c,#0f322c);color:#fff;border-radius:18px;padding:28px 26px;margin-top:36px;text-align:center;box-shadow:0 16px 40px rgba(22,66,60,.18)}
+.cta-box .t{font-size:17px;font-weight:700;margin-bottom:6px}
+.cta-box .d{font-size:13.5px;opacity:.88;margin-bottom:16px;line-height:1.7}
+.faq-item{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:10px}
+.faq-q{font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:6px}
+.faq-a{font-size:13.5px;color:var(--sub);line-height:1.8;margin:0}
+.note{background:var(--gold-bg);border:1px solid #e8dcb8;border-radius:8px;padding:12px 16px;font-size:12.5px;color:var(--sub);margin-top:18px;line-height:1.7}
+.site-footer{background:var(--white);border-top:1px solid var(--border);padding:24px;margin-top:48px}
+.site-footer-inner{max-width:780px;margin:0 auto;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--muted)}
+.site-footer-inner a{color:var(--muted)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a class="brand-name" href="/">Ejari Helper</a>
+    <div class="lang-sw" role="navigation" aria-label="Language"><a href="/legal-chat" class="lang-opt" hreflang="en" lang="en" dir="ltr">EN</a><a href="/ar/legal-chat" class="lang-opt on" hreflang="ar">عربي</a></div>
+  </div>
+</nav>
+
+<main>
+  <nav class="bc" aria-label="مسار التنقل">
+    <a href="/">الرئيسية</a><span class="bc-sep">‹</span>
+    <span>المحامي الذكي للإيجارات</span>
+  </nav>
+
+  <div class="guide-badge">استشارات إيجارية · دبي</div>
+  <h1>محامي إيجارات ذكي في دبي — إجابات فورية على منازعاتك الإيجارية</h1>
+  <div class="guide-meta">متاح 24/7 · إجابة خلال 60 ثانية · 50 درهماً / 30 دقيقة · <a href="/legal-chat" lang="en" dir="ltr">English</a></div>
+
+  <p class="lead"><strong>عندك نزاع إيجاري في دبي؟</strong> اسأل المساعد القانوني الذكي عن حالتك — استرداد مبلغ التأمين، زيادة إيجار مخالفة، إشعار إخلاء، صيانة يرفضها المالك، أو رفع قضية في مركز فض المنازعات الإيجارية (RDC) — واحصل خلال ثوانٍ على إجابة مدعومة بمواد <strong>القانون رقم 26 لسنة 2007</strong> و<strong>القانون رقم 33 لسنة 2008</strong> و<strong>المرسوم رقم 43 لسنة 2013</strong>، مع الخطوة العملية التالية لحالتك. جلسة 30 دقيقة بـ <strong>50 درهماً</strong> فقط — مقابل نحو 1,500 درهم للساعة لدى مكاتب المحاماة.</p>
+
+  <div class="hero-cta">
+    <a href="/legal-chat" class="btn-main" data-cta="ar-legal-chat-hero">ابدأ الاستشارة الآن ← أول سؤال مجاني</a>
+    <a href="/ar/guide/rental-dispute" class="btn-ghost">دليل رفع قضية في RDC</a>
+  </div>
+
+  <section>
+    <h2 class="sec-title">ما الذي يمكن أن يساعدك فيه؟</h2>
+    <div class="topics">
+      <div class="topic"><div class="t-icon">💰</div><div class="t-title">استرداد مبلغ التأمين</div><div class="t-desc">المالك يماطل أو يقتطع بدون سبب؟ اعرف حقوقك وخطوات المطالبة الصحيحة.</div></div>
+      <div class="topic"><div class="t-icon">📈</div><div class="t-title">زيادة الإيجار</div><div class="t-desc">هل الزيادة قانونية وفق مؤشر ريرا والمرسوم 43 لسنة 2013؟ وماذا عن إشعار الـ 90 يوماً؟</div></div>
+      <div class="topic"><div class="t-icon">🚪</div><div class="t-title">إشعارات الإخلاء</div><div class="t-desc">إشعار الـ 12 شهراً الموثق، الأسباب القانونية الأربعة، ومتى يمكنك الطعن.</div></div>
+      <div class="topic"><div class="t-icon">⚖️</div><div class="t-title">قضايا مركز فض المنازعات</div><div class="t-desc">الرسوم (3.5% بحد أدنى 500 درهم)، المستندات المطلوبة، ومدة التقاضي المتوقعة.</div></div>
+      <div class="topic"><div class="t-icon">🔧</div><div class="t-title">الصيانة والإصلاحات</div><div class="t-desc">من يتحمل تكلفة الصيانة؟ وماذا تفعل إذا رفض المالك الإصلاح؟</div></div>
+      <div class="topic"><div class="t-icon">📄</div><div class="t-title">عقود الإيجار وإيجاري</div><div class="t-desc">بنود العقد، الإنهاء المبكر، تسجيل <a href="/ar/guide/ejari-renewal">تجديد إيجاري</a> وغيرها.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">كيف تعمل الخدمة؟</h2>
+    <div class="steps">
+      <div class="step-item"><div class="step-num">1</div><div class="step-body"><h3>اكتب سؤالك بالعربية أو الإنجليزية</h3><p>اشرح حالتك بالتفصيل — ويمكنك أيضاً رفع عقد الإيجار أو المراسلات كملف PDF أو صورة.</p></div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-body"><h3>احصل على إجابة مدعومة بالقانون</h3><p>إجابة خلال 60 ثانية تقريباً، مع الاستشهاد بالمادة القانونية المحددة (مثل «المادة 25(2) من القانون 33 لسنة 2008»).</p></div></div>
+      <div class="step-item"><div class="step-num">3</div><div class="step-body"><h3>اعرف خطوتك العملية التالية</h3><p>كل إجابة تنتهي بخطوة واضحة يمكنك تنفيذها اليوم: مطالبة كتابية، حساب الرسوم، أو رفع القضية في rdc.gov.ae.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">التكلفة — مقارنة سريعة</h2>
+    <table class="fees">
+      <tr><th>الخيار</th><th>التكلفة</th><th>التوفر</th></tr>
+      <tr><td><strong>المحامي الذكي (هذه الخدمة)</strong></td><td><strong>50 درهماً</strong> / جلسة 30 دقيقة — أول سؤال مجاني</td><td>فوري، 24/7</td></tr>
+      <tr><td>استشارة مكتب محاماة في دبي</td><td>1,000–1,500 درهم / ساعة تقريباً</td><td>بموعد مسبق</td></tr>
+      <tr><td>رسوم رفع قضية في RDC</td><td>3.5% من الإيجار السنوي (بحد أدنى 500 درهم وأقصى 20,000)</td><td>عبر rdc.gov.ae</td></tr>
+    </table>
+    <div class="note">الخدمة تقدم <strong>معلومات قانونية</strong> وليست تمثيلاً قانونياً أمام المحاكم. للقضايا المعقدة أو المبالغ الكبيرة ننصح بمراجعة محامٍ مرخص أو رفع القضية مباشرة في مركز فض المنازعات الإيجارية.</div>
+  </section>
+
+  <div class="cta-box">
+    <div class="t">جرّب الآن — أول سؤال مجاني</div>
+    <div class="d">اكتب حالتك كما تحكيها لصديق. المساعد الذكي يرد بالعربية ويحدد لك القانون والخطوة التالية.</div>
+    <a href="/legal-chat" class="btn-main" data-cta="ar-legal-chat-mid">اسأل المحامي الذكي ←</a>
+  </div>
+
+  <section>
+    <h2 class="sec-title">أسئلة شائعة</h2>
+    <div class="faq-item">
+      <h3 class="faq-q">كيف أرفع قضية منازعات إيجارية في دبي؟</h3>
+      <p class="faq-a">تُرفع القضية في مركز فض المنازعات الإيجارية (RDC) التابع لدائرة الأراضي والأملاك، إلكترونياً عبر موقع rdc.gov.ae أو في مقر المركز. تحتاج شهادة إيجاري سارية، وعقد الإيجار، والمراسلات مع الطرف الآخر. رسوم رفع القضية 3.5% من قيمة الإيجار السنوي (بحد أدنى 500 درهم وأقصى 20,000 درهم)، وتُحدد الجلسة عادة خلال 7–15 يوماً. راجع <a href="/ar/guide/rental-dispute">دليل المنازعات الإيجارية</a> للخطوات كاملة.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">ماذا أفعل إذا رفض المالك إعادة مبلغ التأمين؟</h3>
+      <p class="faq-a">أرسل مطالبة كتابية للمالك أولاً مع إثبات حالة العقار عند التسليم. إذا لم يستجب خلال مدة معقولة، يمكنك رفع قضية في مركز فض المنازعات الإيجارية. لا يجوز للمالك حجز التأمين إلا مقابل أضرار فعلية تتجاوز الاستخدام الطبيعي أو مستحقات غير مدفوعة.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">هل يستطيع المالك زيادة الإيجار كما يشاء؟</h3>
+      <p class="faq-a">لا. زيادات الإيجار في دبي محكومة بالمرسوم رقم 43 لسنة 2013 ومؤشر ريرا للإيجارات: إذا كان إيجارك ضمن 10% من متوسط السوق فلا تجوز أي زيادة، وتتدرج الزيادات المسموحة من 5% إلى 20% كحد أقصى. كما يجب إخطارك كتابياً قبل 90 يوماً من انتهاء العقد.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">متى يحق للمالك إخلائي من العقار؟</h3>
+      <p class="faq-a">للإخلاء بعد انتهاء العقد، يجب على المالك إرسال إشعار موثق عبر كاتب العدل أو بالبريد المسجل قبل 12 شهراً، ولأسباب محددة فقط: البيع، أو السكن الشخصي له أو لأقارب الدرجة الأولى، أو الهدم وإعادة البناء، أو الترميم الشامل. الإشعار غير الموثق أو بدون سبب قانوني يمكن الطعن فيه أمام RDC.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">كم تكلفة الاستشارة مع المحامي الذكي؟</h3>
+      <p class="faq-a">50 درهماً لجلسة 30 دقيقة غير محدودة الأسئلة، مقارنة بنحو 1,500 درهم للساعة لدى مكاتب المحاماة في دبي. أول سؤال مجاني لتجربة الخدمة، ويمكنك الكتابة بالعربية أو الإنجليزية أو أي لغة أخرى.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">هل الإجابات مبنية على القانون الإماراتي فعلاً؟</h3>
+      <p class="faq-a">نعم. المساعد الذكي متخصص في قانون الإيجارات في دبي ويستشهد بالمادة القانونية المحددة في كل إجابة: القانون رقم 26 لسنة 2007 وتعديلاته بالقانون رقم 33 لسنة 2008، والمرسوم رقم 43 لسنة 2013 بشأن زيادات الإيجار. الخدمة معلومات قانونية وليست تمثيلاً قانونياً — للقضايا المعقدة ننصح بمحامٍ مرخص.</p>
+    </div>
+  </section>
+
+  <div class="cta-box">
+    <div class="t">جاهز تعرف موقفك القانوني؟</div>
+    <div class="d">50 درهماً مقابل 30 دقيقة من الإجابات الموثقة — بدلاً من 1,500 درهم في مكتب محاماة.</div>
+    <a href="/legal-chat" class="btn-main" data-cta="ar-legal-chat-footer">ابدأ الآن — أول سؤال مجاني ←</a>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <span>© 2026 Ejari Helper · دبي، الإمارات</span>
+    <span style="color:var(--border)">·</span>
+    <a href="/ar/guide/rental-dispute">المنازعات الإيجارية</a>
+    <span style="color:var(--border)">·</span>
+    <a href="/ar/guide/ejari-renewal">تجديد إيجاري</a>
+    <span style="color:var(--border)">·</span>
+    <a href="/ar/guide/dewa-premises-number">رقم المبنى ديوا</a>
+    <span style="color:var(--border)">·</span>
+    <a href="/legal-chat" lang="en" dir="ltr">English version</a>
+    <span style="color:var(--border)">·</span>
+    <a href="/privacy" lang="en" dir="ltr">Privacy</a>
+    <span style="color:var(--border)">·</span>
+    <a href="/terms" lang="en" dir="ltr">Terms</a>
+  </div>
+</footer>
+</body>
+</html>
