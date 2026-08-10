@@ -44,6 +44,13 @@ GA4 does **not** treat custom events as conversions automatically. In **GA4 Admi
 
 `BASE_URL`, `ANTHROPIC_API_KEY`, `ZIINA_API_KEY`, `SECRET_KEY`, `ADMIN_PASSWORD`, `DATABASE_URL`, `FREE_MODE`, `LEGAL_FREE_MODE`, `ZIINA_EMBEDDED`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, Trustpilot keys — see comments in `app.py`.
 
+## Post-deploy checklist (after each SEO-relevant deploy)
+
+1. **GSC**: resubmit `sitemap.xml` (Search Console → Sitemaps), then use *URL Inspection → Request indexing* for changed/new URLs — at minimum: `/guide/ejari-renewal`, `/guide/ejari-registration`, `/guide/rental-dispute`, `/tools/rent-increase-calculator`, `/guide/security-deposit-refund-dubai`, `/guide/rent-increase-dubai`, `/guide/eviction-notice-dubai`, `/guide/ejari-fine`, `/ar/legal-chat`, `/how-it-works`, `/terms`.
+2. **GA4**: confirm the 7 key events are marked (see Analytics above); walk the funnel once on a phone with `?_ga_debug=1` and watch DebugView.
+3. **Rich Results Test**: run the edited guide URLs (FAQ + HowTo should be detected).
+4. **Redirects**: `curl -sI http://ejarihelper.ae/guide/ejari-renewal` → exactly one `301` to the https URL, which returns `200`.
+
 ## Tests
 
 ```
