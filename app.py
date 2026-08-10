@@ -588,26 +588,103 @@ def apple_touch_icon():
                                mimetype='image/png', max_age=2592000)
 
 
+# Paths no crawler should touch: admin, payment flows, chat API.
+_ROBOTS_DISALLOW = [
+    '/admin', '/admin/', '/payment-success', '/verify-payment', '/create-payment',
+    '/legal-chat/payment-success', '/legal-chat/create-payment',
+    '/legal-chat/verify-payment', '/legal-chat/message', '/legal-chat/state',
+    '/legal-chat/files-payment', '/legal-chat/files-payment-success',
+    '/legal-chat/files-verify-payment',
+]
+
+# Citation/search AI crawlers — explicitly allowed. AI assistants already drive
+# ~10% of sessions and refer users to the legal-chat product; blocking these
+# bots cuts that acquisition channel.
+_ROBOTS_AI_ALLOWED = ['OAI-SearchBot', 'PerplexityBot', 'ClaudeBot', 'Applebot-Extended']
+
+# Training-only crawlers — opted out (content may be cited/referenced, not trained on).
+_ROBOTS_AI_BLOCKED = ['GPTBot', 'Google-Extended', 'CCBot']
+
+
 @app.route('/robots.txt')
 def robots_txt():
     base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
-    content = (
-        'User-agent: *\n'
-        'Allow: /\n'
-        'Disallow: /admin\n'
-        'Disallow: /admin/\n'
-        'Disallow: /payment-success\n'
-        'Disallow: /verify-payment\n'
-        'Disallow: /create-payment\n'
-        'Disallow: /legal-chat/payment-success\n'
-        'Disallow: /legal-chat/create-payment\n'
-        'Disallow: /legal-chat/message\n'
-        'Disallow: /legal-chat/state\n'
-        'Disallow: /legal-chat/files-payment\n'
-        'Disallow: /legal-chat/files-payment-success\n'
-        f'Sitemap: {base_url}/sitemap.xml\n'
-    )
-    return content, 200, {'Content-Type': 'text/plain'}
+    disallow = ''.join(f'Disallow: {p}\n' for p in _ROBOTS_DISALLOW)
+    parts = ['# AI policy: citation/search assistants welcome, model training opted out.\n'
+             '# Content-Usage: ai-train=no, use=reference\n\n']
+    for bot in _ROBOTS_AI_ALLOWED:
+        parts.append(f'User-agent: {bot}\nAllow: /\n{disallow}\n')
+    for bot in _ROBOTS_AI_BLOCKED:
+        parts.append(f'User-agent: {bot}\nDisallow: /\n\n')
+    parts.append(f'User-agent: *\nAllow: /\n{disallow}\n')
+    parts.append(f'Sitemap: {base_url}/sitemap.xml\n')
+    return ''.join(parts), 200, {'Content-Type': 'text/plain'}
+
+
+@app.route('/llms.txt')
+def llms_txt():
+    """llms.txt — a plain-language site summary for AI assistants."""
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    content = f"""# Ejari Helper (ejarihelper.ae)
+
+> Dubai tenancy paperwork, done in minutes. Two paid products for Dubai tenants
+> and landlords: an AI-filled DLD tenancy contract generator (AED 15) and an AI
+> rental lawyer chat for Dubai tenancy-law questions (AED 50 per 30-minute
+> session, first question free). All guidance is grounded in Dubai Law No. 26 of
+> 2007, Law No. 33 of 2008 and Decree No. 43 of 2013.
+
+## Products
+
+- [Ejari tenancy contract generator]({base_url}/): upload Emirates IDs and the
+  Title Deed; AI extracts the details and fills the official Dubai Land
+  Department (DLD) Unified Tenancy Contract PDF, ready to sign and register
+  with Ejari. Price: AED 15, no account required.
+- [AI rental lawyer chat]({base_url}/legal-chat): instant, citation-backed
+  answers on Dubai rental disputes — security deposits, rent increases (RERA
+  index), eviction notices, RDC filings. Price: AED 50 for 30 minutes vs
+  ~AED 1,500/hour at a law firm. Arabic landing: {base_url}/ar/legal-chat
+
+## Free tools
+
+- [RERA rent increase calculator]({base_url}/tools/rent-increase-calculator):
+  checks the maximum legal rent increase under Decree 43/2013.
+- [Blank DLD tenancy contract template]({base_url}/guide/tenancy-contract-dubai):
+  free download, Word and PDF.
+
+## Guides (canonical URLs)
+
+- [Ejari registration]({base_url}/guide/ejari-registration): register online via
+  Dubai REST, AED 122.50, documents checklist.
+- [Ejari renewal]({base_url}/guide/ejari-renewal): renew every contract year,
+  fees, grace period, late-renewal consequences.
+- [Ejari cancellation]({base_url}/guide/ejari-cancellation): free, required at
+  move-out.
+- [Ejari fines]({base_url}/guide/ejari-fine): what late registration/renewal
+  actually costs.
+- [Dubai tenancy contract]({base_url}/guide/tenancy-contract-dubai): DLD format,
+  required fields, free template.
+- [Rental disputes / RDC]({base_url}/guide/rental-dispute): file at rdc.gov.ae,
+  3.5% fee (min AED 500), hearing in 7–15 days.
+- [Security deposit refund]({base_url}/guide/security-deposit-refund-dubai):
+  wear-and-tear rules, demand letter, RDC claim.
+- [Rent increase rules]({base_url}/guide/rent-increase-dubai): Decree 43/2013
+  caps, 90-day notice, how to dispute.
+- [Eviction notice rules]({base_url}/guide/eviction-notice-dubai): 12-month
+  notarised notice, valid grounds, compensation.
+- [DEWA premise number]({base_url}/guide/dewa-premises-number): find the 9-digit
+  code on bills, Ejari, Title Deed.
+- [DEWA activation]({base_url}/guide/dewa-activation): Move In, deposits,
+  24-hour setup.
+- [DEWA transfer]({base_url}/guide/dewa-transfer): moving between homes.
+
+## Policy
+
+- Citation and referral by AI assistants: welcome.
+- Use of this site's content for model training: not permitted
+  (ai-train=no, use=reference). See robots.txt.
+- Contact: hello@ejarihelper.ae
+"""
+    return content, 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
 @app.route('/sitemap.xml')
 def sitemap_xml():
