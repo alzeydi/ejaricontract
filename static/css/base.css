@@ -1,0 +1,146 @@
+/* ============================================================
+   Ejari Helper — system layer.
+   Loaded AFTER each page's inline <style>, so equal-specificity
+   rules here win: this file is the single source of truth for
+   tokens, type scale, a11y, and shared chrome (nav/footer/TOC).
+   ============================================================ */
+
+:root{
+  --bg:#fbfaf7;
+  --white:#fff;
+  --text:#1a1a1a;
+  --sub:#55554f;
+  --muted:#6e6e66;            /* was #86867e — 4.6:1 on --bg, passes WCAG for small text */
+  --border:#e7e6df;
+  --accent:#16423c;
+  --accent-text:#187457;      /* text-safe green: 4.5:1 on --bg */
+  --accent-mid:#1f8f66;
+  --accent-bright:#2fd18d;    /* backgrounds, icons, buttons with dark text only */
+  --accent-bg:#eaf2ec;
+  --grad:linear-gradient(135deg,#1f8f66,#16423c);
+  --grad-bright:linear-gradient(135deg,#2fd18d,#1f8f66);
+  --red:#c0392b; --red-bg:#fdf2f2;
+  --blue:#1a4f8a; --blue-bg:#eef3fa;
+  --gold:#8a6100; --gold-bg:#fdfaf0;
+  --r-sm:8px; --r:12px; --r-lg:16px;
+  --w-read:720px; --w-wide:1080px;
+  --font-ui:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --font-ar:'IBM Plex Sans Arabic','IBM Plex Sans',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+
+/* ---- Base typography ------------------------------------- */
+body{font-family:var(--font-ui);font-size:15px;line-height:1.65}
+html[lang="ar"] body{font-family:var(--font-ar)}
+h1{line-height:1.12;letter-spacing:-.02em}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums;letter-spacing:0}
+
+/* Unified H1 scale: hero pages large, article pages moderate */
+.hero h1{font-size:clamp(26px,3.4vw,38px)}
+.svc-head h1{font-size:clamp(30px,4.4vw,46px)}
+.guide-title{font-size:clamp(26px,3.6vw,34px);line-height:1.22}
+
+/* Contrast fix: gradient-clipped headline text -> solid text-safe green */
+.grad,.hero h1 i{
+  background:none;
+  -webkit-background-clip:initial;background-clip:initial;
+  -webkit-text-fill-color:currentColor;
+  color:var(--accent-text);
+}
+
+/* ---- Accessibility ---------------------------------------- */
+:focus-visible{outline:2px solid var(--accent-mid);outline-offset:2px;border-radius:3px}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
+}
+
+/* ---- Unified header ---------------------------------------- */
+/* display/padding/min-height reset legacy per-page `nav` element rules */
+.eh-nav{display:block;padding:0;min-height:0;background:rgba(251,250,247,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.eh-nav-in{max-width:var(--w-wide);margin:0 auto;min-height:60px;padding:8px 20px;display:flex;align-items:center;gap:16px}
+.eh-brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.eh-logo{width:32px;height:32px;border-radius:9px;background:var(--grad);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(22,66,60,.28)}
+.eh-logo svg{display:block}
+.eh-brand-name{font-size:16px;font-weight:700;color:var(--accent);letter-spacing:-.01em;white-space:nowrap}
+.eh-links{display:flex;align-items:center;gap:4px;margin-left:auto;min-width:0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.eh-links::-webkit-scrollbar{display:none}
+html[dir="rtl"] .eh-links{margin-left:0;margin-right:auto}
+.eh-links a{font-size:13.5px;color:var(--sub);text-decoration:none;padding:7px 10px;border-radius:8px;white-space:nowrap}
+.eh-links a:hover{background:var(--accent-bg);color:var(--accent)}
+.eh-links a.eh-cta{font-weight:700;color:#04140d;background:var(--grad-bright);padding:8px 14px;border-radius:9px;margin-left:6px;box-shadow:0 4px 14px rgba(46,200,140,.25)}
+.eh-links a.eh-cta:hover{background:var(--grad-bright);filter:brightness(1.04);color:#04140d}
+html[dir="rtl"] .eh-links a.eh-cta{margin-left:0;margin-right:6px}
+.eh-lang{display:inline-flex;border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-left:6px;flex-shrink:0}
+html[dir="rtl"] .eh-lang{margin-left:0;margin-right:6px}
+.eh-lang a{font-size:12.5px;padding:6px 10px;color:var(--sub);text-decoration:none;border-radius:0}
+.eh-lang a.on{background:var(--accent);color:#fff;font-weight:600}
+@media(max-width:560px){
+  .eh-links a{padding:7px 8px;font-size:13px}
+  .eh-brand-name{font-size:15px}
+}
+
+/* ---- Unified footer ---------------------------------------- */
+.eh-footer{border-top:1px solid var(--border);background:var(--white);margin-top:56px}
+.eh-footer-in{max-width:var(--w-wide);margin:0 auto;padding:40px 20px 28px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:28px}
+@media(max-width:860px){.eh-footer-in{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.eh-footer-in{grid-template-columns:1fr}}
+.eh-f-col{display:flex;flex-direction:column;gap:7px;align-items:flex-start}
+html[dir="rtl"] .eh-f-col{align-items:flex-start}
+.eh-f-name{font-size:15px;font-weight:700;color:var(--accent)}
+.eh-f-desc{font-size:13px;color:var(--muted);line-height:1.6;margin:0;max-width:34ch}
+.eh-f-h{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.eh-f-col a{font-size:13.5px;color:var(--sub);text-decoration:none}
+.eh-f-col a:hover{color:var(--accent);text-decoration:underline}
+.eh-f-meta{max-width:var(--w-wide);margin:0 auto;padding:16px 20px 26px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:12.5px;color:var(--muted)}
+.eh-f-meta a{color:var(--muted);text-decoration:none}
+.eh-f-meta a:hover{color:var(--accent);text-decoration:underline}
+.eh-f-review{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--sub);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg)}
+
+/* ---- Video facade (click-to-load YouTube) ------------------ */
+.video-fac{position:absolute;top:0;left:0;width:100%;height:100%;border:0;padding:0;margin:0;cursor:pointer;background:#0d1f1a;display:block;overflow:hidden}
+.video-fac img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:.85}
+.video-fac:hover img{opacity:.95}
+.video-fac .vf-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(22,66,60,.92);box-shadow:0 8px 28px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;transition:transform .15s ease}
+.video-fac:hover .vf-play{transform:translate(-50%,-50%) scale(1.06)}
+.video-fac .vf-play::after{content:'';display:block;width:0;height:0;border-left:18px solid #2fd18d;border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px}
+.video-fac .vf-badge{position:absolute;left:12px;bottom:12px;font-size:12px;font-weight:600;color:#fff;background:rgba(13,31,26,.78);padding:4px 10px;border-radius:6px}
+
+/* ---- Guide table of contents ------------------------------- */
+.eh-toc-box{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:0;margin:18px 0 22px}
+.eh-toc-box summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;padding:12px 16px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.eh-toc-box summary::-webkit-details-marker{display:none}
+.eh-toc-box summary::after{content:'';width:7px;height:7px;border-right:1.8px solid var(--muted);border-bottom:1.8px solid var(--muted);transform:rotate(45deg);margin-left:auto;transition:transform .15s}
+html[dir="rtl"] .eh-toc-box summary::after{margin-left:0;margin-right:auto}
+.eh-toc-box[open] summary::after{transform:rotate(-135deg)}
+.eh-toc-box ol{margin:0;padding:2px 16px 12px 34px}
+html[dir="rtl"] .eh-toc-box ol{padding:2px 34px 12px 16px}
+.eh-toc-box li{margin:5px 0;font-size:13.5px;line-height:1.45}
+.eh-toc-box a{color:var(--sub);text-decoration:none}
+.eh-toc-box a:hover{color:var(--accent-text);text-decoration:underline}
+@media(min-width:1240px){
+  .eh-toc{position:fixed;top:92px;left:calc(50% - 610px);width:230px;max-height:calc(100vh - 130px);overflow:auto;z-index:5}
+  html[dir="rtl"] .eh-toc{left:auto;right:calc(50% - 610px)}
+  .eh-toc .eh-toc-box{margin:0}
+}
+
+/* ---- Icon chip (SVG replacement for emoji icons) ----------- */
+.eh-ic{display:inline-flex;align-items:center;justify-content:center;color:var(--accent)}
+.eh-ic svg{display:block;width:1.25em;height:1.25em}
+
+/* Icon container colors + reading sizes (system-layer overrides) */
+.gc-icon,.rc-icon,.dt-icon,.t-icon,.ubox-icon,.dld-dl-icon,.section-icon{color:var(--accent-mid)}
+.svc-icon.a{color:var(--accent)}
+.svc-icon.b{color:#7fe0b4}
+.gc-icon svg,.rc-icon svg,.dt-icon svg,.t-icon svg,.ubox-icon svg,.dld-dl-icon svg,.section-icon svg,.svc-icon svg,.fc-wicon svg{width:1em;height:1em;display:inline-block;vertical-align:-.12em}
+.guide-intro{font-size:15px}
+.fc-body{font-size:14.5px}
+.faq-a{font-size:14.5px}
+
+/* Inline icon spans (emoji replacements in notes/notices) */
+.eh-ic{color:var(--accent-mid)}
+.fc-note .eh-ic svg,.notice .eh-ic svg,.ext-warn .eh-ic svg{vertical-align:-.14em}
