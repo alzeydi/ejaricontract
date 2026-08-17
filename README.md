@@ -50,7 +50,8 @@ GA4 does **not** treat custom events as conversions automatically. In **GA4 Admi
 2. **GA4**: confirm the 7 key events are marked (see Analytics above); walk the funnel once on a phone with `?_ga_debug=1` and watch DebugView.
 3. **Rich Results Test**: run the edited guide URLs (FAQ + HowTo should be detected).
 4. **Redirects**: `curl -sI http://ejarihelper.ae/guide/ejari-renewal` → exactly one `301` to the https URL, which returns `200`.
-5. **404s**: in GSC → *Pages → Not found (404)*, open the URL list and check each entry now 301s to a live page (`curl -sI` the URL). Anything left should be a URL that genuinely never existed — those are fine to leave as 404s and can be marked *Validate fix*.
+5. **404s**: in GSC → *Pages → Not found (404)*, open the URL list and check each entry now 301s to a live page **in one hop** (`curl -sIL` and count the hops — a 301 into a 404 still counts as a 404). Anything left should be a URL that genuinely never existed — those are fine to leave as 404s and can be marked *Validate fix*.
+   The one URL reported so far was `https://ejarihelper.ae/download/` (crawled 14 Aug 2026): Googlebot walking up from `/download/dld-tenancy-contract.pdf`. Any new file served under a bare directory needs that directory added to `_SECTION_REDIRECTS`.
 
 ## URL canonicalisation
 
@@ -66,6 +67,7 @@ and `redirect_canonical()` emits it together with the scheme/host fix as a **sin
 | upper/mixed case — `/Guide/X` | `/guide/x` |
 | doubled slashes — `/guide//x` | `/guide/x` |
 | bare directory — `/guide`, `/tools`, `/ar` | `/`, `/`, `/ar/legal-chat` |
+| bare directory — `/download` | `/guide/tenancy-contract-dubai` |
 | raw source file — `/static/guide/x.html` | `/guide/x` |
 | English-only guide under `/ar/` | `/guide/x` |
 

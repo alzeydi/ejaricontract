@@ -225,12 +225,24 @@ def test_url_variants_301_to_canonical_then_200(client, variant, canonical):
     ('/ar', '/ar/legal-chat'),
     ('/ar/', '/ar/legal-chat'),
     ('/ar/guide', '/ar/legal-chat'),
+    # The URL Search Console reported, reached by walking up from
+    # /download/dld-tenancy-contract.pdf.
+    ('/download/', '/guide/tenancy-contract-dubai'),
+    ('/download', '/guide/tenancy-contract-dubai'),
 ])
 def test_bare_directory_paths_301_somewhere_real(client, section, target):
-    """Crawlers walk up the path tree; these have no index page of their own."""
+    """Crawlers walk up the path tree; these have no index page of their own.
+    Each must land on a 200 in ONE hop — a 301 into a 404 is still a 404."""
     r = get(client, section, headers={'X-Forwarded-Proto': 'https'})
     assert r.status_code == 301, section
     assert r.headers['Location'] == f'{CANONICAL}{target}', section
+    assert get(client, target, headers={'X-Forwarded-Proto': 'https'}).status_code == 200, section
+
+
+def test_download_files_themselves_still_serve(client):
+    """Only the bare directory redirects — the actual files must not move."""
+    for path in ('/download/dld-tenancy-contract.pdf', '/download/dld-tenancy-contract.docx'):
+        assert get(client, path, headers={'X-Forwarded-Proto': 'https'}).status_code == 200, path
 
 
 def test_english_only_guide_under_ar_redirects_to_english_twin(client):

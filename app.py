@@ -271,6 +271,11 @@ _SECTION_REDIRECTS = {
     '/index': '/',
     '/home': '/',
     '/404': '/',
+    # The one URL Search Console actually flagged (crawled 14 Aug 2026):
+    # Googlebot walked up from /download/dld-tenancy-contract.pdf. The page
+    # that hosts and explains that template is the right landing spot.
+    '/download': '/guide/tenancy-contract-dubai',
+    '/downloads': '/guide/tenancy-contract-dubai',
     '/ar': '/ar/legal-chat',
     '/ar/guide': '/ar/legal-chat',
     '/ar/guides': '/ar/legal-chat',
