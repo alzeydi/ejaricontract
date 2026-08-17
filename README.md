@@ -50,6 +50,35 @@ GA4 does **not** treat custom events as conversions automatically. In **GA4 Admi
 2. **GA4**: confirm the 7 key events are marked (see Analytics above); walk the funnel once on a phone with `?_ga_debug=1` and watch DebugView.
 3. **Rich Results Test**: run the edited guide URLs (FAQ + HowTo should be detected).
 4. **Redirects**: `curl -sI http://ejarihelper.ae/guide/ejari-renewal` → exactly one `301` to the https URL, which returns `200`.
+5. **404s**: in GSC → *Pages → Not found (404)*, open the URL list and check each entry now 301s to a live page (`curl -sI` the URL). Anything left should be a URL that genuinely never existed — those are fine to leave as 404s and can be marked *Validate fix*.
+
+## URL canonicalisation
+
+`canonical_path()` in `app.py` folds every URL variant into one canonical spelling,
+and `redirect_canonical()` emits it together with the scheme/host fix as a **single**
+301 — no chains. Handled variants:
+
+| Variant | Result |
+| --- | --- |
+| `http://`, `www.` | `https://ejarihelper.ae/…` |
+| trailing slash — `/guide/x/` | `/guide/x` |
+| `.html` / `.htm` suffix — `/guide/x.html` | `/guide/x` |
+| upper/mixed case — `/Guide/X` | `/guide/x` |
+| doubled slashes — `/guide//x` | `/guide/x` |
+| bare directory — `/guide`, `/tools`, `/ar` | `/`, `/`, `/ar/legal-chat` |
+| raw source file — `/static/guide/x.html` | `/guide/x` |
+| English-only guide under `/ar/` | `/guide/x` |
+
+Exceptions: `POST` is never redirected (a 301 drops the body), `/.well-known/*` keeps
+its exact spelling, and non-HTML files under `/static/` keep their case-sensitive
+on-disk name.
+
+Anything that really does not exist returns a **404 with the branded
+`static/404.html`** — never a bounce to the homepage, which Google counts as a soft 404.
+API paths (`/legal-chat/*`, `/admin/*`, `/webhook/*`) get a JSON 404 instead.
+
+When adding a page: add the slug to `_GUIDE_SLUGS` / `_AR_GUIDE_SLUGS` / `_TOOL_SLUGS`,
+the URL to `sitemap_xml()`, and the path to `PAGES` in `tests/test_seo.py`.
 
 ## Tests
 
@@ -57,4 +86,6 @@ GA4 does **not** treat custom events as conversions automatically. In **GA4 Admi
 python3 -m pytest tests/ -q
 ```
 
-Covers canonical-redirect behaviour (single-hop http→https 301), robots/llms/sitemap output, and page-head SEO invariants (canonical + hreflang).
+Covers canonical-redirect behaviour (single-hop http→https 301, URL-shape normalisation,
+404-not-soft-404), robots/llms/sitemap output, and page-head SEO invariants
+(canonical + hreflang).

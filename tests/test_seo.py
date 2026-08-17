@@ -178,8 +178,106 @@ def test_sitemap_covers_all_pages(client):
     assert body.count('hreflang="ar"') == len(HREFLANG_PAIRS) * 2
 
 
-def test_unknown_guide_redirects_home(client):
-    r = get(client, '/guide/does-not-exist', headers={'X-Forwarded-Proto': 'https'})
-    assert r.status_code == 302
-    r = get(client, '/tools/does-not-exist', headers={'X-Forwarded-Proto': 'https'})
-    assert r.status_code == 302
+def test_unknown_guide_returns_404_not_a_soft_404(client):
+    """A page that does not exist must say 404 — bouncing to the homepage is a
+    soft 404 in Google's eyes and hides the broken link from the visitor."""
+    for path in ('/guide/does-not-exist', '/tools/does-not-exist',
+                 '/ar/guide/does-not-exist', '/no-such-page'):
+        r = get(client, path, headers={'X-Forwarded-Proto': 'https'})
+        assert r.status_code == 404, path
+        body = r.get_data(as_text=True)
+        assert 'noindex' in body, path
+        # The 404 page routes people back into the site.
+        assert '/legal-chat' in body and '/guide/ejari-registration' in body, path
+
+
+# ── URL-shape normalisation: no 404s for variants of real pages ───────
+
+@pytest.mark.parametrize('variant,canonical', [
+    ('/guide/ejari-renewal/', '/guide/ejari-renewal'),
+    ('/guide/ejari-renewal.html', '/guide/ejari-renewal'),
+    ('/guide/Ejari-Renewal', '/guide/ejari-renewal'),
+    ('/GUIDE/EJARI-RENEWAL/', '/guide/ejari-renewal'),
+    ('/legal-chat/', '/legal-chat'),
+    ('/how-it-works/', '/how-it-works'),
+    ('/how-it-works.html', '/how-it-works'),
+    ('/tools/rent-increase-calculator/', '/tools/rent-increase-calculator'),
+    ('/ar/guide/ejari-renewal/', '/ar/guide/ejari-renewal'),
+    ('/ar/legal-chat/', '/ar/legal-chat'),
+    ('/guide//ejari-renewal', '/guide/ejari-renewal'),
+    ('/index.html', '/'),
+    ('/privacy/', '/privacy'),
+    ('/terms/', '/terms'),
+])
+def test_url_variants_301_to_canonical_then_200(client, variant, canonical):
+    r = get(client, variant, headers={'X-Forwarded-Proto': 'https'})
+    assert r.status_code == 301, variant
+    assert r.headers['Location'] == f'{CANONICAL}{canonical}', variant
+    # One hop only: the target answers 200 directly.
+    assert get(client, canonical, headers={'X-Forwarded-Proto': 'https'}).status_code == 200
+
+
+@pytest.mark.parametrize('section,target', [
+    ('/guide', '/'),
+    ('/guide/', '/'),
+    ('/guides', '/'),
+    ('/tools', '/'),
+    ('/ar', '/ar/legal-chat'),
+    ('/ar/', '/ar/legal-chat'),
+    ('/ar/guide', '/ar/legal-chat'),
+])
+def test_bare_directory_paths_301_somewhere_real(client, section, target):
+    """Crawlers walk up the path tree; these have no index page of their own."""
+    r = get(client, section, headers={'X-Forwarded-Proto': 'https'})
+    assert r.status_code == 301, section
+    assert r.headers['Location'] == f'{CANONICAL}{target}', section
+
+
+def test_english_only_guide_under_ar_redirects_to_english_twin(client):
+    r = get(client, '/ar/guide/ejari-fine', headers={'X-Forwarded-Proto': 'https'})
+    assert r.status_code == 301
+    assert r.headers['Location'].endswith('/guide/ejari-fine')
+    assert get(client, '/guide/ejari-fine',
+               headers={'X-Forwarded-Proto': 'https'}).status_code == 200
+
+
+def test_variant_and_scheme_collapse_in_one_hop(client):
+    """http + www + trailing slash must all be fixed by ONE 301."""
+    r = client.get('/guide/ejari-renewal/', base_url='http://www.ejarihelper.ae',
+                   headers={'X-Forwarded-Proto': 'http'})
+    assert r.status_code == 301
+    assert r.headers['Location'] == f'{CANONICAL}/guide/ejari-renewal'
+
+
+def test_static_assets_are_not_rewritten(client):
+    """Static filenames are case-sensitive on disk — normalisation must skip them."""
+    for path in ('/static/css/base.css', '/static/og-image.png', '/static/favicon.svg'):
+        r = get(client, path, headers={'X-Forwarded-Proto': 'https'})
+        assert r.status_code == 200, path
+
+
+@pytest.mark.parametrize('raw,canonical', [
+    ('/static/index.html', '/'),
+    ('/static/how-it-works.html', '/how-it-works'),
+    ('/static/legal-chat.html', '/legal-chat'),
+    ('/static/terms.html', '/terms'),
+    ('/static/guide/ejari-fine.html', '/guide/ejari-fine'),
+    ('/static/tools/rent-increase-calculator.html', '/tools/rent-increase-calculator'),
+    ('/static/ar/legal-chat.html', '/ar/legal-chat'),
+    ('/static/ar/guide/ejari-renewal.html', '/ar/guide/ejari-renewal'),
+    ('/static/404.html', '/'),
+])
+def test_raw_static_html_301s_to_the_served_url(client, raw, canonical):
+    """The on-disk copies still carry unsubstituted __BASE_URL__ placeholders,
+    so a crawler that reaches them sees a duplicate with a broken canonical."""
+    r = get(client, raw, headers={'X-Forwarded-Proto': 'https'})
+    assert r.status_code == 301, raw
+    assert r.headers['Location'] == f'{CANONICAL}{canonical}', raw
+
+
+def test_post_endpoints_are_not_normalised(client):
+    """A 301 on POST would drop the request body — the handler must be reached.
+    Sends an invalid rating so nothing is written: 400 proves it got there."""
+    r = client.post('/rate', base_url=CANONICAL, json={'stars': 99},
+                    headers={'X-Forwarded-Proto': 'https'})
+    assert r.status_code == 400

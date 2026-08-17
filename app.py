@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Ejari Tenancy Contract Generator - Flask Backend"""
 
-import io, os, base64, json
+import io, os, re, base64, json
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
-from flask import Flask, request, send_file, jsonify, send_from_directory, session, redirect, Response
+from flask import Flask, request, send_file, jsonify, send_from_directory, session, redirect, abort, Response
 from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 from reportlab.pdfgen import canvas
@@ -255,9 +255,54 @@ def render_page(*rel_path):
     return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
 
 
+# ── Canonical URL shape ────────────────────────────────────────────────
+# Nothing on the site links to them, but crawlers keep discovering URL
+# variants of real pages — trailing slashes, .html suffixes, mixed case,
+# doubled slashes — and every one of those used to be a hard 404 (Search
+# Console: "Not found (404)"). They now collapse into the canonical URL with
+# a single 301, in the same hop as the scheme/host fix.
+
+# Bare directory paths have no index page of their own — point them at the
+# closest real entry point instead of 404ing.
+_SECTION_REDIRECTS = {
+    '/guide': '/',
+    '/guides': '/',
+    '/tools': '/',
+    '/index': '/',
+    '/home': '/',
+    '/404': '/',
+    '/ar': '/ar/legal-chat',
+    '/ar/guide': '/ar/legal-chat',
+    '/ar/guides': '/ar/legal-chat',
+}
+
+
+def canonical_path(path):
+    """Return the canonical spelling of a request path (unchanged if already canonical)."""
+    # .well-known paths must keep their exact spelling.
+    if path.startswith('/.well-known/'):
+        return path
+    if path.startswith('/static/'):
+        # Static assets keep their case-sensitive on-disk name. The one
+        # exception is page HTML: /static/guide/x.html is the un-templated
+        # source of /guide/x — __BASE_URL__ is never substituted there, so it
+        # ships a broken canonical tag and Google indexes it as a duplicate.
+        if not path.lower().endswith(('.html', '.htm')):
+            return path
+        path = path[len('/static'):]
+    p = re.sub(r'/{2,}', '/', path).lower()
+    for suffix in ('.html', '.htm'):
+        if p.endswith(suffix):
+            p = p[:-len(suffix)]
+            break
+    if len(p) > 1:
+        p = p.rstrip('/') or '/'
+    return _SECTION_REDIRECTS.get(p, p)
+
+
 @app.before_request
 def redirect_canonical():
-    """Force canonical host (no www) AND canonical scheme (https) in a single 301.
+    """Force the canonical host (no www), scheme (https) and path shape in a single 301.
     Avoids the http→https→non-www redirect chain that confuses Googlebot and
     causes 'Page with redirect' indexing errors."""
     from flask import redirect, request as req
@@ -265,10 +310,15 @@ def redirect_canonical():
     proto = req.headers.get('X-Forwarded-Proto', 'http' if not req.is_secure else 'https').lower()
     needs_https = proto == 'http' and not host.startswith('localhost') and not host.startswith('127.')
     needs_apex = host.startswith('www.')
-    if needs_https or needs_apex:
+    # Only GET/HEAD are normalised: POST endpoints are called by our own JS and
+    # by Ziina webhooks with exact paths, and a 301 would drop the body.
+    new_path = canonical_path(req.path) if req.method in ('GET', 'HEAD') else req.path
+    if needs_https or needs_apex or new_path != req.path:
         new_host = host[4:] if needs_apex else host
         new_scheme = 'https' if needs_https else proto
-        return redirect(f'{new_scheme}://{new_host}{req.full_path.rstrip("?")}', code=301)
+        query = req.query_string.decode()
+        target = f'{new_scheme}://{new_host}{new_path}' + (f'?{query}' if query else '')
+        return redirect(target, code=301)
 
 @app.route('/')
 def index():
@@ -751,8 +801,7 @@ _TOOL_SLUGS = {'rent-increase-calculator'}
 @app.route('/tools/<slug>')
 def tool(slug):
     if slug not in _TOOL_SLUGS:
-        from flask import redirect
-        return redirect('/', 302)
+        abort(404)
     return render_page('tools', f'{slug}.html')
 
 # Guides that also exist in Arabic under /ar/guide/<slug>
@@ -761,16 +810,18 @@ _AR_GUIDE_SLUGS = {'rental-dispute', 'ejari-renewal', 'dewa-premises-number'}
 @app.route('/guide/<slug>')
 def guide(slug):
     if slug not in _GUIDE_SLUGS:
-        from flask import redirect
-        return redirect('/', 302)
+        abort(404)
     return render_page('guide', f'{slug}.html')
 
 
 @app.route('/ar/guide/<slug>')
 def guide_ar(slug):
+    # An English-only guide requested under /ar/ is a real page in the wrong
+    # language folder — send it to its English twin instead of 404ing.
     if slug not in _AR_GUIDE_SLUGS:
-        from flask import redirect
-        return redirect('/', 302)
+        if slug in _GUIDE_SLUGS:
+            return redirect(f'/guide/{slug}', 301)
+        abort(404)
     return render_page('ar', 'guide', f'{slug}.html')
 
 
@@ -782,6 +833,21 @@ def privacy():
 @app.route('/terms')
 def terms():
     return render_page('terms.html')
+
+
+@app.errorhandler(404)
+def page_not_found(_e):
+    """Branded 404 that keeps the 404 status — never a soft 404.
+
+    A missing page used to bounce to the homepage with a 302, which Google
+    classifies as a soft 404 and which drops the visitor with no explanation.
+    Now the status is honest and the page routes people to the real content.
+    JSON for API paths so front-end fetch() callers still get JSON.
+    """
+    if request.path.startswith(('/legal-chat/', '/admin/', '/webhook/')):
+        return jsonify({'ok': False, 'error': 'Not found'}), 404
+    body, _status, headers = render_page('404.html')
+    return body, 404, headers
 
 
 # ── Legal Chat (paid AI consultation on Dubai rental disputes) ─────────
