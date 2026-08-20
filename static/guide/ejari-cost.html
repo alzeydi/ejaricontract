@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18223357108"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-18223357108');
+  // GA4 — measurement ID injected server-side from GA4_MEASUREMENT_ID env var (see README.md).
+  var GA4_ID = '__GA4_ID__';
+  if (/^G-[A-Z0-9]+$/.test(GA4_ID)) gtag('config', GA4_ID, (location.search.indexOf('_ga_debug=1') > -1) ? {debug_mode: true} : {});
+  // GA4 key-event helper. Each event below must be marked as a Key Event in GA4 admin — see README.md.
+  function ehEvent(name, params){ try { gtag('event', name, params || {}); } catch(e) {} }
+  // Delegated tracking: template downloads everywhere; guide/tool → product CTA clicks.
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a) return;
+    var href = a.getAttribute('href') || '';
+    if (href.indexOf('/download/') === 0){
+      ehEvent('template_downloaded', {file_name: href.split('/').pop(), source_page: location.pathname});
+    } else if (a.hasAttribute('data-cta')){
+      ehEvent('cta_click', {source_page: location.pathname, cta_target: a.getAttribute('data-cta')});
+    } else if ((location.pathname.indexOf('/guide/') === 0 || location.pathname.indexOf('/ar/guide/') === 0 || location.pathname.indexOf('/tools/') === 0) &&
+               (href === '/' || href.indexOf('/legal-chat') === 0 || href.indexOf('/ar/legal-chat') === 0 || href.indexOf('/#') === 0)){
+      ehEvent('cta_click', {source_page: location.pathname, cta_target: href});
+    }
+  }, true);
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<title>Ejari Cost 2026: AED 177.75 Online — Full Breakdown</title>
+<meta name="description" content="Ejari costs AED 177.75 filed yourself and AED 219.75 at a trustee centre in 2026. Every fee line item, all channels compared, and where the markups hide.">
+<link rel="canonical" href="__BASE_URL__/guide/ejari-cost">
+<link rel="alternate" hreflang="en" href="__BASE_URL__/guide/ejari-cost">
+<link rel="alternate" hreflang="x-default" href="__BASE_URL__/guide/ejari-cost">
+<meta property="og:type" content="article">
+<meta property="og:url" content="__BASE_URL__/guide/ejari-cost">
+<meta property="og:title" content="Ejari Cost in 2026 — AED 177.75, Line by Line">
+<meta property="og:description" content="The government fee is AED 120 and never changes. Everything above it is a service-partner fee or somebody’s margin — here is exactly where each dirham goes.">
+<meta property="og:site_name" content="Ejari Helper">
+<meta property="og:image" content="__BASE_URL__/static/og-image.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ejari Helper — Dubai tenancy contracts in minutes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ejari Cost in 2026 — AED 177.75, Line by Line">
+<meta name="twitter:description" content="The government fee is AED 120 and never changes. Everything above it is a service-partner fee or somebody’s margin — here is exactly where each dirham goes.">
+<meta name="twitter:image" content="__BASE_URL__/static/og-image.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet"></noscript>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "Article", "headline": "Ejari Cost in 2026: The Full Fee Breakdown", "description": "Every line item in the Dubai Ejari registration fee, all filing channels compared, and where third-party markups hide.", "author": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/about"}, "publisher": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/"}, "mainEntityOfPage": "__BASE_URL__/guide/ejari-cost", "datePublished": "2026-08-20", "dateModified": "2026-08-20", "isAccessibleForFree": true, "inLanguage": "en"}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "__BASE_URL__/"}, {"@type": "ListItem", "position": 2, "name": "Guides", "item": "__BASE_URL__/guides"}, {"@type": "ListItem", "position": 3, "name": "Ejari Cost"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How much does Ejari cost in 2026?", "acceptedAnswer": {"@type": "Answer", "text": "AED 177.75 if you file it yourself in the Dubai REST app or on the DLD portal. That is AED 100 registration, AED 10 knowledge fee, AED 10 innovation fee, AED 55 service-partner fee and AED 2.75 VAT. At a trustee or typing centre the same registration costs AED 219.75."}}, {"@type": "Question", "name": "Why is Ejari more expensive at a typing centre?", "acceptedAnswer": {"@type": "Answer", "text": "The government portion is identical. What changes is the service-partner fee: AED 55 when you file it yourself online, AED 95 when a trustee centre clerk files it for you, plus 5% VAT on that fee. That is the entire AED 42 difference — AED 219.75 against AED 177.75."}}, {"@type": "Question", "name": "Is VAT charged on the Ejari fee?", "acceptedAnswer": {"@type": "Answer", "text": "Only on the service-partner portion. The AED 100 registration fee and the AED 10 knowledge and innovation fees are government charges outside the scope of VAT. The 5% applies to the partner fee alone — AED 2.75 online, AED 4.75 at a trustee centre."}}, {"@type": "Question", "name": "Does Ejari renewal cost less than first registration?", "acceptedAnswer": {"@type": "Answer", "text": "No. Renewal costs exactly the same as a first registration — AED 177.75 online, AED 219.75 at a centre. There is no loyalty discount, and there is no surcharge for renewing late either; the fee is flat however overdue you are."}}, {"@type": "Question", "name": "How much does it cost to cancel Ejari?", "acceptedAnswer": {"@type": "Answer", "text": "Nothing. Cancellation is free through Dubai REST or at a trustee centre. Because it costs nothing and an open registration on a unit blocks the next tenant's filing, there is no reason to skip it when you move out."}}, {"@type": "Question", "name": "Who pays the Ejari fee — landlord or tenant?", "acceptedAnswer": {"@type": "Answer", "text": "UAE law does not assign it. Law No. 26 of 2007 places the registration duty on the landlord, but Dubai contracts routinely pass it to the tenant and in practice the tenant usually pays. Whichever way you agree, write it into the contract so it cannot be reopened later."}}, {"@type": "Question", "name": "Is AED 300 or AED 500 for Ejari a scam?", "acceptedAnswer": {"@type": "Answer", "text": "Not necessarily a scam, but it is not the government fee. Agents, property managers and online filing services charge the AED 177.75 fee plus their own margin, and they are entitled to. What is not acceptable is presenting the total as though it were the official price. Ask any provider to show the government fee and their service fee as separate lines."}}, {"@type": "Question", "name": "What else do I have to pay when moving into a Dubai rental?", "acceptedAnswer": {"@type": "Answer", "text": "Ejari is one of the smaller line items. Budget also for the agency commission (typically 5% of annual rent), the security deposit (5% unfurnished, 10% furnished), the DEWA connection deposit (AED 2,000 for an apartment, AED 4,000 for a villa) and the DEWA activation charges. Ejari at AED 177.75 is rarely what breaks the budget."}}]}
+</script>
+<style>
+:root{--bg:#fbfaf7;--white:#fff;--text:#1a1a1a;--sub:#55554f;--muted:#86867e;--border:#e7e6df;--accent:#16423c;--accent-bright:#2fd18d;--grad:linear-gradient(135deg,#1f8f66,#16423c);--grad-bright:linear-gradient(135deg,#2fd18d,#1f8f66);--accent-bg:#eaf2ec;--accent-mid:#1f8f66;--red:#c0392b;--red-bg:#fdf2f2;--blue:#1a4f8a;--blue-bg:#eef3fa;--gold:#b8860b;--gold-bg:#fdfaf0;--r:10px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+nav{background:rgba(251,250,247,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border);min-height:62px;display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:780px;width:100%;margin:0 auto;display:flex;align-items:center;gap:16px}
+.brand-name{display:inline-flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:var(--accent);letter-spacing:-.01em;text-decoration:none}.brand-name::before{content:'';width:32px;height:32px;border-radius:9px;flex-shrink:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none'%3E%3Cpath d='M4 11l8-6 8 6' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M6 10v9h12v-9' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M9.4 14.3l1.9 2 3.4-3.5' stroke='%235be0a8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/19px no-repeat,linear-gradient(135deg,#1f8f66,#16423c);box-shadow:0 4px 14px rgba(22,66,60,.28)}
+.nav-sep{color:var(--border)}
+.nav-cur{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+main{max-width:720px;margin:0 auto;padding:32px 20px 80px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.bc{font-size:12px;color:var(--muted);margin-bottom:20px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.bc a{color:var(--muted)}
+.bc a:hover{color:var(--accent);text-decoration:none}
+.bc-sep{color:var(--border)}
+.guide-badge{font-size:11px;font-weight:600;color:var(--accent-mid);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.guide-title{font-family:'IBM Plex Sans',sans-serif;font-size:30px;font-weight:700;color:var(--accent);letter-spacing:-.02em;line-height:1.25;margin-bottom:8px}
+.guide-meta{font-size:12px;color:var(--muted);margin-bottom:12px}
+.guide-intro{font-size:14px;color:var(--sub);margin-bottom:28px;line-height:1.7}
+.fc{display:flex;flex-direction:column}
+.fc-conn{display:flex;flex-direction:column;align-items:center;gap:0;padding:2px 0}
+.fc-conn-line{width:2px;height:16px;background:var(--border)}
+.fc-conn-arr{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--border)}
+.fc-conn-label{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);padding:2px 0}
+.fc-node{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:16px 18px}
+.fc-node-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.fc-title{font-size:14px;font-weight:600;color:var(--text)}
+.fc-body{font-size:13px;color:var(--sub);line-height:1.6;padding-left:32px}
+.fc-body ul{padding-left:16px;margin-top:4px}
+.fc-body ol{padding-left:16px;margin-top:4px}
+.fc-body li{margin-bottom:3px}
+.fc-node.step{border-left:4px solid var(--accent)}
+.fc-num{width:22px;height:22px;background:var(--accent);color:white;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-node.decision{border-left:4px solid var(--gold);background:var(--gold-bg)}
+.fc-dicon{width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-branch{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fc-branch-item{border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;background:var(--white)}
+.fc-branch-item.yes{border-color:#a5c8a5;background:#f6fbf6}
+.fc-branch-item.no{border-color:#e8bebe;background:#fdf5f5}
+.fc-branch-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.fc-branch-tag.yes{color:#2e7d32}
+.fc-branch-tag.no{color:var(--red)}
+.fc-branch-title{font-size:13px;font-weight:600;color:var(--text)}
+.fc-branch-desc{font-size:12px;color:var(--sub);margin-top:4px;line-height:1.5}
+.fc-node.success{border-left:4px solid #2e7d32;background:#f1f8f1}
+.fc-sicon{width:22px;height:22px;background:#2e7d32;color:white;border-radius:50%;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-node.warn{border-left:4px solid var(--red);background:var(--red-bg)}
+.fc-wicon{width:22px;height:22px;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-node.info{border-left:4px solid var(--blue);background:var(--blue-bg)}
+.fc-iicon{width:22px;height:22px;background:var(--blue);color:white;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-note{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:10px 12px;font-size:12px;color:var(--sub);margin-top:10px;line-height:1.6}
+.fc-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+.fc-table td{padding:6px 8px;border-bottom:1px solid var(--bg);color:var(--sub);vertical-align:top}
+.fc-table td:first-child{font-weight:500;color:var(--text);width:55%}
+.fc-table tr:last-child td{border-bottom:none}
+.fc-tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:8px}
+.fc-tag.green{background:#e8f5e9;color:#2e7d32}
+.fc-tag.blue{background:var(--blue-bg);color:var(--blue)}
+.fc-tag.amber{background:var(--gold-bg);color:var(--gold)}
+.guide-cta{background:linear-gradient(120deg,#16423c,#0f322c);color:white;border-radius:18px;padding:30px 28px;margin-top:36px;text-align:center;box-shadow:0 16px 40px rgba(22,66,60,.18)}
+.guide-cta-title{font-size:16px;font-weight:600;margin-bottom:6px}
+.guide-cta-desc{font-size:13px;opacity:.85;margin-bottom:16px;line-height:1.5}
+.guide-cta-btn{display:inline-block;background:linear-gradient(135deg,#2fd18d,#1f8f66);color:#04140d;font-size:13.5px;font-weight:700;padding:12px 26px;border-radius:10px;text-decoration:none;box-shadow:0 6px 20px rgba(46,200,140,.35)}
+.related{margin-top:32px}
+.related-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.rc{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px;text-decoration:none;display:block;box-shadow:0 2px 10px rgba(22,66,60,.05);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.rc:hover{border-color:#cfe6d8;text-decoration:none;transform:translateY(-3px);box-shadow:0 14px 34px rgba(22,66,60,.12)}
+.rc-icon{font-size:18px;margin-bottom:6px}
+.rc-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.rc-desc{font-size:11px;color:var(--muted)}
+.site-footer{background:var(--white);border-top:1px solid var(--border);padding:24px;margin-top:48px}
+.site-footer-inner{max-width:780px;margin:0 auto;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.footer-copy{font-size:11px;color:var(--muted)}
+.footer-copy a{color:var(--muted)}
+@media(max-width:540px){
+  .fc-branch{grid-template-columns:1fr}
+  .guide-title{font-size:22px}
+}
+.dld-dl{background:var(--white);border:1.5px solid var(--accent);border-radius:var(--r);padding:16px 18px;margin-bottom:24px}
+.dld-dl-row{display:flex;align-items:center;gap:14px}
+.dld-dl-icon{font-size:28px;flex-shrink:0}
+.dld-dl-body{flex:1;min-width:0}
+.dld-dl-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.dld-dl-desc{font-size:12px;color:var(--sub);line-height:1.5}
+.dld-dl-btn{background:var(--accent);color:#fff;font-size:13px;font-weight:600;padding:9px 16px;border-radius:7px;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.dld-dl-btn:hover{opacity:.9;text-decoration:none}
+.dld-dl-note{font-size:12px;color:var(--sub);margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);line-height:1.55}
+.dld-dl-note a{color:var(--accent);font-weight:600}
+@media(max-width:540px){.dld-dl-row{flex-wrap:wrap}.dld-dl-btn{width:100%;text-align:center}}
+.faq{margin-top:36px}
+.faq-title{font-size:18px;font-weight:700;color:var(--accent);letter-spacing:-.01em;margin-bottom:12px}
+.faq-item{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:10px}
+.faq-q{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
+.faq-a{font-size:13px;color:var(--sub);line-height:1.65;margin:0}
+
+.lang-sw{margin-inline-start:auto;display:inline-flex;border:1.5px solid var(--border);border-radius:999px;overflow:hidden;flex-shrink:0;background:var(--white)}
+.lang-sw a{padding:5px 12px;font-size:12px;font-weight:700;color:var(--sub);text-decoration:none;line-height:1.4}
+.lang-sw a.on{background:var(--accent);color:#fff}
+.lang-sw a:hover{text-decoration:none}
+</style>
+<link rel="stylesheet" href="/static/css/base.css">
+</head>
+<body>
+<nav class="eh-nav" aria-label="Main">
+  <div class="eh-nav-in">
+    <a href="/" class="eh-brand"><span class="eh-logo" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 11l8-6 8 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9h12v-9" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.4 14.3l1.9 2 3.4-3.5" stroke="#5be0a8" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="eh-brand-name">Ejari Helper</span></a>
+    <div class="eh-links">
+      <a href="/what-is-ejari">What is Ejari</a>
+      <a href="/guides">Guides</a>
+      <a href="/ejari-help">Ejari help</a>
+      <a href="/tools/rent-increase-calculator">Rent calculator</a>
+      
+      <a class="eh-cta" href="/legal-chat" data-cta="ask-ai-lawyer">Ask AI Lawyer →</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <nav class="bc" aria-label="Breadcrumb">
+    <a href="/">Home</a><span class="bc-sep">›</span>
+    <a href="/guides">Guides</a><span class="bc-sep">›</span>
+    <span>Ejari Cost</span>
+  </nav>
+
+  <div class="guide-badge">Ejari Guide · Dubai</div>
+  <h1 class="guide-title">Ejari cost in 2026: AED 177.75,<br>and where every dirham goes</h1>
+  <div class="guide-meta">Updated August 2026 · AED 177.75 online · AED 219.75 at a trustee centre · Cancellation free</div>
+  <p class="guide-intro"><strong>Ejari costs AED 177.75</strong> if you file it yourself in the Dubai REST app or on the DLD portal, and <strong>AED 219.75</strong> at a trustee or typing centre. The government portion — AED 120 — is identical on both routes; the entire difference is the service-partner fee and the VAT charged on it. Anything above AED 219.75 is somebody’s margin, and you are entitled to see it as a separate line.</p>
+
+  <div class="fc">
+
+    <div class="fc-node step">
+      <div class="fc-node-head">
+        <div class="fc-num">1</div>
+        <h2 class="fc-title">The exact 2026 fee, line by line</h2>
+      </div>
+      <div class="fc-body">
+      <figure class="dgm">
+        <svg viewBox="0 0 460 210" role="img" aria-labelledby="feeT feeD" class="dgm-svg">
+          <title id="feeT">Ejari fee composition, online versus trustee centre</title>
+          <desc id="feeD">Two stacked bars comparing the AED 177.75 online total with the AED 219.75 trustee-centre total. The registration fee of 100 dirhams, the knowledge fee of 10 and the innovation fee of 10 are identical in both. Only the service-partner fee differs: 55 dirhams plus 2.75 VAT online, against 95 dirhams plus 4.75 VAT at a centre.</desc>
+          <text x="16" y="22" fill="#1a1a1a" font-family="IBM Plex Sans, sans-serif" font-size="11" font-weight="600">Filed yourself — Dubai REST / DLD portal</text>
+          <rect x="16" y="30" width="180" height="26" fill="#16423c"/>
+          <rect x="196" y="30" width="18" height="26" fill="#1f8f66"/>
+          <rect x="214" y="30" width="18" height="26" fill="#2fd18d"/>
+          <rect x="232" y="30" width="99" height="26" fill="#b8860b"/>
+          <rect x="331" y="30" width="6" height="26" fill="#c0392b"/>
+          <text x="106" y="47" fill="#fff" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" text-anchor="middle">100</text>
+          <text x="281" y="47" fill="#fff" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" text-anchor="middle">55</text>
+          <text x="349" y="47" fill="#1a1a1a" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="700">AED 177.75</text>
+
+          <text x="16" y="90" fill="#1a1a1a" font-family="IBM Plex Sans, sans-serif" font-size="11" font-weight="600">Filed at a trustee / typing centre</text>
+          <rect x="16" y="98" width="180" height="26" fill="#16423c"/>
+          <rect x="196" y="98" width="18" height="26" fill="#1f8f66"/>
+          <rect x="214" y="98" width="18" height="26" fill="#2fd18d"/>
+          <rect x="232" y="98" width="171" height="26" fill="#b8860b"/>
+          <rect x="403" y="98" width="9" height="26" fill="#c0392b"/>
+          <text x="106" y="115" fill="#fff" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" text-anchor="middle">100</text>
+          <text x="317" y="115" fill="#fff" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" text-anchor="middle">95</text>
+          <text x="16" y="142" fill="#1a1a1a" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="700">AED 219.75</text>
+
+          <rect x="16" y="162" width="11" height="11" fill="#16423c"/>
+          <text x="33" y="171" fill="#55554f" font-family="IBM Plex Sans, sans-serif" font-size="9.5">Registration 100</text>
+          <rect x="124" y="162" width="11" height="11" fill="#1f8f66"/>
+          <text x="141" y="171" fill="#55554f" font-family="IBM Plex Sans, sans-serif" font-size="9.5">Knowledge 10</text>
+          <rect x="226" y="162" width="11" height="11" fill="#2fd18d"/>
+          <text x="243" y="171" fill="#55554f" font-family="IBM Plex Sans, sans-serif" font-size="9.5">Innovation 10</text>
+          <rect x="330" y="162" width="11" height="11" fill="#b8860b"/>
+          <text x="347" y="171" fill="#55554f" font-family="IBM Plex Sans, sans-serif" font-size="9.5">Service partner</text>
+          <rect x="16" y="182" width="11" height="11" fill="#c0392b"/>
+          <text x="33" y="191" fill="#55554f" font-family="IBM Plex Sans, sans-serif" font-size="9.5">VAT (5% on the service-partner fee only)</text>
+        </svg>
+        <figcaption class="dgm-cap">The government portion — <strong>AED 120</strong> — is identical on both routes. The whole AED 42 difference is the service-partner fee and the VAT on it.</figcaption>
+      </figure>
+
+        Filed yourself in Dubai REST or on the DLD portal:
+        <table class="fc-table">
+          <tr><td>Tenancy contract registration</td><td><strong>AED 100.00</strong></td></tr>
+          <tr><td>Knowledge fee</td><td>AED 10.00</td></tr>
+          <tr><td>Innovation fee</td><td>AED 10.00</td></tr>
+          <tr><td>Service-partner fee</td><td>AED 55.00</td></tr>
+          <tr><td>VAT (5% on the service-partner fee)</td><td>AED 2.75</td></tr>
+          <tr><td><strong>Total</strong></td><td><strong>AED 177.75</strong></td></tr>
+        </table>
+        <div class="fc-note">The AED 120 of government charges is fixed and identical on every route. Only the service-partner fee moves — which is why the channel you choose, not the emirate or the rent, decides what you pay.</div>
+      </div>
+    </div>
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+    <div class="fc-node step">
+      <div class="fc-node-head">
+        <div class="fc-num">2</div>
+        <h2 class="fc-title">The same registration at a trustee centre</h2>
+      </div>
+      <div class="fc-body">
+        <table class="fc-table">
+          <tr><td>Tenancy contract registration</td><td><strong>AED 100.00</strong></td></tr>
+          <tr><td>Knowledge fee</td><td>AED 10.00</td></tr>
+          <tr><td>Innovation fee</td><td>AED 10.00</td></tr>
+          <tr><td>Service-partner fee</td><td>AED 95.00</td></tr>
+          <tr><td>VAT (5% on the service-partner fee)</td><td>AED 4.75</td></tr>
+          <tr><td><strong>Total</strong></td><td><strong>AED 219.75</strong></td></tr>
+        </table>
+        You are paying AED 42 for a clerk to check the documents and file them. That is often
+        worth it: the most common rejection reason is a contract that does not match the Title
+        Deed, and a trustee-centre clerk catches it before it is submitted.
+        <div class="fc-note">If your scans are clean and the contract already mirrors the Title Deed, the AED 42 buys nothing you cannot do in ten minutes yourself.</div>
+      </div>
+    </div>
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+    <div class="fc-node decision">
+      <div class="fc-node-head">
+        <div class="fc-dicon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 21.5 12 12 21.5 2.5 12z"/></svg></div>
+        <h2 class="fc-title">Every channel compared, with the markup shown</h2>
+      </div>
+      <div class="fc-body">
+        <table class="fc-table">
+          <tr><td><strong>Dubai REST app / DLD portal</strong></td><td><strong>AED 177.75</strong> — government fee only, no markup. Certificate usually the same day</td></tr>
+          <tr><td><strong>Trustee / typing centre</strong></td><td><strong>AED 219.75</strong> — government fee only, higher partner tier. Issued while you wait</td></tr>
+          <tr><td><strong>Online filing services</strong></td><td>AED 250–350 — AED 177.75 plus roughly AED 75–175 margin</td></tr>
+          <tr><td><strong>Real-estate agent</strong></td><td>AED 300–500 — AED 177.75 plus roughly AED 120–320 margin</td></tr>
+          <tr><td><strong>Property-management company</strong></td><td>AED 400–500, sometimes bundled into a management fee</td></tr>
+        </table>
+        <div class="fc-note">A provider charging more than AED 219.75 is charging a service fee, and that is legitimate — as long as they will show you the government fee and their fee on separate lines. If they will not split it, or will not quote at all until you email an Emirates ID and a signed contract, that is the signal to walk. See <a href="/ejari-help">Ejari help</a>.</div>
+      </div>
+    </div>
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+    <div class="fc-node success">
+      <div class="fc-node-head">
+        <div class="fc-sicon">✓</div>
+        <h2 class="fc-title">What costs nothing</h2>
+      </div>
+      <div class="fc-body">
+        <table class="fc-table">
+          <tr><td><strong>Cancelling an Ejari</strong></td><td>Free, through Dubai REST or a trustee centre — <a href="/guide/ejari-cancellation">how to cancel</a></td></tr>
+          <tr><td><strong>Refiling after a rejection</strong></td><td>Free. A refused application is not charged again when you correct and resubmit</td></tr>
+          <tr><td><strong>Checking status or re-downloading</strong></td><td>Free and unlimited — <a href="/guide/ejari-check">every way to check</a></td></tr>
+          <tr><td><strong>Creating the Ejari / UAE Pass account</strong></td><td>Free</td></tr>
+          <tr><td><strong>Renewing late</strong></td><td>No surcharge. The fee is AED 177.75 however overdue you are — <a href="/guide/ejari-fine">what late Ejari actually costs</a></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+    <div class="fc-node warn">
+      <div class="fc-node-head">
+        <div class="fc-wicon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4.5"/><path d="M12 17.4h.01" stroke-width="2.4"/></svg></div>
+        <h2 class="fc-title">What the Ejari fee does not cover</h2>
+      </div>
+      <div class="fc-body">
+        Ejari is one of the smaller numbers in a Dubai move-in. The realistic total on an
+        AED 85,000 one-bedroom looks like this:
+        <table class="fc-table">
+          <tr><td>Ejari registration</td><td>AED 177.75</td></tr>
+          <tr><td>Agency commission (typically 5% of annual rent)</td><td>≈ AED 4,250</td></tr>
+          <tr><td>Security deposit (5% unfurnished / 10% furnished)</td><td>AED 4,250 – 8,500 — <a href="/guide/security-deposit-refund-dubai">refundable, if you document it</a></td></tr>
+          <tr><td>DEWA connection deposit</td><td>AED 2,000 apartment / AED 4,000 villa — refundable</td></tr>
+          <tr><td>DEWA activation &amp; registration charges</td><td>≈ AED 130 – 180 — <a href="/guide/dewa-activation">DEWA activation</a></td></tr>
+          <tr><td>Tenancy contract preparation</td><td>AED 0 with the <a href="/guide/tenancy-contract-dubai">free DLD template</a>, or AED 15 <a href="/">auto-filled from your documents</a></td></tr>
+        </table>
+        <div class="fc-note">Deposits come back; commission and fees do not. The line most people lose money on is the security deposit, not the registration fee — photograph everything on move-in day.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="guide-cta" style="margin:26px 0;background:linear-gradient(180deg,#16423c 0%,#0f322c 100%);color:#fff;border:none">
+    <div class="guide-cta-title" style="color:#fff">⚖️ Being asked to pay more than AED 219.75?</div>
+    <div class="guide-cta-desc" style="color:#dfe9e6">Ask the AI rental lawyer what is and is not chargeable to you under Dubai tenancy law, with the article numbers cited. AED 50 for 30 minutes, <strong style="color:#fff">first question free</strong>.</div>
+    <a href="/legal-chat" class="guide-cta-btn" style="background:#fff;color:#16423c" data-cta="ejari-cost-legal-chat">Check what I actually owe →</a>
+  </div>
+  <section class="faq">
+    <h2 class="faq-title">Frequently asked questions</h2>
+    <div class="faq-item">
+      <h3 class="faq-q">How much does Ejari cost in 2026?</h3>
+      <p class="faq-a">AED 177.75 if you file it yourself in the Dubai REST app or on the DLD portal. That is AED 100 registration, AED 10 knowledge fee, AED 10 innovation fee, AED 55 service-partner fee and AED 2.75 VAT. At a trustee or typing centre the same registration costs AED 219.75.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">Why is Ejari more expensive at a typing centre?</h3>
+      <p class="faq-a">The government portion is identical. What changes is the service-partner fee: AED 55 when you file it yourself online, AED 95 when a trustee centre clerk files it for you, plus 5% VAT on that fee. That is the entire AED 42 difference — AED 219.75 against AED 177.75.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">Is VAT charged on the Ejari fee?</h3>
+      <p class="faq-a">Only on the service-partner portion. The AED 100 registration fee and the AED 10 knowledge and innovation fees are government charges outside the scope of VAT. The 5% applies to the partner fee alone — AED 2.75 online, AED 4.75 at a trustee centre.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">Does Ejari renewal cost less than first registration?</h3>
+      <p class="faq-a">No. Renewal costs exactly the same as a first registration — AED 177.75 online, AED 219.75 at a centre. There is no loyalty discount, and there is no surcharge for renewing late either; the fee is flat however overdue you are.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">How much does it cost to cancel Ejari?</h3>
+      <p class="faq-a">Nothing. Cancellation is free through Dubai REST or at a trustee centre. Because it costs nothing and an open registration on a unit blocks the next tenant's filing, there is no reason to skip it when you move out.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">Who pays the Ejari fee — landlord or tenant?</h3>
+      <p class="faq-a">UAE law does not assign it. Law No. 26 of 2007 places the registration duty on the landlord, but Dubai contracts routinely pass it to the tenant and in practice the tenant usually pays. Whichever way you agree, write it into the contract so it cannot be reopened later.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">Is AED 300 or AED 500 for Ejari a scam?</h3>
+      <p class="faq-a">Not necessarily a scam, but it is not the government fee. Agents, property managers and online filing services charge the AED 177.75 fee plus their own margin, and they are entitled to. What is not acceptable is presenting the total as though it were the official price. Ask any provider to show the government fee and their service fee as separate lines.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">What else do I have to pay when moving into a Dubai rental?</h3>
+      <p class="faq-a">Ejari is one of the smaller line items. Budget also for the agency commission (typically 5% of annual rent), the security deposit (5% unfurnished, 10% furnished), the DEWA connection deposit (AED 2,000 for an apartment, AED 4,000 for a villa) and the DEWA activation charges. Ejari at AED 177.75 is rarely what breaks the budget.</p>
+    </div>
+  </section>
+
+  <div class="related">
+    <div class="related-title">Related guides</div>
+    <div class="related-grid">
+      <a href="/guide/ejari-registration" class="rc">
+        <div class="rc-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="5" width="12" height="16" rx="1.5"/><path d="M9 5V3.5A1.5 1.5 0 0 1 10.5 2h3A1.5 1.5 0 0 1 15 3.5V5"/><path d="M9.3 13.5l1.9 2 3.5-3.6"/></svg></div>
+        <div class="rc-title">Register Ejari</div>
+        <div class="rc-desc">The filing itself, step by step</div>
+      </a>
+      <a href="/what-is-ejari" class="rc">
+        <div class="rc-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg></div>
+        <div class="rc-title">What is Ejari</div>
+        <div class="rc-desc">The system, explained from scratch</div>
+      </a>
+      <a href="/guide/ejari-renewal" class="rc">
+        <div class="rc-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 8a8 8 0 0 0-14.5-2.5"/><path d="M5.5 2.5v3h3"/><path d="M4 16a8 8 0 0 0 14.5 2.5"/><path d="M18.5 21.5v-3h-3"/></svg></div>
+        <div class="rc-title">Renew Ejari</div>
+        <div class="rc-desc">Same fee, yearly deadline</div>
+      </a>
+      <a href="/tools/rent-increase-calculator" class="rc">
+        <div class="rc-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8.5 7.5h7"/><path d="M8.5 12h.01"/><path d="M12 12h.01"/><path d="M15.5 12h.01"/><path d="M8.5 16h.01"/><path d="M12 16h.01"/><path d="M15.5 16h.01"/></svg></div>
+        <div class="rc-title">Rent increase calculator</div>
+        <div class="rc-desc">The legal cap on your renewal</div>
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<footer class="eh-footer">
+  <div class="eh-footer-in">
+    <div class="eh-f-col">
+      <div class="eh-f-name">Ejari Helper</div>
+      <p class="eh-f-desc">AI-powered Dubai tenancy contract generator and rental-law assistant. DLD format, filled from your documents in minutes — no account needed.</p>
+      <a href="https://www.trustpilot.com/review/ejarihelper.ae" target="_blank" rel="noopener" class="eh-f-review">Leave us a review</a>
+    </div>
+    <div class="eh-f-col">
+      <div class="eh-f-h">Product</div>
+      <a href="/">Generate contract</a>
+      <a href="/legal-chat">AI rental lawyer</a>
+      <a href="/tools/rent-increase-calculator">Rent increase calculator</a>
+      <a href="/how-it-works">How it works</a>
+    </div>
+    <div class="eh-f-col">
+      <div class="eh-f-h">Guides</div>
+      <a href="/what-is-ejari">What is Ejari</a>
+      <a href="/guide/ejari-registration">Ejari registration</a>
+      <a href="/guide/ejari-cost">Ejari cost</a>
+      <a href="/guide/ejari-check">Check &amp; verify Ejari</a>
+      <a href="/guide/ejari-renewal">Ejari renewal</a>
+      <a href="/guides">All guides</a>
+    </div>
+    <div class="eh-f-col" lang="ar" dir="rtl">
+      <div class="eh-f-h">بالعربية</div>
+      <a href="/ar/legal-chat">المحامي الذكي للإيجارات</a>
+      <a href="/ar/guide/ejari-renewal">تجديد إيجاري</a>
+      <a href="/ar/guide/rental-dispute">المنازعات الإيجارية</a>
+      <a href="/ar/guide/dewa-premises-number">رقم المبنى ديوا</a>
+    </div>
+  </div>
+  <div class="eh-f-meta">
+    <span>© 2026 Ejari Helper · Dubai, UAE</span>
+    <a href="mailto:hello@ejarihelper.ae" onclick="this.href='mailto:'+atob('YWx6ZXlkaUBnbWFpbC5jb20=')">hello@ejarihelper.ae</a>
+    <a href="/about">About</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+  </div>
+  <p class="eh-f-disc">Ejari Helper is an independent service and is <strong>not affiliated with, endorsed by, or connected to</strong> the Dubai Land Department, RERA, or any UAE government body. &ldquo;Ejari&rdquo; is a Dubai Land Department mark, used here descriptively. Registration is filed through the official channels &mdash; <a href="https://dubailand.gov.ae" rel="nofollow noopener" target="_blank">dubailand.gov.ae</a>, the Dubai REST app, or a trustee centre. Nothing on this site is legal advice; see the <a href="/terms">terms</a>.</p>
+</footer>
+<script defer src="/static/js/toc.js"></script>
+</body>
+</html>

@@ -265,9 +265,9 @@ def render_page(*rel_path):
 # Bare directory paths have no index page of their own — point them at the
 # closest real entry point instead of 404ing.
 _SECTION_REDIRECTS = {
-    '/guide': '/',
-    '/guides': '/',
-    '/tools': '/',
+    # /guides is a real hub page now; /guide is its singular typo-twin.
+    '/guide': '/guides',
+    '/tools': '/guides',
     '/index': '/',
     '/home': '/',
     '/404': '/',
@@ -699,6 +699,18 @@ def llms_txt():
   index), eviction notices, RDC filings. Price: AED 50 for 30 minutes vs
   ~AED 1,500/hour at a law firm. Arabic landing: {base_url}/ar/legal-chat
 
+## Start here
+
+- [What is Ejari]({base_url}/what-is-ejari): the definition page — what the
+  Dubai Land Department registry is, why Law No. 26 of 2007 makes it
+  mandatory, what it costs, and how to get one.
+- [Ejari help]({base_url}/ejari-help): the nine problems that actually block a
+  registration (document mismatches, expired certificates, landlords
+  withholding a Title Deed, DEWA refusals) and the fix for each.
+- [All guides]({base_url}/guides): the complete index.
+- [About]({base_url}/about): who runs this site, how the guidance is sourced,
+  and an explicit statement that we are not affiliated with DLD or RERA.
+
 ## Free tools
 
 - [RERA rent increase calculator]({base_url}/tools/rent-increase-calculator):
@@ -708,8 +720,17 @@ def llms_txt():
 
 ## Guides (canonical URLs)
 
-- [Ejari registration]({base_url}/guide/ejari-registration): register online via
-  Dubai REST, AED 122.50, documents checklist.
+- [Ejari registration]({base_url}/guide/ejari-registration): how to make an
+  Ejari online via Dubai REST, AED 177.75, documents checklist.
+- [Ejari cost]({base_url}/guide/ejari-cost): the full 2026 fee breakdown —
+  AED 177.75 filed yourself (AED 100 registration + AED 10 knowledge +
+  AED 10 innovation + AED 55 service partner + AED 2.75 VAT) versus
+  AED 219.75 at a trustee centre. Cancellation is free.
+- [Ejari check]({base_url}/guide/ejari-check): check status in Dubai REST, by
+  SMS to 4488 or on the DLD portal; re-download the certificate free; verify
+  authenticity via the QR code.
+- [Ejari number]({base_url}/guide/ejari-number): format 22-99999/2026, where
+  to find it, and how it differs from the 9-digit DEWA premises number.
 - [Ejari renewal]({base_url}/guide/ejari-renewal): renew every contract year,
   fees, grace period, late-renewal consequences.
 - [Ejari cancellation]({base_url}/guide/ejari-cancellation): free, required at
@@ -738,8 +759,73 @@ def llms_txt():
 - Use of this site's content for model training: not permitted
   (ai-train=no, use=reference). See robots.txt.
 - Contact: hello@ejarihelper.ae
+- Affiliation: independent. NOT affiliated with, endorsed by, or connected to
+  the Dubai Land Department, RERA, or any UAE government body. "Ejari" is a
+  Dubai Land Department mark. Official portal: dubailand.gov.ae
 """
     return content, 200, {'Content-Type': 'text/plain; charset=utf-8'}
+
+# Google ignores <changefreq> and <priority> entirely and reads only
+# <lastmod>, so the sitemap carries lastmod and nothing else. The date is
+# lifted from each page's own JSON-LD dateModified, which keeps the sitemap
+# and the structured data from ever drifting apart.
+_SITE_DEFAULT_LASTMOD = '2026-08-20'
+_LASTMOD_RE = re.compile(r'"dateModified"\s*:\s*"(\d{4}-\d{2}-\d{2})"')
+_lastmod_cache = {}
+
+
+def page_lastmod(path):
+    """Read dateModified out of the page's structured data. Falls back to the
+    site default for pages that carry no Article schema (privacy, terms)."""
+    if path in _lastmod_cache:
+        return _lastmod_cache[path]
+    rel = (path.strip('/') or 'index') + '.html'
+    try:
+        with open(os.path.join(app.static_folder, *rel.split('/')), encoding='utf-8') as f:
+            m = _LASTMOD_RE.search(f.read())
+        date = m.group(1) if m else _SITE_DEFAULT_LASTMOD
+    except OSError:
+        date = _SITE_DEFAULT_LASTMOD
+    _lastmod_cache[path] = date
+    return date
+
+
+# Lower-cased because canonical_path() lower-cases every request path: a
+# mixed-case key would be served from a URL that 301s, and IndexNow does not
+# follow redirects when verifying keyLocation.
+INDEXNOW_KEY = os.environ.get('INDEXNOW_KEY', '').lower()
+
+
+@app.route('/<key>.txt')
+def indexnow_key_file(key):
+    """IndexNow verifies ownership by fetching /<key>.txt containing the key."""
+    if not INDEXNOW_KEY or key.lower() != INDEXNOW_KEY.lower():
+        abort(404)
+    return INDEXNOW_KEY, 200, {'Content-Type': 'text/plain'}
+
+
+@app.route('/admin/indexnow', methods=['POST'])
+def indexnow_submit():
+    """Push every sitemap URL to IndexNow (Bing, Yandex, DuckDuckGo).
+    Google ignores IndexNow, so the sitemap remains the route that matters
+    there — this just shortens the lag on the other engines after a deploy."""
+    if not session.get('admin'):
+        return jsonify({'error': 'unauthorized'}), 401
+    if not INDEXNOW_KEY:
+        return jsonify({'error': 'INDEXNOW_KEY not set'}), 400
+    import requests
+    base_url = os.environ.get('BASE_URL', request.host_url.rstrip('/'))
+    host = base_url.split('://', 1)[-1]
+    urls = re.findall(r'<loc>([^<]+)</loc>', sitemap_xml()[0])
+    try:
+        r = requests.post('https://api.indexnow.org/IndexNow', timeout=15, json={
+            'host': host, 'key': INDEXNOW_KEY,
+            'keyLocation': f'{base_url}/{INDEXNOW_KEY}.txt',
+            'urlList': urls})
+        return jsonify({'submitted': len(urls), 'status': r.status_code})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 502
+
 
 @app.route('/sitemap.xml')
 def sitemap_xml():
@@ -756,37 +842,43 @@ def sitemap_xml():
     def guide_pair(slug):
         return (f'/guide/{slug}', f'/ar/guide/{slug}')
 
-    # (path, changefreq, priority, (en_path, ar_path) or None)
+    # (path, (en_path, ar_path) or None)
     entries = [
-        ('/', 'weekly', '1.0', None),
-        ('/guide/ejari-registration', 'monthly', '0.8', None),
-        ('/guide/dewa-activation', 'monthly', '0.7', None),
-        ('/guide/rental-dispute', 'monthly', '0.7', guide_pair('rental-dispute')),
-        ('/guide/ejari-renewal', 'monthly', '0.8', guide_pair('ejari-renewal')),
-        ('/guide/tenancy-contract-dubai', 'monthly', '0.8', None),
-        ('/guide/dewa-premises-number', 'monthly', '0.6', guide_pair('dewa-premises-number')),
-        ('/guide/dewa-transfer', 'monthly', '0.8', None),
-        ('/guide/ejari-cancellation', 'monthly', '0.7', None),
-        ('/tools/rent-increase-calculator', 'monthly', '0.8', None),
-        ('/guide/security-deposit-refund-dubai', 'monthly', '0.8', None),
-        ('/guide/rent-increase-dubai', 'monthly', '0.8', None),
-        ('/guide/eviction-notice-dubai', 'monthly', '0.8', None),
-        ('/guide/ejari-fine', 'monthly', '0.7', None),
-        ('/ar/guide/rental-dispute', 'monthly', '0.7', guide_pair('rental-dispute')),
-        ('/ar/guide/ejari-renewal', 'monthly', '0.8', guide_pair('ejari-renewal')),
-        ('/ar/guide/dewa-premises-number', 'monthly', '0.6', guide_pair('dewa-premises-number')),
-        ('/legal-chat', 'weekly', '0.9', ('/legal-chat', '/ar/legal-chat')),
-        ('/ar/legal-chat', 'weekly', '0.8', ('/legal-chat', '/ar/legal-chat')),
-        ('/how-it-works', 'monthly', '0.9', None),
-        ('/privacy', 'yearly', '0.5', None),
-        ('/terms', 'yearly', '0.5', None),
+        ('/', None),
+        ('/what-is-ejari', None),
+        ('/ejari-help', None),
+        ('/guides', None),
+        ('/guide/ejari-registration', None),
+        ('/guide/ejari-cost', None),
+        ('/guide/ejari-check', None),
+        ('/guide/ejari-number', None),
+        ('/guide/ejari-renewal', guide_pair('ejari-renewal')),
+        ('/guide/ejari-cancellation', None),
+        ('/guide/ejari-fine', None),
+        ('/guide/tenancy-contract-dubai', None),
+        ('/guide/rental-dispute', guide_pair('rental-dispute')),
+        ('/guide/security-deposit-refund-dubai', None),
+        ('/guide/rent-increase-dubai', None),
+        ('/guide/eviction-notice-dubai', None),
+        ('/guide/dewa-activation', None),
+        ('/guide/dewa-premises-number', guide_pair('dewa-premises-number')),
+        ('/guide/dewa-transfer', None),
+        ('/tools/rent-increase-calculator', None),
+        ('/ar/guide/rental-dispute', guide_pair('rental-dispute')),
+        ('/ar/guide/ejari-renewal', guide_pair('ejari-renewal')),
+        ('/ar/guide/dewa-premises-number', guide_pair('dewa-premises-number')),
+        ('/legal-chat', ('/legal-chat', '/ar/legal-chat')),
+        ('/ar/legal-chat', ('/legal-chat', '/ar/legal-chat')),
+        ('/how-it-works', None),
+        ('/about', None),
+        ('/privacy', None),
+        ('/terms', None),
     ]
     urls = ''
-    for path, freq, prio, pair in entries:
+    for path, pair in entries:
         urls += (f'\n  <url>\n    <loc>{base_url}{path}</loc>'
                  f'{hreflang_links(*pair) if pair else ""}'
-                 f'\n    <changefreq>{freq}</changefreq>'
-                 f'\n    <priority>{prio}</priority>\n  </url>')
+                 f'\n    <lastmod>{page_lastmod(path)}</lastmod>\n  </url>')
     xml = ('<?xml version="1.0" encoding="UTF-8"?>\n'
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
            'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
@@ -798,7 +890,8 @@ _GUIDE_SLUGS = {'ejari-registration', 'dewa-activation', 'rental-dispute',
                 'ejari-renewal', 'dewa-premises-number', 'tenancy-contract-dubai',
                 'dewa-transfer', 'ejari-cancellation',
                 'security-deposit-refund-dubai', 'rent-increase-dubai',
-                'eviction-notice-dubai', 'ejari-fine'}
+                'eviction-notice-dubai', 'ejari-fine',
+                'ejari-check', 'ejari-cost', 'ejari-number'}
 
 _TOOL_SLUGS = {'rent-increase-calculator'}
 
@@ -828,6 +921,29 @@ def guide_ar(slug):
             return redirect(f'/guide/{slug}', 301)
         abort(404)
     return render_page('ar', 'guide', f'{slug}.html')
+
+
+@app.route('/what-is-ejari')
+def what_is_ejari():
+    """Definition page for the head term. Deliberately a top-level URL rather
+    than /guide/… — it is the entry point of the whole Ejari cluster, not one
+    guide among twelve."""
+    return render_page('what-is-ejari.html')
+
+
+@app.route('/ejari-help')
+def ejari_help():
+    return render_page('ejari-help.html')
+
+
+@app.route('/guides')
+def guides_index():
+    return render_page('guides.html')
+
+
+@app.route('/about')
+def about():
+    return render_page('about.html')
 
 
 @app.route('/privacy')

@@ -46,7 +46,7 @@ GA4 does **not** treat custom events as conversions automatically. In **GA4 Admi
 
 ## Post-deploy checklist (after each SEO-relevant deploy)
 
-1. **GSC**: resubmit `sitemap.xml` (Search Console → Sitemaps), then use *URL Inspection → Request indexing* for changed/new URLs — at minimum: `/guide/ejari-renewal`, `/guide/ejari-registration`, `/guide/rental-dispute`, `/tools/rent-increase-calculator`, `/guide/security-deposit-refund-dubai`, `/guide/rent-increase-dubai`, `/guide/eviction-notice-dubai`, `/guide/ejari-fine`, `/ar/legal-chat`, `/how-it-works`, `/terms`.
+1. **GSC**: resubmit `sitemap.xml` (Search Console → Sitemaps), then use *URL Inspection → Request indexing* for changed/new URLs. Priority order for the current cluster: `/what-is-ejari`, `/ejari-help`, `/guide/ejari-cost`, `/guide/ejari-check`, `/guide/ejari-number`, `/guides`, `/about`, `/guide/ejari-registration`, then the rest.
 2. **GA4**: confirm the 7 key events are marked (see Analytics above); walk the funnel once on a phone with `?_ga_debug=1` and watch DebugView.
 3. **Rich Results Test**: run the edited guide URLs (FAQ + HowTo should be detected).
 4. **Redirects**: `curl -sI http://ejarihelper.ae/guide/ejari-renewal` → exactly one `301` to the https URL, which returns `200`.
@@ -79,8 +79,58 @@ Anything that really does not exist returns a **404 with the branded
 `static/404.html`** — never a bounce to the homepage, which Google counts as a soft 404.
 API paths (`/legal-chat/*`, `/admin/*`, `/webhook/*`) get a JSON 404 instead.
 
-When adding a page: add the slug to `_GUIDE_SLUGS` / `_AR_GUIDE_SLUGS` / `_TOOL_SLUGS`,
-the URL to `sitemap_xml()`, and the path to `PAGES` in `tests/test_seo.py`.
+When adding a page: add the slug to `_GUIDE_SLUGS` / `_AR_GUIDE_SLUGS` / `_TOOL_SLUGS`
+(or a top-level route for a cluster entry point like `/what-is-ejari`), the URL to
+`sitemap_xml()`, and the path to `PAGES` in `tests/test_seo.py`. The page must carry
+`dateModified` in its JSON-LD — `sitemap_xml()` reads `<lastmod>` straight out of it,
+and `test_every_page_declares_a_modification_date` fails without it.
+
+## Ejari fees — single source of truth
+
+The 2026 government fee is **AED 177.75** filed yourself (Dubai REST / DLD portal) and
+**AED 219.75** at a trustee centre:
+
+| | Online | Trustee centre |
+| --- | --- | --- |
+| Registration | 100.00 | 100.00 |
+| Knowledge fee | 10.00 | 10.00 |
+| Innovation fee | 10.00 | 10.00 |
+| Service-partner fee | 55.00 | 95.00 |
+| VAT (5% of the partner fee only) | 2.75 | 4.75 |
+| **Total** | **177.75** | **219.75** |
+
+Cancellation is free and renewal costs the same as first registration. This figure is
+the site's main competitive edge — every competitor audited publishes a stale or vague
+number — so `test_fee_figure_is_consistent_sitewide` fails the build if a superseded
+figure (`122.50`, `AED 215`, `AED 220`) reappears anywhere in `static/`.
+
+## SEO strategy docs
+
+- `SEO-STRATEGY.md` — competitor teardown, on-site audit, phase plan, what still needs
+  the owner (Cloudflare dashboard, trade-licence details, Dubai REST screenshots).
+- `SEO-OFFSITE-PLAYBOOK.md` — link-building targets and digital-PR pitches, plus the
+  Google Ads campaign structure, keyword lists, negatives and ad copy.
+
+### Live-site checks
+
+`tests/test_seo.py` includes network tests that are skipped by default:
+
+```
+LIVE_SEO_TESTS=1 python3 -m pytest tests/ -q
+```
+
+`test_live_robots_is_not_overridden_by_cloudflare` fails while Cloudflare's managed
+`robots.txt` is enabled — it is prepended to the app's own and contradicts it,
+disallowing `ClaudeBot` and `Applebot-Extended` that `_ROBOTS_AI_ALLOWED` allows.
+Turn the managed file off in the Cloudflare dashboard so `app.py` is the only source
+of truth.
+
+## IndexNow (optional)
+
+Set `INDEXNOW_KEY` (lowercase hex) to enable instant URL submission to Bing, Yandex
+and DuckDuckGo — Google does not participate, so this supplements the sitemap rather
+than replacing it. The key file is served at `/<key>.txt`; `POST /admin/indexnow`
+(admin session required) submits every sitemap URL.
 
 ## Tests
 

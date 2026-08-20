@@ -18,6 +18,8 @@ CANONICAL = 'https://ejarihelper.ae'
 # Every indexable page the sitemap advertises.
 PAGES = [
     '/', '/legal-chat', '/ar/legal-chat', '/how-it-works', '/privacy', '/terms',
+    '/what-is-ejari', '/ejari-help', '/guides', '/about',
+    '/guide/ejari-check', '/guide/ejari-cost', '/guide/ejari-number',
     '/guide/ejari-registration', '/guide/ejari-renewal', '/guide/ejari-cancellation',
     '/guide/ejari-fine', '/guide/tenancy-contract-dubai', '/guide/rental-dispute',
     '/guide/security-deposit-refund-dubai', '/guide/rent-increase-dubai',
@@ -139,6 +141,8 @@ def test_json_ld_parses(client, path):
     '/guide/ejari-renewal', '/guide/ejari-registration', '/guide/rental-dispute',
     '/guide/security-deposit-refund-dubai', '/guide/rent-increase-dubai',
     '/guide/eviction-notice-dubai', '/guide/ejari-fine',
+    '/guide/ejari-check', '/guide/ejari-cost', '/guide/ejari-number',
+    '/what-is-ejari', '/ejari-help', '/about',
     '/tools/rent-increase-calculator', '/ar/legal-chat', '/how-it-works',
 ])
 def test_faq_schema_present(client, path):
@@ -218,10 +222,9 @@ def test_url_variants_301_to_canonical_then_200(client, variant, canonical):
 
 
 @pytest.mark.parametrize('section,target', [
-    ('/guide', '/'),
-    ('/guide/', '/'),
-    ('/guides', '/'),
-    ('/tools', '/'),
+    ('/guide', '/guides'),
+    ('/guide/', '/guides'),
+    ('/tools', '/guides'),
     ('/ar', '/ar/legal-chat'),
     ('/ar/', '/ar/legal-chat'),
     ('/ar/guide', '/ar/legal-chat'),
@@ -293,3 +296,119 @@ def test_post_endpoints_are_not_normalised(client):
     r = client.post('/rate', base_url=CANONICAL, json={'stars': 99},
                     headers={'X-Forwarded-Proto': 'https'})
     assert r.status_code == 400
+
+
+# ── sitemap freshness ─────────────────────────────────────────────────
+
+def test_sitemap_carries_lastmod_and_not_the_ignored_hints(client):
+    """Google reads <lastmod> and ignores <changefreq>/<priority> outright.
+    A sitemap without lastmod carries no freshness signal at all."""
+    body = get(client, '/sitemap.xml').get_data(as_text=True)
+    assert body.count('<lastmod>') == body.count('<loc>')
+    assert '<changefreq>' not in body
+    assert '<priority>' not in body
+
+
+@pytest.mark.parametrize('path', [
+    '/what-is-ejari', '/guide/ejari-cost', '/guide/ejari-registration',
+    '/guide/ejari-fine', '/how-it-works',
+])
+def test_sitemap_lastmod_matches_the_pages_own_datemodified(client, path):
+    """The sitemap date is lifted from the page's structured data, so the two
+    can never drift apart and contradict each other."""
+    sitemap = get(client, '/sitemap.xml').get_data(as_text=True)
+    entry = re.search(rf'<loc>{re.escape(CANONICAL + path)}</loc>.*?<lastmod>([\d-]+)</lastmod>',
+                      sitemap, re.S)
+    assert entry, f'{path} missing from sitemap'
+    page = get(client, path, headers={'X-Forwarded-Proto': 'https'}).get_data(as_text=True)
+    declared = re.search(r'"dateModified":\s*"([\d-]+)"', page)
+    assert declared, f'{path} has no dateModified in its JSON-LD'
+    assert entry.group(1) == declared.group(1), path
+
+
+@pytest.mark.parametrize('path', PAGES)
+def test_every_page_declares_a_modification_date(client, path):
+    body = get(client, path, headers={'X-Forwarded-Proto': 'https'}).get_data(as_text=True)
+    assert re.search(r'"dateModified":\s*"\d{4}-\d{2}-\d{2}"', body), path
+
+
+# ── snippet + image preview permissions ───────────────────────────────
+
+@pytest.mark.parametrize('path', PAGES)
+def test_robots_meta_allows_large_previews(client, path):
+    """Without max-image-preview:large the guides cannot win an image-rich
+    result, and max-snippet:-1 is what allows a full featured snippet."""
+    body = get(client, path, headers={'X-Forwarded-Proto': 'https'}).get_data(as_text=True)
+    assert 'max-image-preview:large' in body, path
+    assert 'max-snippet:-1' in body, path
+
+
+# ── E-E-A-T: the non-affiliation disclaimer ───────────────────────────
+
+@pytest.mark.parametrize('path', PAGES)
+def test_non_affiliation_disclaimer_on_every_page(client, path):
+    """'Ejari' is a Dubai Land Department mark and this domain contains it.
+    Saying plainly that the site is independent is both the legal safeguard
+    and a trust signal on YMYL content."""
+    body = get(client, path, headers={'X-Forwarded-Proto': 'https'}).get_data(as_text=True)
+    assert 'eh-f-disc' in body, path
+    assert 'dubailand.gov.ae' in body, path
+
+
+def test_about_page_is_linked_from_every_page(client):
+    for path in PAGES:
+        body = get(client, path, headers={'X-Forwarded-Proto': 'https'}).get_data(as_text=True)
+        assert 'href="/about"' in body, path
+
+
+# ── intent coverage: one URL per head query ───────────────────────────
+
+@pytest.mark.parametrize('path,phrase', [
+    ('/what-is-ejari', 'what is ejari'),
+    ('/ejari-help', 'ejari help'),
+    ('/guide/ejari-registration', 'how to make an ejari'),
+    ('/guide/ejari-cost', 'ejari cost'),
+    ('/guide/ejari-check', 'ejari check'),
+    ('/guide/ejari-number', 'ejari number'),
+])
+def test_head_queries_have_a_page_that_targets_them(client, path, phrase):
+    """Each head query needs a URL whose title and H1 actually answer it —
+    a phrase buried inside another page cannot rank for it."""
+    body = get(client, path, headers={'X-Forwarded-Proto': 'https'}).get_data(as_text=True)
+    title = html.unescape(re.search(r'<title>(.*?)</title>', body).group(1)).lower()
+    h1 = html.unescape(re.sub(r'<[^>]*>', ' ', re.search(r'<h1[^>]*>(.*?)</h1>', body, re.S).group(1))).lower()
+    words = phrase.split()
+    assert all(w in title for w in words if w not in ('an', 'to', 'how')), f'{path}: title misses "{phrase}"'
+    assert all(w in h1 for w in words), f'{path}: h1 misses "{phrase}"'
+
+
+def test_fee_figure_is_consistent_sitewide(client):
+    """The Ejari fee is this site's headline fact and its main competitive
+    edge. One stale copy of it anywhere undermines the whole claim."""
+    import pathlib
+    stale = []
+    for f in pathlib.Path('static').rglob('*.html'):
+        text = f.read_text(encoding='utf-8')
+        for bad in ('122.50', 'AED 215', 'AED 220'):
+            if bad in text:
+                stale.append(f'{f}: {bad}')
+    assert not stale, 'superseded Ejari fee still on: ' + ', '.join(stale)
+
+
+# ── live-site checks (opt in with LIVE_SEO_TESTS=1) ───────────────────
+
+@pytest.mark.skipif(not os.environ.get('LIVE_SEO_TESTS'),
+                    reason='hits the live site; set LIVE_SEO_TESTS=1 to run')
+def test_live_robots_is_not_overridden_by_cloudflare():
+    """Cloudflare's managed robots.txt is prepended to ours and contradicts
+    it — it disallows ClaudeBot and Applebot-Extended, which _ROBOTS_AI_ALLOWED
+    deliberately allows. Two groups for one user-agent is resolved differently
+    by different parsers, so the app must be the only source of truth.
+    Fix: Cloudflare dashboard -> disable the managed robots.txt."""
+    import urllib.request
+    with urllib.request.urlopen('https://ejarihelper.ae/robots.txt', timeout=20) as r:
+        body = r.read().decode()
+    assert 'Cloudflare Managed content' not in body, (
+        'Cloudflare is injecting its own robots.txt ahead of the app\'s')
+    for bot in ['ClaudeBot', 'Applebot-Extended']:
+        assert f'User-agent: {bot}\nDisallow: /' not in body, f'{bot} blocked by an override'
