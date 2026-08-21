@@ -413,16 +413,54 @@ def test_fee_figure_is_consistent_sitewide(client):
 
 @pytest.mark.skipif(not os.environ.get('LIVE_SEO_TESTS'),
                     reason='hits the live site; set LIVE_SEO_TESTS=1 to run')
-def test_live_robots_is_not_overridden_by_cloudflare():
-    """Cloudflare's managed robots.txt is prepended to ours and contradicts
-    it — it disallows ClaudeBot and Applebot-Extended, which _ROBOTS_AI_ALLOWED
-    deliberately allows. Two groups for one user-agent is resolved differently
-    by different parsers, so the app must be the only source of truth.
-    Fix: Cloudflare dashboard -> disable the managed robots.txt."""
+def test_live_robots_is_the_apps_own_file():
+    """Cloudflare's managed robots.txt used to be prepended to ours and
+    contradict it — two groups for one user-agent, resolved differently by
+    different parsers. The app must be the only source of truth.
+    If this fails: Cloudflare dashboard -> AI Crawl Control -> Managed robots.txt.
+
+    Sends a browser User-Agent deliberately: Cloudflare 403s the default
+    Python-urllib agent, which would fail the test for the wrong reason.
+    """
     import urllib.request
-    with urllib.request.urlopen('https://ejarihelper.ae/robots.txt', timeout=20) as r:
+    req = urllib.request.Request('https://ejarihelper.ae/robots.txt', headers={
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                      'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36'})
+    with urllib.request.urlopen(req, timeout=20) as r:
         body = r.read().decode()
     assert 'Cloudflare Managed content' not in body, (
-        'Cloudflare is injecting its own robots.txt ahead of the app\'s')
-    for bot in ['ClaudeBot', 'Applebot-Extended']:
-        assert f'User-agent: {bot}\nDisallow: /' not in body, f'{bot} blocked by an override'
+        "Cloudflare is injecting its own robots.txt ahead of the app's")
+    # The citation agents must not be disallowed by anything.
+    for bot in ['OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot', 'Perplexity-User',
+                'ClaudeBot', 'Claude-User', 'Applebot']:
+        assert f'User-agent: {bot}\nDisallow: /\n' not in body, f'{bot} disallowed'
+        assert f'User-agent: {bot}\nAllow: /' in body, f'{bot} missing'
+    assert 'Content-Signal: search=yes,ai-train=no,use=reference' in body
+
+
+@pytest.mark.skipif(not os.environ.get('LIVE_SEO_TESTS'),
+                    reason='hits the live site; set LIVE_SEO_TESTS=1 to run')
+@pytest.mark.parametrize('bot,ua', [
+    ('OAI-SearchBot', 'Mozilla/5.0 (compatible; OAI-SearchBot/1.0; +https://openai.com/searchbot)'),
+    ('ChatGPT-User', 'Mozilla/5.0 (compatible; ChatGPT-User/1.0; +https://openai.com/bot)'),
+    ('PerplexityBot', 'Mozilla/5.0 (compatible; PerplexityBot/1.0; +https://perplexity.ai/perplexitybot)'),
+    ('Perplexity-User', 'Mozilla/5.0 (compatible; Perplexity-User/1.0; +https://perplexity.ai/perplexity-user)'),
+    ('ClaudeBot', 'Mozilla/5.0 (compatible; ClaudeBot/1.0; +claudebot@anthropic.com)'),
+    ('Claude-User', 'Mozilla/5.0 (compatible; Claude-User/1.0; +Claude-User@anthropic.com)'),
+    ('Googlebot', 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'),
+    ('bingbot', 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)'),
+])
+def test_live_citation_crawlers_are_not_blocked_at_the_edge(bot, ua):
+    """robots.txt is irrelevant to a crawler that never gets a response. These
+    all returned 403 while Cloudflare's AI crawler block was on, which silently
+    removed the site from AI answers — roughly 10% of sessions.
+    If this fails: Cloudflare dashboard -> AI Crawl Control -> Crawlers -> Allow.
+    """
+    import urllib.request, urllib.error
+    req = urllib.request.Request('https://ejarihelper.ae/guide/ejari-registration',
+                                 headers={'User-Agent': ua})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            assert r.status == 200, f'{bot}: HTTP {r.status}'
+    except urllib.error.HTTPError as e:
+        raise AssertionError(f'{bot} blocked at the edge: HTTP {e.code}') from None
