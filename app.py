@@ -655,10 +655,36 @@ _ROBOTS_DISALLOW = [
 # Citation/search AI crawlers — explicitly allowed. AI assistants already drive
 # ~10% of sessions and refer users to the legal-chat product; blocking these
 # bots cuts that acquisition channel.
-_ROBOTS_AI_ALLOWED = ['OAI-SearchBot', 'PerplexityBot', 'ClaudeBot', 'Applebot-Extended']
+#
+# The *-User agents matter most: they are not indexers but live fetches made
+# when a real person asks an assistant about this site. Cloudflare's AI Crawl
+# Control reports ChatGPT-User as the single busiest crawler here, so a block
+# on it is a block on real users mid-question.
+_ROBOTS_AI_ALLOWED = [
+    'OAI-SearchBot', 'ChatGPT-User',        # OpenAI: search index + live fetch
+    'PerplexityBot', 'Perplexity-User',     # Perplexity: index + live fetch
+    'ClaudeBot', 'Claude-User',             # Anthropic: index + live fetch
+    'Applebot',                             # Apple search (see Applebot-Extended below)
+]
 
-# Training-only crawlers — opted out (content may be cited/referenced, not trained on).
-_ROBOTS_AI_BLOCKED = ['GPTBot', 'Google-Extended', 'CCBot']
+# Training crawlers — opted out (content may be cited/referenced, not trained on).
+#
+# Google-Extended and Applebot-Extended are not crawlers at all: they are
+# control tokens. Disallowing them is how you decline Gemini and Apple
+# Intelligence training while keeping normal search crawling. Applebot-Extended
+# used to sit in the allowed list above, which said the opposite of this file's
+# own stated policy — it grants training permission, it does not fetch anything.
+#
+# Bytespider, meta-externalagent and Amazonbot are here because Cloudflare's
+# managed robots.txt used to block them and no longer does. Stating the policy
+# ourselves is weaker than a network block — a crawler that ignores robots.txt
+# still gets through — so the durable fix is to re-block these six in
+# Cloudflare's AI Crawl Control.
+_ROBOTS_AI_BLOCKED = [
+    'GPTBot', 'CCBot',                      # OpenAI / Common Crawl training
+    'Google-Extended', 'Applebot-Extended', # training control tokens
+    'Bytespider', 'meta-externalagent', 'Amazonbot',
+]
 
 
 @app.route('/robots.txt')
@@ -667,11 +693,14 @@ def robots_txt():
     disallow = ''.join(f'Disallow: {p}\n' for p in _ROBOTS_DISALLOW)
     parts = ['# AI policy: citation/search assistants welcome, model training opted out.\n'
              '# Content-Usage: ai-train=no, use=reference\n\n']
+    # Machine-readable form of the same policy. Cloudflare's managed robots.txt
+    # used to emit this; it is disabled now, so the app states it directly.
+    signal = 'Content-Signal: search=yes,ai-train=no,use=reference\n'
     for bot in _ROBOTS_AI_ALLOWED:
         parts.append(f'User-agent: {bot}\nAllow: /\n{disallow}\n')
     for bot in _ROBOTS_AI_BLOCKED:
         parts.append(f'User-agent: {bot}\nDisallow: /\n\n')
-    parts.append(f'User-agent: *\nAllow: /\n{disallow}\n')
+    parts.append(f'User-agent: *\n{signal}Allow: /\n{disallow}\n')
     parts.append(f'Sitemap: {base_url}/sitemap.xml\n')
     return ''.join(parts), 200, {'Content-Type': 'text/plain'}
 

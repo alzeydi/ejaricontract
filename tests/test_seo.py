@@ -154,10 +154,24 @@ def test_faq_schema_present(client, path):
 
 def test_robots_ai_policy(client):
     body = get(client, '/robots.txt').get_data(as_text=True)
-    for bot in ['OAI-SearchBot', 'PerplexityBot', 'ClaudeBot', 'Applebot-Extended']:
+    # Citation and live-fetch agents: the acquisition channel, kept open.
+    for bot in ['OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot', 'Perplexity-User',
+                'ClaudeBot', 'Claude-User', 'Applebot']:
         assert f'User-agent: {bot}\nAllow: /' in body, bot
-    for bot in ['GPTBot', 'Google-Extended', 'CCBot']:
+    # Training crawlers and training control tokens: opted out.
+    for bot in ['GPTBot', 'CCBot', 'Google-Extended', 'Applebot-Extended',
+                'Bytespider', 'meta-externalagent', 'Amazonbot']:
         assert f'User-agent: {bot}\nDisallow: /\n' in body, bot
+    assert 'Content-Signal: search=yes,ai-train=no,use=reference' in body
+
+
+def test_applebot_extended_is_not_treated_as_a_crawler(client):
+    """Applebot-Extended grants permission to train Apple Intelligence; it
+    fetches nothing. Allowing it while declaring ai-train=no contradicts the
+    file's own policy, so it belongs in the disallow list, not the allow list."""
+    body = get(client, '/robots.txt').get_data(as_text=True)
+    assert 'User-agent: Applebot-Extended\nAllow: /' not in body
+    assert 'User-agent: Applebot-Extended\nDisallow: /' in body
     assert 'Disallow: /legal-chat/message' in body
     assert 'Disallow: /legal-chat/create-payment' in body
     assert f'Sitemap: {CANONICAL}/sitemap.xml' in body
