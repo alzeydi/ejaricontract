@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Ejari Tenancy Contract Generator - Flask Backend"""
 
-import io, os, re, base64, json
+import io, os, re, base64, json, threading
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 from flask import Flask, request, send_file, jsonify, send_from_directory, session, redirect, abort, Response
@@ -217,6 +217,27 @@ def _init_db():
                         confirmed_at TIMESTAMP,
                         ga_reported_at TIMESTAMP,
                         generations INTEGER NOT NULL DEFAULT 0
+                    )
+                ''')
+                # Free-extraction rate limit: a keyed hash of the IP that
+                # changes every day (no raw IPs), rows dropped after 2 days.
+                cur.execute('''
+                    CREATE TABLE IF NOT EXISTS extract_usage (
+                        ip_hash TEXT NOT NULL,
+                        day DATE NOT NULL,
+                        count INTEGER NOT NULL DEFAULT 0,
+                        PRIMARY KEY (ip_hash, day)
+                    )
+                ''')
+                # OCR spend per extraction — token counts only.
+                cur.execute('''
+                    CREATE TABLE IF NOT EXISTS ocr_costs (
+                        id SERIAL PRIMARY KEY,
+                        created_at TIMESTAMP DEFAULT NOW(),
+                        docs INTEGER NOT NULL,
+                        input_tokens INTEGER NOT NULL,
+                        output_tokens INTEGER NOT NULL,
+                        est_usd NUMERIC(10, 5) NOT NULL
                     )
                 ''')
     finally:
@@ -1413,7 +1434,7 @@ def health():
 @app.route('/config')
 def config():
     return jsonify({'free_mode': FREE_MODE, 'legal_free_mode': LEGAL_FREE_MODE, 'ziina_embedded': ZIINA_EMBEDDED,
-                    'contract_price_aed': CONTRACT_PRICE_FILS // 100})
+                    'contract_price_aed': CONTRACT_PRICE_AED, 'turnstile_site_key': TURNSTILE_SITE_KEY})
 
 
 def build_content_block(f):
@@ -1447,50 +1468,137 @@ DOC_PROMPTS = {
 }
 
 
+OCR_MODEL = 'claude-haiku-4-5'
+OCR_USD_PER_MTOK = (1.00, 5.00)  # input, output — claude-haiku-4-5 list price
+
+# Free extraction is abuse-prone (each call costs OCR tokens): a daily cap
+# per visitor plus, when TURNSTILE_SECRET is set, a Cloudflare Turnstile check.
+EXTRACT_DAILY_LIMIT = int(os.environ.get('EXTRACT_DAILY_LIMIT', '5'))
+TURNSTILE_SITE_KEY = os.environ.get('TURNSTILE_SITE_KEY', '')
+TURNSTILE_SECRET = os.environ.get('TURNSTILE_SECRET', '')
+
+# Paid generations: re-downloads after fixing a typo are part of the price.
+GENERATIONS_PER_PAYMENT = 5
+GENERATION_WINDOW_HOURS = 24
+
+
 def extract_one(f):
-    """Extract data from a single document using haiku (fast)."""
+    """Extract data from a single document using haiku (fast). Returns (fields, usage)."""
     prompt = DOC_PROMPTS.get(f['label'], 'Extract all key text fields. Return ONLY JSON.')
     content = [build_content_block(f), {'type': 'text', 'text': prompt}]
     msg = claude.messages.create(
-        model='claude-haiku-4-5',
+        model=OCR_MODEL,
         max_tokens=300,
         messages=[{'role': 'user', 'content': content}]
     )
+    usage = (msg.usage.input_tokens, msg.usage.output_tokens)
     text = ''.join(b.text for b in msg.content if hasattr(b, 'text'))
     text = text.replace('```json', '').replace('```', '').strip()
-    return json.loads(text)
+    return json.loads(text), usage
+
+
+def _client_ip():
+    # Behind Cloudflare the edge's address is what reaches the app; the
+    # visitor's is in CF-Connecting-IP.
+    return request.headers.get('CF-Connecting-IP') or request.remote_addr or ''
+
+
+def _extract_quota_hit():
+    """Count one free extraction for this visitor. Returns (allowed, used_today)."""
+    day = datetime.now(timezone.utc).date()
+    key = (app.secret_key + day.isoformat()).encode()
+    ip_hash = hmac.new(key, _client_ip().encode(), hashlib.sha256).hexdigest()[:32]
+    conn = _get_conn()
+    if not conn:
+        with _mem_lock:
+            k = (ip_hash, day)
+            _mem_extract_usage[k] = _mem_extract_usage.get(k, 0) + 1
+            used = _mem_extract_usage[k]
+        return used <= EXTRACT_DAILY_LIMIT, used
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute('DELETE FROM extract_usage WHERE day < %s', (day - timedelta(days=1),))
+                cur.execute('INSERT INTO extract_usage (ip_hash, day, count) VALUES (%s, %s, 1) '
+                            'ON CONFLICT (ip_hash, day) DO UPDATE SET count = extract_usage.count + 1 '
+                            'RETURNING count', (ip_hash, day))
+                used = cur.fetchone()[0]
+    finally:
+        conn.close()
+    return used <= EXTRACT_DAILY_LIMIT, used
+
+
+_mem_extract_usage = {}
+
+
+def _turnstile_ok(token):
+    if not TURNSTILE_SECRET:
+        return True
+    if not token:
+        return False
+    try:
+        r = req_lib.post('https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                         data={'secret': TURNSTILE_SECRET, 'response': token, 'remoteip': _client_ip()},
+                         timeout=8)
+        return bool(r.json().get('success'))
+    except Exception as e:
+        print(f'[turnstile] verify error: {e}', flush=True)
+        return True  # fail open: an outage at Cloudflare must not block customers; the daily cap still applies
+
+
+def _log_ocr_cost(docs, input_tokens, output_tokens):
+    usd = (input_tokens * OCR_USD_PER_MTOK[0] + output_tokens * OCR_USD_PER_MTOK[1]) / 1_000_000
+    print(f'[ocr] docs={docs} in={input_tokens} out={output_tokens} usd={usd:.5f}', flush=True)
+    try:
+        conn = _get_conn()
+        if conn:
+            try:
+                with conn:
+                    with conn.cursor() as cur:
+                        cur.execute('INSERT INTO ocr_costs (docs, input_tokens, output_tokens, est_usd) '
+                                    'VALUES (%s, %s, %s, %s)', (docs, input_tokens, output_tokens, round(usd, 5)))
+            finally:
+                conn.close()
+    except Exception as e:
+        print(f'[ocr] cost log failed: {e}', flush=True)
+    return usd
 
 
 @app.route('/extract', methods=['POST'])
 def extract():
-    """OCR endpoint — parallel per-document extraction with haiku."""
+    """OCR endpoint — free, rate-limited; parallel per-document extraction with haiku."""
     try:
-        payload = request.json
+        payload = request.json or {}
         files = payload.get('files', [])
-        intent_id = payload.get('intent_id', '')
-
         if not files:
             return jsonify({'error': 'No files provided'}), 400
-
-        # Validate payment session — one payment = one extraction (skipped in FREE_MODE)
-        if not FREE_MODE and intent_id:
-            if intent_id in used_intents:
-                return jsonify({'error': 'This payment has already been used. Please make a new payment to extract again.', 'code': 'already_used'}), 403
+        if not _turnstile_ok(payload.get('turnstile_token', '')):
+            return jsonify({'error': 'Please complete the security check and try again.',
+                            'code': 'verification_failed'}), 403
+        allowed, _used = _extract_quota_hit()
+        if not allowed:
+            return jsonify({'error': f'Free extraction limit reached ({EXTRACT_DAILY_LIMIT} per day). '
+                                     'You can still type the details in by hand.',
+                            'code': 'rate_limited'}), 429
 
         # Run all documents in parallel threads
         from concurrent.futures import ThreadPoolExecutor, as_completed
         results = {}
         failed_docs = []
+        tokens_in = tokens_out = 0
         with ThreadPoolExecutor(max_workers=4) as pool:
             futures = {pool.submit(extract_one, f): f['label'] for f in files}
             for future in as_completed(futures):
                 label = futures[future]
                 try:
-                    results[label] = future.result()
+                    results[label], (ti, to) = future.result()
+                    tokens_in += ti
+                    tokens_out += to
                 except Exception as e:
                     results[label] = {}  # skip failed doc, don't break whole request
                     failed_docs.append(label)
                     print(f'[extract] {label} failed: {type(e).__name__}: {str(e)[:200]}', flush=True)
+        _log_ocr_cost(len(files), tokens_in, tokens_out)
 
         # Merge all results — later docs override earlier for same key
         merged = {}
@@ -1509,31 +1617,129 @@ def extract():
         for k in defaults:
             merged.setdefault(k, '')
 
-        # Mark intent as used — prevents re-use of the same payment (skipped in FREE_MODE)
-        if not FREE_MODE and intent_id:
-            used_intents.add(intent_id)
-
         return jsonify({'ok': True, 'data': merged, 'failed_docs': failed_docs})
 
     except Exception as e:
-        import traceback
-        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+        print(f'[extract] error: {type(e).__name__}: {e}', flush=True)
+        return jsonify({'error': 'Extraction failed. Please try again.'}), 500
+
+
+# ── Preview (free) and paid PDF ─────────────────────────────────────────
+_PDFIUM_LOCK = threading.Lock()  # pdfium is not thread-safe
+PREVIEW_SCALE = 1.3              # ≈94 dpi — readable, not print quality
+WATERMARK = 'PREVIEW — ejarihelper.ae'
+
+
+def _watermark(pdf_bytes):
+    """Stamp a diagonal PREVIEW watermark three times on every page."""
+    writer = PdfWriter(clone_from=io.BytesIO(pdf_bytes))
+    for page in writer.pages:
+        w, h = float(page.mediabox.width), float(page.mediabox.height)
+        packet = io.BytesIO()
+        c = canvas.Canvas(packet, pagesize=(w, h))
+        c.setFillColorRGB(0.75, 0.12, 0.12)
+        c.setFillAlpha(0.22)
+        c.setFont('Helvetica-Bold', 40)
+        for y in (h * 0.22, h * 0.52, h * 0.82):
+            c.saveState()
+            c.translate(w / 2, y)
+            c.rotate(32)
+            c.drawCentredString(0, 0, WATERMARK)
+            c.restoreState()
+        c.save()
+        packet.seek(0)
+        page.merge_page(PdfReader(packet).pages[0])
+    out = io.BytesIO()
+    writer.write(out)
+    return out.getvalue()
+
+
+def render_preview_pages(data):
+    """Filled contract → watermarked JPEG data URLs, one per page. No PDF leaves the server."""
+    import pypdfium2 as pdfium
+    pdf = _watermark(fill_ejari_pdf(data))
+    pages = []
+    with _PDFIUM_LOCK:
+        doc = pdfium.PdfDocument(pdf)
+        try:
+            for i in range(len(doc)):
+                img = doc[i].render(scale=PREVIEW_SCALE).to_pil().convert('RGB')
+                buf = io.BytesIO()
+                img.save(buf, format='JPEG', quality=62, optimize=True)
+                pages.append('data:image/jpeg;base64,' + base64.b64encode(buf.getvalue()).decode())
+        finally:
+            doc.close()
+    return pages
+
+
+def _contract_data(body):
+    data = body.get('data') if isinstance(body.get('data'), dict) else None
+    if data is None:
+        return None
+    data = {k: (v if isinstance(v, list) else str(v)[:300]) for k, v in data.items()}
+    if not data.get('date'):
+        data['date'] = datetime.now().strftime('%d/%m/%Y')
+    return data
+
+
+@app.route('/preview', methods=['POST'])
+def preview():
+    data = _contract_data(request.json or {})
+    if data is None:
+        return jsonify({'error': 'No data'}), 400
+    try:
+        return jsonify({'ok': True, 'pages': render_preview_pages(data)})
+    except Exception as e:
+        print(f'[preview] error: {type(e).__name__}: {e}', flush=True)
+        return jsonify({'error': 'Could not build the preview. Please try again.'}), 500
+
+
+def _ledger_use_generation(intent_id):
+    """Spend one of a payment's generations. True when allowed."""
+    conn = _get_conn()
+    if not conn:
+        with _mem_lock:
+            row = _mem_payments.get(intent_id)
+            if (not row or row['status'] != 'completed' or row['generations'] >= GENERATIONS_PER_PAYMENT
+                    or row['confirmed_at'] < _utcnow() - timedelta(hours=GENERATION_WINDOW_HOURS)):
+                return False
+            row['generations'] += 1
+            return True
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("UPDATE payments SET generations = generations + 1 "
+                            "WHERE intent_id = %s AND status = 'completed' AND generations < %s "
+                            "AND confirmed_at > (NOW() AT TIME ZONE 'utc') - make_interval(hours => %s) "
+                            "RETURNING generations", (intent_id, GENERATIONS_PER_PAYMENT, GENERATION_WINDOW_HOURS))
+                return cur.fetchone() is not None
+    finally:
+        conn.close()
 
 
 @app.route('/generate', methods=['POST'])
 def generate():
+    """The clean PDF — only for a server-confirmed contract payment."""
+    body = request.json or {}
+    data = _contract_data(body)
+    if data is None:
+        return jsonify({'error': 'No data'}), 400
+    if not FREE_MODE:
+        intent_id = (body.get('intent_id') or '').strip()
+        r = _ziina_confirm(intent_id, 'contract')
+        if not r['paid']:
+            return jsonify({'error': 'Payment required', 'code': 'payment_required'}), 402
+        if not _ledger_safe(_ledger_use_generation, intent_id):
+            return jsonify({'error': 'This payment has been used for its downloads. '
+                                     'Contact us if you need another copy.', 'code': 'generation_limit'}), 403
     try:
-        data = request.json
-        if not data: return jsonify({'error': 'No data'}), 400
-        if not data.get('date'):
-            data['date'] = datetime.now().strftime('%d/%m/%Y')
         pdf_bytes = fill_ejari_pdf(data)
-        name = f"ejari_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
-        return send_file(io.BytesIO(pdf_bytes), mimetype='application/pdf',
-                         as_attachment=True, download_name=name)
     except Exception as e:
-        import traceback
-        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+        print(f'[generate] error: {type(e).__name__}: {e}', flush=True)
+        return jsonify({'error': 'Could not build the PDF. Please try again.'}), 500
+    name = f"ejari_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    return send_file(io.BytesIO(pdf_bytes), mimetype='application/pdf',
+                     as_attachment=True, download_name=name)
 
 
 import requests as req_lib
@@ -1542,8 +1748,6 @@ import uuid, hmac, hashlib
 ZIINA_API_KEY = os.environ.get('ZIINA_API_KEY', '')
 ZIINA_API     = 'https://api-v2.ziina.com/api'
 ZIINA_HEADERS = {'Authorization': f'Bearer {ZIINA_API_KEY}', 'Content-Type': 'application/json'}
-
-used_intents = set()  # intent_ids that have already been used for extraction
 
 PRODUCTS = {
     'contract':     {'name': 'Ejari tenancy contract', 'amount_fils': CONTRACT_PRICE_FILS},
@@ -1584,7 +1788,6 @@ def _payment_error(stage, product='', intent_id='', detail=''):
 # email, name or documents. It makes confirmation idempotent across the two
 # gunicorn workers and restarts, and lets the front-end report each purchase
 # to GA4 exactly once. Without DATABASE_URL (local dev) a dict stands in.
-import threading
 _mem_payments = {}
 
 

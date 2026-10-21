@@ -171,6 +171,14 @@ main{max-width:780px;margin:0 auto;padding:36px 24px 80px}
 .pay-title{font-size:13px;font-weight:600;margin-bottom:2px}
 .pay-desc{font-size:11px;color:var(--muted)}
 .pay-price{text-align:right;flex-shrink:0}
+.ocr-hint{text-align:center;font-size:12px;color:var(--muted);margin-top:8px}
+.ocr-sub{text-align:center;font-size:12px;font-weight:600;color:var(--accent-text);margin-top:4px}
+.ts-box:not(:empty){display:flex;justify-content:center;margin-bottom:10px}
+.preview-box{margin-top:16px}
+.preview-head{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px}
+.preview-pages{display:flex;flex-direction:column;gap:10px;max-height:70vh;overflow-y:auto;padding:8px;background:var(--accent-bg);border-radius:10px}
+.preview-pages img{width:100%;height:auto;display:block;border-radius:4px;box-shadow:0 2px 10px rgba(0,0,0,.12);background:#fff}
+.pay-box{margin-top:14px}
 .pay-guarantee{text-align:center;font-size:12px;font-weight:600;color:var(--accent-text);margin-top:6px}
 .pay-new{font-size:22px;font-weight:700;color:var(--text);line-height:1}
 .pay-cur{font-size:12px;color:var(--muted)}
@@ -233,11 +241,6 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
 
 /* PAY CONFIRM BANNER */
-.pay-confirm{display:none;align-items:center;gap:12px;background:var(--accent-bg);border:1px solid rgba(42,122,111,.3);border-radius:8px;padding:14px 16px;margin-bottom:12px}
-.pay-confirm.on{display:flex}
-.pay-confirm-icon{font-size:22px;flex-shrink:0}
-.pay-confirm-title{font-size:13px;font-weight:600;color:var(--accent);margin-bottom:2px}
-.pay-confirm-sub{font-size:12px;color:var(--muted)}
 
 /* TOAST */
 .toast{position:fixed;bottom:20px;right:20px;padding:11px 16px;border-radius:7px;font-size:13px;font-weight:500;opacity:0;transform:translateY(12px);transition:all .25s;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.12);max-width:280px}
@@ -390,8 +393,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
         },
         {
           "@type": "HowToStep", "position": 2,
-          "name": "Pay and extract",
-          "text": "Pay __CONTRACT_PRICE__ AED via Apple Pay, Google Pay, or card. AI reads your documents and pre-fills the Dubai tenancy contract."
+          "name": "Check the free preview",
+          "text": "Review the pre-filled DLD tenancy contract in a free watermarked preview and correct any field. Pay __CONTRACT_PRICE__ AED via Apple Pay, Google Pay, or card only when it is correct."
         },
         {
           "@type": "HowToStep", "position": 3,
@@ -651,7 +654,7 @@ main{max-width:1080px;padding:26px 24px 80px}
       </div>
     </section>
 
-    <!-- CONTRACT FLOW: upload · pay · extract (hidden until 'Start your contract') -->
+    <!-- CONTRACT FLOW: upload · extract · preview · pay (hidden until 'Start your contract') -->
     <section id="start" class="upload-sec" style="display:none">
       <div class="upload-sec-head">
         <div class="section-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg></div>
@@ -695,40 +698,12 @@ main{max-width:1080px;padding:26px 24px 80px}
           </div>
         </div>
 
-        <div id="payBlock">
-          <div class="pay-row">
-            <div>
-              <div class="pay-title">AI auto-fill · saves 20 min</div>
-              <div class="pay-desc">One-time · no subscription · no account</div>
-            </div>
-            <div class="pay-price">
-              <div class="pay-new">__CONTRACT_PRICE__</div>
-              <div class="pay-cur">AED</div>
-            </div>
-          </div>
-          <button class="btn btn-dark" id="payBtn" onclick="doPay()" disabled><span id="payTxt">Pay __CONTRACT_PRICE__ AED &amp; Extract →</span></button>
-          <div id="payHint" style="text-align:center;font-size:12px;color:var(--muted);margin-top:8px">Upload 3 required documents to continue</div>
-          <div class="pay-guarantee">Rejected at Ejari because of our mistake? We fix it free.</div>
-          <div class="trust" style="margin-top:9px">
-            <span>🔒 Ziina</span><span class="trust-sep">·</span>
-            <span>Apple Pay</span><span class="trust-sep">·</span>
-            <span>Google Pay</span><span class="trust-sep">·</span>
-            <span>Visa / MC</span>
-          </div>
-        </div>
-
-        <!-- Payment confirmation banner (shown after returning from Ziina) -->
-        <div class="pay-confirm" id="payConfirm">
-          <div class="pay-confirm-icon" style="color:var(--accent-mid)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></div>
-          <div>
-            <div class="pay-confirm-title">Payment confirmed — __CONTRACT_PRICE__ AED</div>
-            <div class="pay-confirm-sub" id="payConfirmSub">Analysing your documents with AI…</div>
-          </div>
-        </div>
-
-        <button class="btn btn-green" id="ocrBtn" onclick="runOCR()" style="display:none">
-          <span id="ocrTxt">✨ Extract data from documents</span>
+        <div class="ts-box" id="tsBox"></div>
+        <button class="btn btn-green" id="ocrBtn" onclick="runOCR()" disabled>
+          <span id="ocrTxt">✨ Extract details — free</span>
         </button>
+        <div id="ocrHint" class="ocr-hint">Upload 3 required documents to continue</div>
+        <div class="ocr-sub">Preview free · pay __CONTRACT_PRICE__ AED only if it's correct</div>
         <div class="status" id="ocrSt"></div>
 
       </div><!-- /.section-body -->
@@ -961,10 +936,37 @@ main{max-width:1080px;padding:26px 24px 80px}
 
         <div class="small-note">Sign and register the contract via the official Ejari portal or a typing centre. 🔒 Documents processed in memory — nothing stored on our servers.</div>
 
-        <button class="btn btn-dark" id="genBtn" onclick="genPDF()" style="margin-top:16px">
-          <span id="genTxt">Generate &amp; Download PDF</span>
-          <div class="gen-spin" id="genSpin"></div>
+        <button class="btn btn-dark" id="previewBtn" onclick="showPreview()" style="margin-top:16px">
+          <span id="previewTxt">Preview contract — free</span>
         </button>
+        <div class="preview-box" id="previewBox" style="display:none">
+          <div class="preview-head">Check every field below. The PDF you download has no watermark.</div>
+          <div class="preview-pages" id="previewPages"></div>
+          <div class="pay-box" id="payBox">
+            <div class="pay-row">
+              <div>
+                <div class="pay-title">Ejari-ready PDF · official DLD format</div>
+                <div class="pay-desc">One-time · no subscription · no account</div>
+              </div>
+              <div class="pay-price">
+                <div class="pay-new">__CONTRACT_PRICE__</div>
+                <div class="pay-cur">AED</div>
+              </div>
+            </div>
+            <button class="btn btn-dark" id="payBtn" onclick="doPay()"><span id="payTxt">Pay __CONTRACT_PRICE__ AED &amp; download</span></button>
+            <div class="pay-guarantee">Rejected at Ejari because of our mistake? We fix it free.</div>
+            <div class="trust" style="margin-top:9px">
+              <span>🔒 Ziina</span><span class="trust-sep">·</span>
+              <span>Apple Pay</span><span class="trust-sep">·</span>
+              <span>Google Pay</span><span class="trust-sep">·</span>
+              <span>Visa / MC</span>
+            </div>
+          </div>
+          <button class="btn btn-dark" id="genBtn" onclick="genPDF()" style="display:none;margin-top:14px">
+            <span id="genTxt">↓ Download PDF</span>
+            <div class="gen-spin" id="genSpin"></div>
+          </button>
+        </div>
 
         <!-- Success banner -->
         <div class="dl-success" id="dlSuccess">
@@ -1201,14 +1203,9 @@ let CONTRACT_PRICE = Number('__CONTRACT_PRICE__');
     FREE_MODE = !!cfg.free_mode;
     ZIINA_EMBEDDED = !!cfg.ziina_embedded;
     if (cfg.contract_price_aed) CONTRACT_PRICE = cfg.contract_price_aed;
+    TS_KEY = cfg.turnstile_site_key || '';
   } catch(_) {}
-  if (FREE_MODE) {
-    const pb = $('payBlock');
-    if (pb) pb.style.display = 'none';
-    const ob = $('ocrBtn');
-    if (ob) ob.style.display = 'flex';
-    checkPayReady();
-  }
+  if ($('start').style.display === 'block') ensureTurnstile();
 })();
 const $ = id => document.getElementById(id);
 const v = id => ($( id)?.value||'').trim();
@@ -1251,6 +1248,7 @@ function reportExtraction(res, docCount){
 function openUpload(e){
   if(e) e.preventDefault();
   fireContractStarted('form_opened');
+  ensureTurnstile();
   const s=$('start');
   s.style.display='block';
   s.scrollIntoView({behavior:'smooth',block:'start'});
@@ -1278,10 +1276,26 @@ function onFile(fid,bid,sid){
   }
   $(bid).classList.toggle('has-file',!!f);
   $(sid).textContent=f?'✓ '+f.name:'';
-  checkPayReady();
+  checkReady();
 }
 
-function checkPayReady(){
+// ── Free extraction: Cloudflare Turnstile, loaded only once the form opens ──
+let TS_KEY='', tsToken='', tsWidget=null;
+function ensureTurnstile(){
+  if(!TS_KEY || tsWidget!==null) return;
+  tsWidget=false; // loading
+  window.onTurnstileLoad=()=>{
+    tsWidget=turnstile.render('#tsBox',{sitekey:TS_KEY,size:'flexible',
+      callback:t=>{tsToken=t;},'expired-callback':()=>{tsToken='';},'error-callback':()=>{tsToken='';}});
+  };
+  const sc=document.createElement('script');
+  sc.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad';
+  sc.async=true;
+  document.head.appendChild(sc);
+}
+function resetTurnstile(){ tsToken=''; try{ if(tsWidget) turnstile.reset(tsWidget); }catch(_){} }
+
+function checkReady(){
   const required=['fTEID','fLEID','fTD'];
   const done=required.filter(id=>$(id).files[0]).length;
   const ready=done===3;
@@ -1289,51 +1303,63 @@ function checkPayReady(){
     docsUploadedFired=true;
     ehEvent('contract_docs_uploaded',{docs_count:done,product:'contract'});
   }
-  if(FREE_MODE){
-    $('ocrBtn').disabled=!ready;
-  }else{
-    $('payBtn').disabled=!ready;
-    $('payHint').textContent=ready
-      ?'One-time payment · no account needed'
-      :`Upload ${3-done} more required document${3-done===1?'':'s'} to continue`;
-  }
+  $('ocrBtn').disabled=!ready;
+  $('ocrHint').textContent=ready
+    ?'Takes about 20 seconds'
+    :`Upload ${3-done} more required document${3-done===1?'':'s'} to continue`;
+}
+
+// ── Form state survives the Ziina redirect (this browser only, 2 h) ──
+const FORM_KEY='ejari_form', PAID_KEY='ejari_paid_intent', FORM_TTL=2*3600*1000;
+const FORM_IDS=['tenant_phone','tenant_email','lessor_phone','lessor_email','contract_date','contract_from',
+  'contract_to','annual_rent','contract_value','security_deposit','mode_of_payment','t1','t2','t3','t4','t5'];
+function saveForm(){
+  try{
+    const f={}; FORM_IDS.forEach(id=>{f[id]=$(id).value;});
+    localStorage.setItem(FORM_KEY,JSON.stringify({t:Date.now(),ext,f,cvHeld}));
+  }catch(_){}
+}
+function loadForm(){
+  try{
+    const d=JSON.parse(localStorage.getItem(FORM_KEY)||'null');
+    if(!d||Date.now()-d.t>FORM_TTL){ localStorage.removeItem(FORM_KEY); return null; }
+    return d;
+  }catch(_){ return null; }
+}
+function restoreForm(d){
+  ext=d.ext||{};
+  $('start').style.display='block';
+  buildScreen2();
+  FORM_IDS.forEach(id=>{ if(d.f && d.f[id]!=null) $(id).value=d.f[id]; });
+  cvHeld=!!d.cvHeld;
+  recalc();
+}
+function clearForm(){ try{ localStorage.removeItem(FORM_KEY); }catch(_){} }
+function paidIntent(){ try{ return localStorage.getItem(PAID_KEY)||''; }catch(_){ return ''; } }
+
+function resetPayBtn(){
+  $('payBtn').disabled=false;
+  $('payTxt').textContent=`Pay ${CONTRACT_PRICE} AED & download`;
 }
 
 async function doPay(){
+  if(!validateRequired()) return;
   const btn=$('payBtn');
   btn.disabled=true;
   $('payTxt').textContent='Creating payment…';
   ehEvent('begin_checkout',{value:CONTRACT_PRICE,currency:'AED',product:'contract',
     items:[{item_id:'contract',item_name:'Ejari tenancy contract',price:CONTRACT_PRICE,quantity:1}]});
-
   try{
-    const resp = await fetch(PAY_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({})
-    });
-    const data = await resp.json();
+    const data=await fetch(PAY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).then(r=>r.json());
     if(!data.ok) throw new Error(data.error||'Payment creation failed');
-
-    intentId = data.intent_id;
+    intentId=data.intent_id;
     sessionStorage.setItem('ejari_intent_id', intentId);
+    saveForm();
 
     // Hosted (redirect) checkout — works on an unverified account.
-    // Used until the embedded widget is approved (ZIINA_EMBEDDED flag).
     if(!ZIINA_EMBEDDED || !data.embedded_url){
-      // Page reloads on return, so persist the files before leaving.
-      const slots=[
-        {id:'fTEID',lbl:'TENANT_EMIRATES_ID'},{id:'fLEID',lbl:'LESSOR_EMIRATES_ID'},
-        {id:'fTD',lbl:'TITLE_DEED'},{id:'fEJ',lbl:'PREVIOUS_EJARI'}
-      ];
-      const savedFiles=[];
-      for(const {id,lbl} of slots){
-        const file=$(id).files[0];
-        if(file) savedFiles.push({label:lbl,data:await b64(file),mime_type:mtype(file),name:file.name});
-      }
-      if(savedFiles.length) sessionStorage.setItem('ejari_files',JSON.stringify(savedFiles));
       $('payTxt').textContent='Redirecting to payment…';
-      window.location.href = data.redirect_url;
+      window.location.href=data.redirect_url;
       return;
     }
 
@@ -1342,90 +1368,39 @@ async function doPay(){
     try{
       await openZiinaCheckout(data.embedded_url);
     }catch(e){
-      btn.disabled=false;
-      $('payTxt').textContent='Pay __CONTRACT_PRICE__ AED & Extract →';
+      resetPayBtn();
       ehEvent('payment_failed',{reason:e.message,product:'contract'});
       if(e.message==='failed')    toast('Payment failed — please try again','fail');
       else if(e.message==='cancelled') toast('Payment cancelled','fail');
-      return; // user closed the widget — nothing else to do
+      return;
     }
-
-    // Payment completed in the widget — confirm with backend, then extract.
     $('payTxt').textContent='Confirming payment…';
-    const confirmed=await confirmPayment(intentId,'contract');
-    if(confirmed.paid) reportPurchase(confirmed);
-    else ehEvent('payment_failed',{reason:'not_confirmed',product:'contract'});
-
-    await paidOK();
-
+    await afterPayment(intentId);
   }catch(err){
     ehEvent('payment_failed',{reason:'create_error',product:'contract'});
-    toast('Payment error: '+err.message, 'fail');
-    btn.disabled=false;
-    $('payTxt').textContent='Pay __CONTRACT_PRICE__ AED & Extract →';
+    toast('Payment error: '+err.message,'fail');
+    resetPayBtn();
   }
 }
 
-async function paidOK(){
-  $('payBlock').style.display='none';
-  $('payConfirm').classList.add('on');
-
-  // Page never reloaded (embedded checkout) — read files straight from the inputs.
-  const slots=[
-    {id:'fTEID',lbl:'TENANT_EMIRATES_ID'},{id:'fLEID',lbl:'LESSOR_EMIRATES_ID'},
-    {id:'fTD',lbl:'TITLE_DEED'},{id:'fEJ',lbl:'PREVIOUS_EJARI'}
-  ];
-  let files=[];
-  for(const {id,lbl} of slots){
-    const file=$(id).files[0];
-    if(file) files.push({label:lbl,data:await b64(file),mime_type:mtype(file),name:file.name});
-  }
-
-  // Fallback for the legacy redirect flow, where files live in sessionStorage.
-  if(!files.length){
-    const saved=JSON.parse(sessionStorage.getItem('ejari_files')||'[]');
-    const uiMap={TENANT_EMIRATES_ID:['bTEID','sTEID'],LESSOR_EMIRATES_ID:['bLEID','sLEID'],TITLE_DEED:['bTD','sTD'],PREVIOUS_EJARI:['bEJ','sEJ']};
-    saved.forEach(f=>{
-      const ids=uiMap[f.label];
-      if(ids){$(ids[0]).classList.add('has-file');$(ids[1]).textContent='✓ '+f.name;}
-    });
-    files=saved;
-  }
-
-  if(files.length){
-    await runOCRWithData(files);
+// Paid: report once, remember the payment for re-downloads, download.
+async function afterPayment(iid){
+  const d=await confirmPayment(iid,'contract');
+  try{ localStorage.setItem(PAID_KEY,iid); }catch(_){}
+  $('previewBox').style.display='block';
+  $('payBox').style.display='none';
+  $('genBtn').style.display='flex';
+  if(d.paid){
+    reportPurchase(d);
+    await genPDF();
   }else{
-    $('payConfirmSub').textContent='Upload documents below and click Extract';
-    $('ocrBtn').style.display='flex';
+    // The server re-checks with Ziina on download.
+    ehEvent('payment_failed',{reason:'not_confirmed',product:'contract'});
+    toast('Payment is still confirming — press Download in a moment.','fail');
   }
 }
 
-// Run OCR with pre-loaded base64 data (after payment redirect)
-async function runOCRWithData(files){
-  setSt('loading','Analysing documents with AI…');
-  try{
-    const intentId=sessionStorage.getItem('ejari_intent_id')||'';
-    const r=await fetch(EXT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files,intent_id:intentId})});
-    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error||'Server error '+r.status);}
-    const res=await r.json();
-    if(!res.ok) throw new Error(res.error||'Extraction failed');
-    ext=res.data;
-    reportExtraction(res,files.length);
-    const n=Object.values(ext).filter(x=>x&&String(x).trim()).length;
-    setSt('ok',`✓ Extracted ${n} fields from ${files.length} document(s)`);
-    $('payConfirmSub').textContent=`Extraction complete — ${n} fields filled automatically`;
-    sessionStorage.removeItem('ejari_files');
-    setTimeout(buildScreen2,700);
-  }catch(err){
-    ehEvent('extraction_failed',{reason:String(err.message).slice(0,100),product:'contract'});
-    setSt('err','⚠ '+err.message);
-    $('payConfirmSub').textContent='Extraction failed — try again below';
-    $('ocrBtn').style.display='flex';
-    $('ocrTxt').textContent='✨ Try again';
-  }
-}
-
-// On return from Ziina — verify payment then unlock OCR
+// On return from Ziina
 window.addEventListener('load', async ()=>{
   const params = new URLSearchParams(location.search);
 
@@ -1437,38 +1412,36 @@ window.addEventListener('load', async ()=>{
     history.replaceState(null,'',clean.pathname+clean.search+clean.hash);
   }
 
+  const saved=loadForm();
   if(params.has('paid')){
-    // success_url carries the intent id; sessionStorage is the fallback for
-    // tabs opened before that change.
-    intentId = params.get('intent_id') || sessionStorage.getItem('ejari_intent_id') || '';
-    if(intentId) sessionStorage.setItem('ejari_intent_id', intentId);
-
-    const d = intentId ? await confirmPayment(intentId,'contract') : {paid:false};
-    if(d.paid) reportPurchase(d);
-    else ehEvent('payment_failed',{reason:intentId?'not_confirmed':'no_intent_id',product:'contract'});
-    // Unlock either way — Ziina only redirects to success_url after payment.
-    await paidOK();
+    const iid=params.get('intent_id')||sessionStorage.getItem('ejari_intent_id')||'';
+    if(!iid){ ehEvent('payment_failed',{reason:'no_intent_id',product:'contract'}); return; }
+    if(saved){
+      restoreForm(saved);
+      await afterPayment(iid);
+    }else{
+      // Returned in another browser (some in-app browsers do this): the form
+      // stayed behind, but the payment is recorded and covers the download.
+      const d=await confirmPayment(iid,'contract');
+      if(d.paid){ reportPurchase(d); try{ localStorage.setItem(PAID_KEY,iid); }catch(_){} }
+      openUpload();
+      toast('Payment received — upload your documents again; the download is already paid.');
+    }
+    return;
   }
-  if(params.has('cancelled')){
-    ehEvent('payment_failed',{reason:'cancelled',product:'contract'});
-    toast('Payment cancelled','fail');
-  }
-  if(params.has('failed')){
-    ehEvent('payment_failed',{reason:'failed',product:'contract'});
-    toast('Payment failed — please try again','fail');
+  if(params.has('cancelled') || params.has('failed')){
+    const reason=params.has('cancelled')?'cancelled':'failed';
+    ehEvent('payment_failed',{reason,product:'contract'});
+    toast(reason==='cancelled'?'Payment cancelled':'Payment failed — please try again','fail');
+    if(saved){ restoreForm(saved); showPreview(); }
   }
 });
 
 // Reset button if page is restored from bfcache (Back button after Ziina redirect)
-// Only re-enable if stuck in payment flow — not if disabled due to missing docs
 window.addEventListener('pageshow', function(e){
   if(e.persisted){
-    const btn=$('payBtn');
     const txt=$('payTxt');
-    if(btn && txt && (txt.textContent.includes('Redirecting') || txt.textContent.includes('Creating payment'))){
-      btn.disabled=false;
-      txt.textContent='Pay __CONTRACT_PRICE__ AED & Extract →';
-    }
+    if(txt && (txt.textContent.includes('Redirecting') || txt.textContent.includes('Creating payment'))) resetPayBtn();
   }
 });
 
@@ -1489,6 +1462,7 @@ async function runOCR(){
   ];
   const files=slots.map(s=>({...s,file:$(s.id).files[0]})).filter(s=>s.file);
   if(!files.length){toast('Upload at least one document','fail');return;}
+  if(TS_KEY && !tsToken){toast('Please complete the security check above','fail');return;}
 
   const btn=$('ocrBtn');btn.disabled=true;
   setSt('loading','Analysing documents with AI…');
@@ -1496,28 +1470,22 @@ async function runOCR(){
   try{
     const payload=[];
     for(const {file,lbl} of files) payload.push({label:lbl,data:await b64(file),mime_type:mtype(file)});
-    const intentId=sessionStorage.getItem('ejari_intent_id')||'';
-
-    const r=await fetch(EXT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files:payload,intent_id:intentId})});
-    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error||'Server error '+r.status);}
-    const res=await r.json();
-    if(!res.ok) throw new Error(res.error||'Extraction failed');
+    const r=await fetch(EXT_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({files:payload,turnstile_token:tsToken})});
+    const res=await r.json().catch(()=>({}));
+    if(!r.ok||!res.ok){ const e=new Error(res.error||'Server error '+r.status); e.code=res.code; throw e; }
     ext=res.data;
     reportExtraction(res,files.length);
-
-    // Invalidate payment session — one payment = one extraction
-    sessionStorage.removeItem('ejari_intent_id');
-    sessionStorage.removeItem('ejari_files');
-
     const n=Object.values(ext).filter(x=>x&&String(x).trim()).length;
     setSt('ok',`✓ Extracted ${n} fields from ${files.length} document(s)`);
     setTimeout(buildScreen2,700);
-
   }catch(err){
-    ehEvent('extraction_failed',{reason:String(err.message).slice(0,100),product:'contract'});
+    ehEvent('extraction_failed',{reason:err.code||String(err.message).slice(0,100),product:'contract'});
     setSt('err','⚠ '+err.message);
     btn.disabled=false;
     $('ocrTxt').textContent='✨ Try again';
+  }finally{
+    resetTurnstile();
   }
 }
 
@@ -1641,11 +1609,15 @@ function recalc(){
 $('contract_value').addEventListener('input',function(){cvHeld=!!this.value.trim();$('cv_hint').textContent='';this.classList.remove('calc');});
 $('annual_rent').addEventListener('input',recalc);
 
-async function genPDF(){
+function validateRequired(){
   const req=['tenant_phone','contract_from','contract_to','annual_rent','contract_value','mode_of_payment'];
-  for(const id of req){if(!v(id)){toast('Fill all required fields (*)','fail');return;}}
+  for(const id of req){ if(!v(id)){ toast('Fill all required fields (*)','fail'); $(id).focus(); return false; } }
+  return true;
+}
+
+function collectData(){
   const contractDate=v('contract_date')||new Date().toLocaleDateString('en-GB');
-  const data={
+  return {
     date:contractDate,
     owner_name:ext.owner_name||ext.lessor_name||'',
     lessor_name:ext.lessor_name||'',lessor_emirates_id:ext.lessor_emirates_id||'',
@@ -1665,27 +1637,64 @@ async function genPDF(){
     tenant_sign_date:contractDate,lessor_sign_date:contractDate,
     additional_terms:[v('t1'),v('t2'),v('t3'),v('t4'),v('t5')],
   };
+}
+
+// Free watermarked preview (page images, no PDF) — payment comes after it.
+async function showPreview(){
+  if(!validateRequired()) return;
+  const btn=$('previewBtn');
+  btn.disabled=true;$('previewTxt').textContent='Building preview…';
+  try{
+    const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:collectData()})});
+    const res=await r.json().catch(()=>({}));
+    if(!r.ok||!res.ok) throw new Error(res.error||'Preview failed');
+    $('previewPages').innerHTML=res.pages.map((src,i)=>
+      `<img src="${src}" alt="Contract preview, page ${i+1}" width="595" height="842">`).join('');
+    const paid=FREE_MODE||!!paidIntent();
+    $('previewBox').style.display='block';
+    $('payBox').style.display=paid?'none':'block';
+    $('genBtn').style.display=paid?'flex':'none';
+    $('previewTxt').textContent='↻ Update preview';
+    ehEvent('preview_viewed',{pages:res.pages.length,product:'contract'});
+    $('previewBox').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(err){
+    $('previewTxt').textContent='Preview contract — free';
+    toast(err.message,'fail');
+  }finally{btn.disabled=false;}
+}
+
+// Clean PDF — the server only builds it for a confirmed payment.
+async function genPDF(){
+  if(!validateRequired()) return;
   const btn=$('genBtn'),txt=$('genTxt'),sp=$('genSpin');
   btn.disabled=true;txt.textContent='Generating…';sp.style.display='block';
   try{
-    const r=await fetch(GEN_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-    if(!r.ok){const e=await r.json();throw new Error(e.error||'Server error');}
+    const r=await fetch(GEN_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({data:collectData(),intent_id:paidIntent()})});
+    if(!r.ok){
+      const e=await r.json().catch(()=>({}));
+      if(e.code==='payment_required'){
+        try{ localStorage.removeItem(PAID_KEY); }catch(_){}
+        $('payBox').style.display='block';$('genBtn').style.display='none';resetPayBtn();
+      }
+      throw new Error(e.error||'Server error');
+    }
     const blob=await r.blob();
     const a=document.createElement('a');
     a.href=URL.createObjectURL(blob);
     a.download=`ejari_${(ext.tenant_name||'contract').replace(/\s+/g,'_')}.pdf`;
     a.click();
+    clearForm();
     step(2);
     toast('PDF downloaded successfully!');
     $('dlSuccess').classList.add('on');
     $('nextSteps').classList.add('on');
-    $('genBtn').textContent='↓ Download again';
     if(!sessionStorage.getItem('ejari_rated')) $('ratingWidget').classList.add('on');
     if(sessionStorage.getItem('ejari_lead')){ $('leadWidget').style.display='none'; }
     else { $('leadSuccess').style.display='none'; }
     setTimeout(()=>$('nextSteps').scrollIntoView({behavior:'smooth',block:'start'}),300);
   }catch(err){toast(err.message,'fail');}
-  finally{btn.disabled=false;txt.textContent='Generate & Download PDF';sp.style.display='none';}
+  finally{btn.disabled=false;txt.textContent='↓ Download PDF';sp.style.display='none';}
 }
 </script>
 <script defer src="https://cdn.jsdelivr.net/npm/flatpickr" onload="initFlatpickr()"></script>

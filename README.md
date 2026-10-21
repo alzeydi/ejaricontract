@@ -2,7 +2,7 @@
 
 Flask app with two products:
 
-1. **Ejari tenancy contract generator** — upload Emirates IDs + Title Deed, AI extracts the fields and fills the official DLD Unified Tenancy Contract PDF. **`CONTRACT_PRICE_AED`** per contract (default AED 39, Ziina checkout).
+1. **Ejari tenancy contract generator** — upload Emirates IDs + Title Deed, AI extracts the fields (free), the user checks a free watermarked preview, then pays to download the official DLD Unified Tenancy Contract PDF. **`CONTRACT_PRICE_AED`** per contract (default AED 39, Ziina checkout).
 2. **AI rental lawyer chat** (`/legal-chat`) — Dubai tenancy-law Q&A grounded in Law 26/2007, Law 33/2008 and Decree 43/2013. **`LEGAL_PRICE_AED`** per 30-minute session (default AED 50).
 
 Static marketing/guide pages live in `static/` and are served through Flask routes that inject `__BASE_URL__` and `__GA4_ID__` placeholders.
@@ -36,6 +36,7 @@ Every event carries `page_path` (added by `ehEvent`); product events also carry 
 | `contract_docs_uploaded` | All 3 required documents selected (homepage) | `docs_count` |
 | `extraction_completed` | `/extract` returned fields | `fields_filled`, `fields_missing`, `docs_failed` |
 | `extraction_failed` | `/extract` errored or every document failed | `reason` |
+| `preview_viewed` | Free watermarked preview rendered (homepage generator) | `pages` |
 | `begin_checkout` | Pay button pressed, before the Ziina intent is created (contract, chat, chat file top-up) | `value`, `currency`, `items` |
 | `purchase` | **Server-confirmed** payment, exactly once per `transaction_id` (see below) | `transaction_id`, `value`, `currency`, `items[{item_id, item_name, price, quantity}]` |
 | `payment_success` | Same moment and same dedupe as `purchase` (contract) | `value`, `currency`, `transaction_id` |
@@ -64,6 +65,14 @@ In **GA4 Admin → Events** (each name appears up to 24 h after it first fires, 
 2. On mobile Safari and mobile Chrome, walk the funnel: open the contract form (`contract_started`), pick 3 documents (`doc_uploaded` ×3, `contract_docs_uploaded`), tap a guide CTA (`cta_click`), download the template (`template_downloaded`), send a chat message (`chat_started`).
 3. Payments need a real intent: complete one, check `purchase` arrives once with its `transaction_id`, then reload the page and re-open the success URL — no second `purchase`.
 4. All navigation-time events (`cta_click`, `template_downloaded`) rely on gtag's default `sendBeacon` transport, which survives page unload on iOS Safari.
+
+## Generator: free preview, paid PDF
+
+`/extract` is free, `/preview` returns watermarked JPEG page images (no PDF), and `/generate` builds the clean PDF only for a server-confirmed contract payment (up to 5 downloads within 24 h of payment, for fixing typos). Abuse controls on `/extract`:
+
+- `EXTRACT_DAILY_LIMIT` (default 5) extractions per visitor per day, keyed by a daily-rotating HMAC of the IP (`CF-Connecting-IP` behind Cloudflare) — no raw IPs stored, rows deleted after 2 days;
+- Cloudflare Turnstile when `TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET` are set (the widget loads only when the form opens);
+- every extraction logs OCR tokens and estimated USD (`[ocr]` log line + `ocr_costs` table).
 
 ## Other env vars
 

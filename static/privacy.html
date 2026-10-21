@@ -123,7 +123,8 @@ a:hover{text-decoration:underline}
   </ul>
 
   <h2>3. Data Storage</h2>
-  <p>We do not store your uploaded documents or the personal information extracted from them. All processing is performed in-memory and discarded immediately after your PDF is generated. Your browser's sessionStorage temporarily holds file data during the payment step — this is cleared after use and never sent to our servers permanently.</p>
+  <p>We do not store your uploaded documents or the personal information extracted from them. All processing is performed in-memory and discarded immediately after the fields are extracted or your PDF is generated. While you pay, your own browser keeps the contract details you entered (never the uploaded files) for up to 2 hours so the form is still filled in when you return from the payment page; it is cleared after the download.</p>
+  <p>Extraction is free, so to prevent abuse we count extractions per visitor per day. We store only a keyed hash of your IP address that changes every day (the IP address itself is never stored), and delete it after 48 hours. When enabled, Cloudflare Turnstile checks that requests come from a real browser.</p>
 
   <h2>4. Payments</h2>
   <p>Payments are processed by <strong>Ziina</strong>, a licensed payment service provider in the UAE. We do not collect or store your payment card details. Please review <a href="https://ziina.com/privacy-policy" target="_blank" rel="noopener">Ziina's Privacy Policy</a> for details on how payment data is handled.</p>
@@ -139,6 +140,7 @@ a:hover{text-decoration:underline}
     <li><strong>Ziina</strong> — payment processing (UAE)</li>
     <li><strong>Google Fonts</strong> — typography (loaded from Google CDN)</li>
     <li><strong>Google Analytics 4 / Google Ads</strong> — site analytics and ad conversion measurement</li>
+    <li><strong>Cloudflare</strong> — content delivery, security and the Turnstile bot check</li>
   </ul>
 
   <h2>7. Data Security</h2>
