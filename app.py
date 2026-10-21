@@ -1672,14 +1672,74 @@ def render_preview_pages(data):
     return pages
 
 
+# ── Contract field rules (mirrored in static/index.html → FIELD_RULES) ──
+REQUIRED_FIELDS = [
+    'tenant_name', 'tenant_emirates_id', 'tenant_phone', 'lessor_name', 'lessor_emirates_id',
+    'building_name', 'property_no', 'property_type', 'location', 'plot_no', 'premises_no_dewa',
+    'contract_from', 'contract_to', 'annual_rent', 'contract_value', 'mode_of_payment',
+]
+_EID_RE = re.compile(r'^784-\d{4}-\d{7}-\d$')
+_DATE_RE = re.compile(r'^(\d{2})/(\d{2})/(\d{4})$')
+_AMOUNT_RE = re.compile(r'^\d+(\.\d{1,2})?$')
+
+
+def _parse_date(value):
+    m = _DATE_RE.match(value or '')
+    if not m:
+        return None
+    try:
+        return datetime(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+    except ValueError:
+        return None
+
+
+def normalize_contract(data):
+    """Canonical forms: dashed Emirates IDs, digit-only numbers (leading zeros kept)."""
+    for k in ('tenant_emirates_id', 'lessor_emirates_id'):
+        digits = re.sub(r'\D', '', data.get(k, ''))
+        if len(digits) == 15:
+            data[k] = f'{digits[:3]}-{digits[3:7]}-{digits[7:14]}-{digits[14]}'
+    for k in ('premises_no_dewa', 'makani_no'):
+        data[k] = re.sub(r'\s', '', data.get(k, ''))
+    for k in ('annual_rent', 'contract_value', 'security_deposit'):
+        data[k] = re.sub(r'[,\s]', '', data.get(k, ''))
+    return data
+
+
+def validate_contract(data):
+    """Field → message for every missing or malformed field ({} when the contract is complete)."""
+    errors = {k: 'Required' for k in REQUIRED_FIELDS if not str(data.get(k, '')).strip()}
+    for k in ('tenant_emirates_id', 'lessor_emirates_id'):
+        if data.get(k) and not _EID_RE.match(data[k]):
+            errors[k] = 'Emirates ID format: 784-XXXX-XXXXXXX-X'
+    if data.get('premises_no_dewa') and not re.fullmatch(r'\d{9}', data['premises_no_dewa']):
+        errors['premises_no_dewa'] = 'DEWA premise number: 9 digits'
+    if data.get('makani_no') and not re.fullmatch(r'\d{10}', data['makani_no']):
+        errors['makani_no'] = 'Makani number: 10 digits'
+    for k in ('annual_rent', 'contract_value', 'security_deposit'):
+        if data.get(k) and not _AMOUNT_RE.match(data[k]):
+            errors[k] = 'Numbers only, no separators'
+    for k in ('contract_from', 'contract_to', 'date'):
+        if data.get(k) and not _parse_date(data[k]):
+            errors[k] = 'Date format: DD/MM/YYYY'
+    start, end = _parse_date(data.get('contract_from')), _parse_date(data.get('contract_to'))
+    if start and end and end <= start:
+        errors['contract_to'] = 'End date must be after the start date'
+    return errors
+
+
 def _contract_data(body):
     data = body.get('data') if isinstance(body.get('data'), dict) else None
     if data is None:
         return None
-    data = {k: (v if isinstance(v, list) else str(v)[:300]) for k, v in data.items()}
+    data = {k: (v if isinstance(v, list) else str(v).strip()[:300]) for k, v in data.items()}
     if not data.get('date'):
         data['date'] = datetime.now().strftime('%d/%m/%Y')
-    return data
+    return normalize_contract(data)
+
+
+def _invalid(errors):
+    return jsonify({'error': 'Please fix the highlighted fields.', 'code': 'invalid', 'fields': errors}), 422
 
 
 @app.route('/preview', methods=['POST'])
@@ -1687,6 +1747,9 @@ def preview():
     data = _contract_data(request.json or {})
     if data is None:
         return jsonify({'error': 'No data'}), 400
+    errors = validate_contract(data)
+    if errors:
+        return _invalid(errors)
     try:
         return jsonify({'ok': True, 'pages': render_preview_pages(data)})
     except Exception as e:
@@ -1724,6 +1787,9 @@ def generate():
     data = _contract_data(body)
     if data is None:
         return jsonify({'error': 'No data'}), 400
+    errors = validate_contract(data)
+    if errors:
+        return _invalid(errors)  # before spending one of the paid downloads
     if not FREE_MODE:
         intent_id = (body.get('intent_id') or '').strip()
         r = _ziina_confirm(intent_id, 'contract')

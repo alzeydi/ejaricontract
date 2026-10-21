@@ -216,6 +216,13 @@ main{max-width:780px;margin:0 auto;padding:36px 24px 80px}
 .ei-input:hover{border-bottom-color:var(--border)!important}
 .ei-input:focus{outline:none!important;border-bottom-color:var(--accent-mid)!important}
 .ei-input.nil{color:var(--muted);font-style:italic;font-weight:400}
+.ei-input.req-miss::placeholder{color:#c0392b;font-style:normal}
+.ei-k .req{color:#c0392b}
+.ei select.ei-input{appearance:auto}
+input.invalid,select.invalid{border-color:#c0392b!important;background:#fff6f5!important}
+.ei-input.invalid{border-bottom:1px solid #c0392b!important}
+.err-msg{font-size:11px;color:#c0392b;margin-top:3px;font-weight:500}
+.link-btn{display:block;margin:10px auto 0;background:none;border:none;color:var(--accent-text);font-size:13px;font-weight:600;text-decoration:underline;cursor:pointer;font-family:inherit}
 .ei-input::placeholder{color:#ccc;font-style:normal}
 
 /* FORM */
@@ -660,7 +667,7 @@ main{max-width:1080px;padding:26px 24px 80px}
         <div class="section-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg></div>
         <div>
           <h2 class="section-title">Generate your Ejari contract</h2>
-          <div class="section-desc">Emirates IDs · Title Deed · previous Ejari (optional)</div>
+          <div class="section-desc">Upload what you have — every document is optional</div>
         </div>
       </div>
       <div class="section-body">
@@ -678,14 +685,14 @@ main{max-width:1080px;padding:26px 24px 80px}
           <div class="ubox" id="bLEID">
             <input type="file" id="fLEID" accept="image/*,.pdf" onchange="onFile('fLEID','bLEID','sLEID')">
             <div class="ubox-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="11" r="2"/><path d="M6 16c.5-1.6 1.4-2.3 2.5-2.3S10.5 14.4 11 16"/><path d="M14 9.5h5M14 12.5h5M14 15.5h3"/></svg></div>
-            <div class="ubox-label">Lessor Emirates ID</div>
+            <div class="ubox-label">Lessor Emirates ID <span class="opt-pill">if available</span></div>
             <div class="ubox-hint">Front side · JPG / PNG / PDF</div>
             <div class="ubox-file" id="sLEID"></div>
           </div>
           <div class="ubox" id="bTD">
             <input type="file" id="fTD" accept="image/*,.pdf" onchange="onFile('fTD','bTD','sTD')">
             <div class="ubox-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="5" width="12" height="16" rx="1.5"/><path d="M9 5V3.5A1.5 1.5 0 0 1 10.5 2h3A1.5 1.5 0 0 1 15 3.5V5"/><path d="M9.3 13.5l1.9 2 3.5-3.6"/></svg></div>
-            <div class="ubox-label">Title Deed</div>
+            <div class="ubox-label">Title Deed <span class="opt-pill">if available</span></div>
             <div class="ubox-hint">Property ownership document</div>
             <div class="ubox-file" id="sTD"></div>
           </div>
@@ -702,8 +709,9 @@ main{max-width:1080px;padding:26px 24px 80px}
         <button class="btn btn-green" id="ocrBtn" onclick="runOCR()" disabled>
           <span id="ocrTxt">✨ Extract details — free</span>
         </button>
-        <div id="ocrHint" class="ocr-hint">Upload 3 required documents to continue</div>
+        <div id="ocrHint" class="ocr-hint">Upload any document you have to continue</div>
         <div class="ocr-sub">Preview free · pay __CONTRACT_PRICE__ AED only if it's correct</div>
+        <button type="button" class="link-btn" id="manualBtn" onclick="startManual()">No documents at hand? Fill in by hand →</button>
         <div class="status" id="ocrSt"></div>
 
       </div><!-- /.section-body -->
@@ -872,7 +880,7 @@ main{max-width:1080px;padding:26px 24px 80px}
     <!-- Extracted summary -->
     <div class="section" style="margin-bottom:16px">
       <div class="ext-head">
-        <span class="ext-label">Extracted from documents</span>
+        <span class="ext-label">Contract details</span>
         <span class="ext-count" id="extCount"></span>
       </div>
       <div class="ext-warn"><span class="eh-ic" style="color:var(--gold)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4.5"/><path d="M12 17.4h.01" stroke-width="2.4"/></svg></span> <strong>Check every field carefully</strong> — AI recognition can make mistakes. Click any field to correct it.</div>
@@ -907,13 +915,13 @@ main{max-width:1080px;padding:26px 24px 80px}
 
         <div class="row-label">💰 Financials</div>
         <div class="field-group">
-          <div class="field"><label>Annual rent (AED) <span class="req">*</span></label><input id="annual_rent" placeholder="e.g. 68,250" inputmode="numeric"></div>
+          <div class="field"><label>Annual rent (AED) <span class="req">*</span></label><input id="annual_rent" placeholder="e.g. 68250" inputmode="decimal"></div>
           <div class="field">
             <label>Contract value (AED) <span class="req">*</span></label>
-            <input id="contract_value" placeholder="Auto-calculated" inputmode="numeric">
+            <input id="contract_value" placeholder="Auto-calculated" inputmode="decimal">
             <div class="hint" id="cv_hint"></div>
           </div>
-          <div class="field"><label>Security deposit (AED) <span class="opt">optional</span></label><input id="security_deposit" placeholder="e.g. 3,500" inputmode="numeric"></div>
+          <div class="field"><label>Security deposit (AED) <span class="opt">optional</span></label><input id="security_deposit" placeholder="e.g. 3500" inputmode="decimal"></div>
           <div class="field">
             <label>Payment mode <span class="req">*</span></label>
             <select id="mode_of_payment">
@@ -1296,17 +1304,24 @@ function ensureTurnstile(){
 function resetTurnstile(){ tsToken=''; try{ if(tsWidget) turnstile.reset(tsWidget); }catch(_){} }
 
 function checkReady(){
-  const required=['fTEID','fLEID','fTD'];
-  const done=required.filter(id=>$(id).files[0]).length;
-  const ready=done===3;
-  if(ready && !docsUploadedFired){
+  const done=['fTEID','fLEID','fTD'].filter(id=>$(id).files[0]).length;
+  if(done===3 && !docsUploadedFired){
     docsUploadedFired=true;
     ehEvent('contract_docs_uploaded',{docs_count:done,product:'contract'});
   }
-  $('ocrBtn').disabled=!ready;
-  $('ocrHint').textContent=ready
-    ?'Takes about 20 seconds'
-    :`Upload ${3-done} more required document${3-done===1?'':'s'} to continue`;
+  const any=['fTEID','fLEID','fTD','fEJ'].some(id=>$(id).files[0]);
+  $('ocrBtn').disabled=!any;
+  $('ocrHint').textContent=any
+    ?'Takes about 20 seconds · missing details can be typed in next'
+    :'Upload any document you have to continue';
+}
+
+// No documents (or the free daily limit is used up): type everything in.
+function startManual(){
+  fireContractStarted('manual');
+  ehEvent('manual_entry_started',{product:'contract'});
+  ext={};
+  buildScreen2();
 }
 
 // ── Form state survives the Ziina redirect (this browser only, 2 h) ──
@@ -1489,46 +1504,116 @@ async function runOCR(){
   }
 }
 
-function buildScreen2(){
-  const rows=[
-    {label:'Tenant name',   key:'tenant_name'},
-    {label:'Tenant EID',    key:'tenant_emirates_id'},
-    {label:'Lessor name',   key:'lessor_name'},
-    {label:'Lessor EID',    key:'lessor_emirates_id'},
-    {label:'Owner name',    key:'owner_name'},
-    {label:'Building',      key:'building_name'},
-    {label:'Unit No.',      key:'property_no'},
-    {label:'Property type', key:'property_type'},
-    {label:'Area m²',       key:'property_area'},
-    {label:'Location',      key:'location'},
-    {label:'DEWA No.',      key:'premises_no_dewa'},
-    {label:'Makani No.',    key:'makani_no'},
-    {label:'Plot No.',      key:'plot_no'},
-    {label:'Security dep.', key:'security_deposit'},
-  ];
+// Every DLD field the PDF prints. req = Ejari rejects the contract without it.
+const GRID_FIELDS=[
+  {label:'Tenant name',key:'tenant_name',req:1},
+  {label:'Tenant Emirates ID',key:'tenant_emirates_id',req:1,ph:'784-XXXX-XXXXXXX-X',im:'numeric'},
+  {label:'Lessor name',key:'lessor_name',req:1},
+  {label:'Lessor Emirates ID',key:'lessor_emirates_id',req:1,ph:'784-XXXX-XXXXXXX-X',im:'numeric'},
+  {label:'Owner name',key:'owner_name',ph:'same as lessor if empty'},
+  {label:'Property usage',key:'property_usage',opts:['Residential','Commercial','Industrial']},
+  {label:'Building',key:'building_name',req:1},
+  {label:'Unit No.',key:'property_no',req:1},
+  {label:'Property type',key:'property_type',req:1,ph:'Apartment / Villa / Office…'},
+  {label:'Area m²',key:'property_area'},
+  {label:'Location',key:'location',req:1,ph:'community, e.g. Dubai Marina'},
+  {label:'Plot No.',key:'plot_no',req:1},
+  {label:'DEWA premise No.',key:'premises_no_dewa',req:1,ph:'9 digits',im:'numeric'},
+  {label:'Makani No.',key:'makani_no',ph:'10 digits',im:'numeric'},
+  {label:'Tenant licence No.',key:'tenant_license_no',ph:'companies only'},
+  {label:'Tenant licensing authority',key:'tenant_licensing_authority',ph:'companies only'},
+  {label:'Lessor licence No.',key:'lessor_license_no',ph:'companies only'},
+  {label:'Lessor licensing authority',key:'lessor_licensing_authority',ph:'companies only'},
+];
+// Same rules as app.py → REQUIRED_FIELDS / validate_contract().
+const REQUIRED_FIELDS=['tenant_name','tenant_emirates_id','tenant_phone','lessor_name','lessor_emirates_id',
+  'building_name','property_no','property_type','location','plot_no','premises_no_dewa',
+  'contract_from','contract_to','annual_rent','contract_value','mode_of_payment'];
+const EID_RE=/^784-\d{4}-\d{7}-\d$/, DATE_RE=/^(\d{2})\/(\d{2})\/(\d{4})$/, AMOUNT_RE=/^\d+(\.\d{1,2})?$/;
+const FIELD_RULES={
+  tenant_emirates_id:[EID_RE,'Emirates ID format: 784-XXXX-XXXXXXX-X'],
+  lessor_emirates_id:[EID_RE,'Emirates ID format: 784-XXXX-XXXXXXX-X'],
+  premises_no_dewa:[/^\d{9}$/,'DEWA premise number: 9 digits'],
+  makani_no:[/^\d{10}$/,'Makani number: 10 digits'],
+  annual_rent:[AMOUNT_RE,'Numbers only, no separators'],
+  contract_value:[AMOUNT_RE,'Numbers only, no separators'],
+  security_deposit:[AMOUNT_RE,'Numbers only, no separators'],
+};
+function normalizeField(key,val){
+  val=String(val==null?'':val).trim();
+  if(key.endsWith('_emirates_id')){
+    const d=val.replace(/\D/g,'');
+    if(d.length===15) return `${d.slice(0,3)}-${d.slice(3,7)}-${d.slice(7,14)}-${d.slice(14)}`;
+  }
+  if(key==='premises_no_dewa'||key==='makani_no') return val.replace(/\s/g,'');
+  if(key==='annual_rent'||key==='contract_value'||key==='security_deposit') return val.replace(/[,\s]/g,'');
+  return val;
+}
+function parseDMY(s){
+  const m=DATE_RE.exec(s||''); if(!m) return null;
+  const d=new Date(+m[3],+m[2]-1,+m[1]);
+  return d.getDate()===+m[1]&&d.getMonth()===+m[2]-1?d:null;
+}
+function validateContract(data){
+  const errors={};
+  REQUIRED_FIELDS.forEach(k=>{ if(!String(data[k]||'').trim()) errors[k]='Required'; });
+  Object.entries(FIELD_RULES).forEach(([k,[re,msg]])=>{ if(data[k]&&!re.test(data[k])) errors[k]=msg; });
+  ['contract_from','contract_to','date'].forEach(k=>{ if(data[k]&&!parseDMY(data[k])) errors[k]='Date format: DD/MM/YYYY'; });
+  const a=parseDMY(data.contract_from), b=parseDMY(data.contract_to);
+  if(a&&b&&b<=a) errors.contract_to='End date must be after the start date';
+  return errors;
+}
+function fieldInput(key){
+  return document.querySelector(`#extGrid [data-key="${key}"]`) || $(key==='date'?'contract_date':key);
+}
+function showErrors(errors){
+  document.querySelectorAll('#s2 .invalid').forEach(el=>el.classList.remove('invalid'));
+  document.querySelectorAll('#s2 .err-msg').forEach(el=>el.remove());
+  let first=null;
+  Object.entries(errors).forEach(([k,msg])=>{
+    const inp=fieldInput(k); if(!inp) return;
+    inp.classList.add('invalid');
+    const m=document.createElement('div'); m.className='err-msg'; m.textContent=msg;
+    inp.insertAdjacentElement('afterend',m);
+    if(!first) first=inp;
+  });
+  if(first){ first.scrollIntoView({behavior:'smooth',block:'center'}); if(!first.readOnly) first.focus({preventScroll:true}); }
+}
 
-  $('extGrid').innerHTML=rows.map(({label,key})=>{
-    const val=(ext[key]||'').toString().trim();
-    return`<div class="ei">
-      <div class="ei-k">${label}</div>
-      <input class="ei-input${val?'':' nil'}" data-key="${key}" value="${val.replace(/"/g,'&quot;')}" placeholder="not found">
-    </div>`;
+function buildScreen2(){
+  if(!ext.property_usage) ext.property_usage='Residential';
+  $('extGrid').innerHTML=GRID_FIELDS.map(({label,key,req,ph,im,opts})=>{
+    const val=normalizeField(key,ext[key]||'');
+    ext[key]=val;
+    const lbl=`<div class="ei-k">${label}${req?' <span class="req">*</span>':''}</div>`;
+    if(opts) return `<div class="ei">${lbl}<select class="ei-input" data-key="${key}">${
+      opts.map(o=>`<option${o===val?' selected':''}>${o}</option>`).join('')}</select></div>`;
+    const cls='ei-input'+(val?'':' nil')+(req&&!val?' req-miss':'');
+    return `<div class="ei">${lbl}<input class="${cls}" data-key="${key}" value="${val.replace(/"/g,'&quot;')}" placeholder="${req?'required — please fill':(ph||'optional')}"${im?` inputmode="${im}"`:''}${req&&ph?` title="${ph}"`:''}></div>`;
   }).join('');
 
-  // Live sync: update ext when user edits a field
-  $('extGrid').addEventListener('input',e=>{
-    const inp=e.target;if(!inp.dataset.key)return;
-    ext[inp.dataset.key]=inp.value;
-    inp.classList.toggle('nil',!inp.value.trim());
-    updateExtCount();
-  });
+  // Live sync: update ext when user edits a field; normalise on leave.
+  if(!$('extGrid').dataset.bound){
+    $('extGrid').dataset.bound='1';
+    $('extGrid').addEventListener('input',e=>{
+      const inp=e.target;if(!inp.dataset.key)return;
+      ext[inp.dataset.key]=inp.value;
+      inp.classList.toggle('nil',!inp.value.trim());
+      inp.classList.remove('invalid');
+      updateExtCount();
+    });
+    $('extGrid').addEventListener('change',e=>{
+      const inp=e.target;if(!inp.dataset.key)return;
+      inp.value=ext[inp.dataset.key]=normalizeField(inp.dataset.key,inp.value);
+    });
+  }
 
   updateExtCount();
 
   if(ext.contract_from) $('contract_from').value=yr(ext.contract_from);
   if(ext.contract_to)   $('contract_to').value=yr(ext.contract_to);
-  if(ext.annual_rent)      $('annual_rent').value=fmt(ext.annual_rent);
-  if(ext.security_deposit) $('security_deposit').value=fmt(ext.security_deposit);
+  if(ext.annual_rent)      $('annual_rent').value=normalizeField('annual_rent',ext.annual_rent);
+  if(ext.security_deposit) $('security_deposit').value=normalizeField('security_deposit',ext.security_deposit);
   if(ext.tenant_phone)     $('tenant_phone').value=ext.tenant_phone;
 
   recalc();step(1);go('s2');
@@ -1542,7 +1627,6 @@ function updateExtCount(){
 
 // DD/MM/YYYY → DD/MM/YYYY year+1 (for pre-filling from previous Ejari)
 function yr(s){const p=s.split('/');return p.length===3?`${p[0]}/${p[1]}/${+p[2]+1}`:s;}
-function fmt(x){const n=parseFloat(String(x).replace(/[,\s]/g,''));return isNaN(n)?x:n.toLocaleString();}
 
 function parseD(s){
   const p=s.split('/');if(p.length!==3)return null;
@@ -1598,7 +1682,7 @@ function recalc(){
   if(fd&&td&&td>fd&&rent>0){
     const mo=(td.getFullYear()-fd.getFullYear())*12+(td.getMonth()-fd.getMonth())+(td.getDate()-fd.getDate())/30;
     const cv=Math.ceil(rent/12*mo/1000)*1000;
-    $('contract_value').value=cv.toLocaleString();
+    $('contract_value').value=String(cv);
     $('contract_value').classList.add('calc');
     $('cv_hint').textContent=`${Math.round(mo*10)/10} months → ${cv.toLocaleString()} AED`;
   }else{
@@ -1608,10 +1692,15 @@ function recalc(){
 }
 $('contract_value').addEventListener('input',function(){cvHeld=!!this.value.trim();$('cv_hint').textContent='';this.classList.remove('calc');});
 $('annual_rent').addEventListener('input',recalc);
+['annual_rent','contract_value','security_deposit'].forEach(id=>$(id).addEventListener('change',function(){
+  this.value=normalizeField(id,this.value); this.classList.remove('invalid');
+  if(id==='annual_rent') recalc();
+}));
 
 function validateRequired(){
-  const req=['tenant_phone','contract_from','contract_to','annual_rent','contract_value','mode_of_payment'];
-  for(const id of req){ if(!v(id)){ toast('Fill all required fields (*)','fail'); $(id).focus(); return false; } }
+  const errors=validateContract(collectData());
+  showErrors(errors);
+  if(Object.keys(errors).length){ toast('Please fix the highlighted fields','fail'); return false; }
   return true;
 }
 
@@ -1620,20 +1709,20 @@ function collectData(){
   return {
     date:contractDate,
     owner_name:ext.owner_name||ext.lessor_name||'',
-    lessor_name:ext.lessor_name||'',lessor_emirates_id:ext.lessor_emirates_id||'',
-    lessor_license_no:'',lessor_licensing_authority:'',
+    lessor_name:ext.lessor_name||'',lessor_emirates_id:normalizeField('lessor_emirates_id',ext.lessor_emirates_id),
+    lessor_license_no:ext.lessor_license_no||'',lessor_licensing_authority:ext.lessor_licensing_authority||'',
     lessor_email:v('lessor_email'),lessor_phone:v('lessor_phone'),
-    tenant_name:ext.tenant_name||'',tenant_emirates_id:ext.tenant_emirates_id||'',
-    tenant_license_no:'',tenant_licensing_authority:'',
+    tenant_name:ext.tenant_name||'',tenant_emirates_id:normalizeField('tenant_emirates_id',ext.tenant_emirates_id),
+    tenant_license_no:ext.tenant_license_no||'',tenant_licensing_authority:ext.tenant_licensing_authority||'',
     tenant_email:v('tenant_email'),tenant_phone:v('tenant_phone'),
-    property_usage:'Residential',
-    plot_no:ext.plot_no||'',makani_no:ext.makani_no||'',
+    property_usage:ext.property_usage||'Residential',
+    plot_no:ext.plot_no||'',makani_no:normalizeField('makani_no',ext.makani_no),
     building_name:ext.building_name||'',property_no:ext.property_no||'',
-    property_type:ext.property_type||'Apartment',property_area:ext.property_area||'',
-    location:ext.location||'',premises_no_dewa:ext.premises_no_dewa||'',
+    property_type:ext.property_type||'',property_area:ext.property_area||'',
+    location:ext.location||'',premises_no_dewa:normalizeField('premises_no_dewa',ext.premises_no_dewa),
     contract_from:v('contract_from'),contract_to:v('contract_to'),
-    contract_value:v('contract_value'),annual_rent:v('annual_rent'),
-    security_deposit:v('security_deposit'),mode_of_payment:v('mode_of_payment'),
+    contract_value:normalizeField('contract_value',v('contract_value')),annual_rent:normalizeField('annual_rent',v('annual_rent')),
+    security_deposit:normalizeField('security_deposit',v('security_deposit')),mode_of_payment:v('mode_of_payment'),
     tenant_sign_date:contractDate,lessor_sign_date:contractDate,
     additional_terms:[v('t1'),v('t2'),v('t3'),v('t4'),v('t5')],
   };
@@ -1647,6 +1736,7 @@ async function showPreview(){
   try{
     const r=await fetch('/preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:collectData()})});
     const res=await r.json().catch(()=>({}));
+    if(res.code==='invalid') showErrors(res.fields||{});
     if(!r.ok||!res.ok) throw new Error(res.error||'Preview failed');
     $('previewPages').innerHTML=res.pages.map((src,i)=>
       `<img src="${src}" alt="Contract preview, page ${i+1}" width="595" height="842">`).join('');
@@ -1673,6 +1763,7 @@ async function genPDF(){
       body:JSON.stringify({data:collectData(),intent_id:paidIntent()})});
     if(!r.ok){
       const e=await r.json().catch(()=>({}));
+      if(e.code==='invalid') showErrors(e.fields||{});
       if(e.code==='payment_required'){
         try{ localStorage.removeItem(PAID_KEY); }catch(_){}
         $('payBox').style.display='block';$('genBtn').style.display='none';resetPayBtn();

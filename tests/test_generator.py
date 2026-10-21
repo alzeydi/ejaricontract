@@ -13,8 +13,12 @@ os.environ.setdefault('ANTHROPIC_API_KEY', 'test')
 import app as appmod  # noqa: E402
 from test_payments import FakeZiina  # noqa: E402
 
-CONTRACT = {'tenant_name': 'TEST TENANT', 'tenant_emirates_id': '784-1990-1234567-1',
-            'annual_rent': '85000', 'contract_from': '01/11/2026', 'contract_to': '31/10/2027'}
+CONTRACT = {'tenant_name': 'TEST TENANT', 'tenant_emirates_id': '784-1990-1234567-1', 'tenant_phone': '+971501234567',
+            'lessor_name': 'TEST LESSOR', 'lessor_emirates_id': '784-1980-1234567-2',
+            'building_name': 'MARINA HEIGHTS', 'property_no': '1204', 'property_type': 'Apartment',
+            'location': 'Dubai Marina', 'plot_no': '392-1001', 'premises_no_dewa': '012345678',
+            'contract_from': '01/11/2026', 'contract_to': '31/10/2027', 'annual_rent': '85000',
+            'contract_value': '85000', 'mode_of_payment': '4 Cheques'}
 DOC = {'label': 'TENANT_EMIRATES_ID', 'data': 'eA==', 'mime_type': 'image/png'}
 
 
@@ -105,3 +109,42 @@ def test_lawyer_payment_does_not_buy_a_contract(client, env):
 def test_free_mode_skips_payment(client, env, monkeypatch):
     monkeypatch.setattr(appmod, 'FREE_MODE', True)
     assert client.post('/generate', json={'data': CONTRACT}).status_code == 200
+
+
+def test_validation_rules_match_the_spec():
+    v = appmod.validate_contract
+    n = appmod.normalize_contract
+    assert v(n(dict(CONTRACT))) == {}
+    data = n(dict(CONTRACT, tenant_emirates_id='784199012345671', premises_no_dewa='012 345 678',
+                  annual_rent='85,000', makani_no='12345 67890'))
+    assert v(data) == {}
+    assert data['tenant_emirates_id'] == '784-1990-1234567-1'
+    assert data['premises_no_dewa'] == '012345678'  # leading zero kept
+    assert data['annual_rent'] == '85000' and data['makani_no'] == '1234567890'
+    bad = v(n(dict(CONTRACT, lessor_emirates_id='784-12', premises_no_dewa='12345', makani_no='123',
+                   security_deposit='3.5k', contract_from='2026-11-01', contract_to='01/10/2026', plot_no='')))
+    assert bad == {
+        'lessor_emirates_id': 'Emirates ID format: 784-XXXX-XXXXXXX-X',
+        'premises_no_dewa': 'DEWA premise number: 9 digits',
+        'makani_no': 'Makani number: 10 digits',
+        'security_deposit': 'Numbers only, no separators',
+        'contract_from': 'Date format: DD/MM/YYYY',
+        'plot_no': 'Required',
+    }
+    assert v(n(dict(CONTRACT, contract_to='01/11/2026')))['contract_to'] == 'End date must be after the start date'
+
+
+def test_invalid_contract_is_rejected_before_spending_a_download(client, env):
+    iid = _paid_intent(client, env)
+    r = client.post('/generate', json={'data': dict(CONTRACT, premises_no_dewa='1'), 'intent_id': iid})
+    assert r.status_code == 422 and r.get_json()['fields'] == {'premises_no_dewa': 'DEWA premise number: 9 digits'}
+    for _ in range(appmod.GENERATIONS_PER_PAYMENT):
+        assert client.post('/generate', json={'data': CONTRACT, 'intent_id': iid}).status_code == 200
+
+
+def test_client_rules_mirror_the_server():
+    """index.html re-implements the field rules for instant feedback; keep both in step."""
+    import re
+    html = open('static/index.html', encoding='utf-8').read()
+    m = re.search(r"const REQUIRED_FIELDS=\[(.*?)\];", html, re.S)
+    assert m and re.findall(r"'([a-z_]+)'", m.group(1)) == appmod.REQUIRED_FIELDS

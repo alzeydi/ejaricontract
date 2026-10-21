@@ -37,6 +37,7 @@ Every event carries `page_path` (added by `ehEvent`); product events also carry 
 | `extraction_completed` | `/extract` returned fields | `fields_filled`, `fields_missing`, `docs_failed` |
 | `extraction_failed` | `/extract` errored or every document failed | `reason` |
 | `preview_viewed` | Free watermarked preview rendered (homepage generator) | `pages` |
+| `manual_entry_started` | "Fill in by hand" (no documents, or the free limit is used up) | — |
 | `begin_checkout` | Pay button pressed, before the Ziina intent is created (contract, chat, chat file top-up) | `value`, `currency`, `items` |
 | `purchase` | **Server-confirmed** payment, exactly once per `transaction_id` (see below) | `transaction_id`, `value`, `currency`, `items[{item_id, item_name, price, quantity}]` |
 | `payment_success` | Same moment and same dedupe as `purchase` (contract) | `value`, `currency`, `transaction_id` |
@@ -73,6 +74,8 @@ In **GA4 Admin → Events** (each name appears up to 24 h after it first fires, 
 - `EXTRACT_DAILY_LIMIT` (default 5) extractions per visitor per day, keyed by a daily-rotating HMAC of the IP (`CF-Connecting-IP` behind Cloudflare) — no raw IPs stored, rows deleted after 2 days;
 - Cloudflare Turnstile when `TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET` are set (the widget loads only when the form opens);
 - every extraction logs OCR tokens and estimated USD (`[ocr]` log line + `ocr_costs` table).
+
+Every document is optional, and "Fill in by hand" skips upload entirely. The review form lists every DLD field; required ones are marked and highlighted when empty. The same rules run in the browser (`FIELD_RULES` in `static/index.html`) and on the server (`validate_contract()` in `app.py`, 422 with per-field messages on `/preview` and `/generate`): Emirates ID `784-XXXX-XXXXXXX-X` (15 bare digits are auto-formatted), DEWA premise number 9 digits (leading zeros kept), Makani 10 digits, amounts digits only (separators stripped), dates `DD/MM/YYYY` with the end after the start.
 
 ## Other env vars
 
