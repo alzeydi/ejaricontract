@@ -26,6 +26,8 @@ claude = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from env
 # FREE_MODE=false (default) → users must pay 15 AED via Ziina before extraction
 FREE_MODE = os.environ.get('FREE_MODE', 'false').lower() in ('1', 'true', 'yes')
 
+CONTRACT_PRICE_FILS = 1500  # 15 AED
+
 # LEGAL_FREE_MODE=true  → /legal-chat is unlimited and free (paywall hidden)
 # LEGAL_FREE_MODE=false (default) → users pay 50 AED for a 30-minute session
 LEGAL_FREE_MODE = os.environ.get('LEGAL_FREE_MODE', 'false').lower() in ('1', 'true', 'yes')
@@ -188,6 +190,19 @@ def _init_db():
                         phone TEXT NOT NULL,
                         source TEXT DEFAULT 'post_download',
                         created_at TIMESTAMP DEFAULT NOW()
+                    )
+                ''')
+                # Payment ledger — Ziina intent ids only, no personal data.
+                cur.execute('''
+                    CREATE TABLE IF NOT EXISTS payments (
+                        intent_id TEXT PRIMARY KEY,
+                        product TEXT NOT NULL,
+                        amount_fils INTEGER NOT NULL,
+                        status TEXT NOT NULL DEFAULT 'created',
+                        created_at TIMESTAMP DEFAULT NOW(),
+                        confirmed_at TIMESTAMP,
+                        ga_reported_at TIMESTAMP,
+                        generations INTEGER NOT NULL DEFAULT 0
                     )
                 ''')
     finally:
@@ -1206,66 +1221,58 @@ def legal_chat_message():
 
 @app.route('/legal-chat/create-payment', methods=['POST'])
 def legal_create_payment():
-    """Create Ziina payment intent for 100 AED legal chat unlock."""
-    try:
-        base_url = request.host_url.rstrip('/')
-        payload = {
-            'amount': LEGAL_PRICE_FILS,
-            'currency_code': 'AED',
-            'message': f'Ejari Helper — AI Legal Chat ({LEGAL_SESSION_MINUTES} min)',
-            'success_url': f'{base_url}/legal-chat/payment-success?intent_id={{PAYMENT_INTENT_ID}}',
-            'cancel_url':  f'{base_url}/legal-chat?cancelled=1',
-            'failure_url': f'{base_url}/legal-chat?failed=1',
-            'allow_tips': False,
-            'operation_id': str(uuid.uuid4()),
-        }
-        resp = req_lib.post(f'{ZIINA_API}/payment_intent', json=payload, headers=ZIINA_HEADERS, timeout=10)
-        data = resp.json()
-        if resp.status_code not in (200, 201) or 'embedded_url' not in data:
-            return jsonify({'error': data.get('message', 'Ziina error'), 'raw': data}), 502
-        return jsonify({
-            'ok': True,
-            'embedded_url': data['embedded_url'],
-            'redirect_url': data.get('redirect_url', ''),
-            'intent_id': data.get('id', ''),
-        })
-    except Exception as e:
-        import traceback
-        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
-
-
-def _grant_legal_session(intent_id, data):
-    """Mark a verified, completed intent as a fresh 30-minute legal-chat session."""
-    paid_until = datetime.now(timezone.utc) + timedelta(minutes=LEGAL_SESSION_MINUTES)
-    session['legal_paid_until'] = paid_until.isoformat()
-    session['legal_free_used'] = 0
-    email, name = _ziina_customer_info(data)
-    _send_telegram(
-        f'💼 <b>Legal Chat unlocked</b>\n'
-        f'💵 AED {LEGAL_PRICE_FILS // 100}\n'
-        f'📧 {email or "(no email)"}\n'
-        f'⏰ {datetime.now().strftime("%d %b %Y, %H:%M")}'
+    """Create Ziina payment intent for the legal chat unlock."""
+    base_url = request.host_url.rstrip('/')
+    data, error = _ziina_create(
+        'lawyer',
+        success_url=f'{base_url}/legal-chat/payment-success?intent_id={{PAYMENT_INTENT_ID}}',
+        cancel_url=f'{base_url}/legal-chat?cancelled=1',
+        failure_url=f'{base_url}/legal-chat?failed=1',
     )
-    if email:
-        trustpilot_invite(email, name, reference_id=f'legal-{intent_id}', delay_days=3)
+    if error:
+        return jsonify({'error': error}), 502
+    return jsonify({
+        'ok': True,
+        'embedded_url': data['embedded_url'],
+        'redirect_url': data.get('redirect_url', ''),
+        'intent_id': data.get('id', ''),
+    })
+
+
+def _grant_legal_session(intent_id, confirmed_at):
+    """Open the paid chat window for a confirmed intent.
+
+    The window is anchored to the payment time, so re-opening the success
+    URL (refresh, back button, another tab) never extends or restarts it.
+    Returns paid_until, or None when that window has already passed.
+    """
+    paid_at = (confirmed_at.replace(tzinfo=timezone.utc) if confirmed_at
+               else datetime.now(timezone.utc))
+    paid_until = paid_at + timedelta(minutes=LEGAL_SESSION_MINUTES)
+    if paid_until <= datetime.now(timezone.utc):
+        return None
+    granted = set(session.get('legal_intents', []))
+    if intent_id not in granted:
+        granted.add(intent_id)
+        session['legal_intents'] = list(granted)
+        session['legal_free_used'] = 0
+    session['legal_paid_until'] = paid_until.isoformat()
     return paid_until
 
 
 @app.route('/legal-chat/verify-payment', methods=['POST'])
 def legal_verify_payment():
     """Embedded-checkout callback — verify the intent and grant a 30-min window."""
-    try:
-        intent_id = (request.json or {}).get('intent_id', '')
-        if not intent_id:
-            return jsonify({'paid': False, 'error': 'No intent_id'}), 400
-        resp = req_lib.get(f'{ZIINA_API}/payment_intent/{intent_id}', headers=ZIINA_HEADERS, timeout=10)
-        data = resp.json()
-        if data.get('status') == 'completed':
-            paid_until = _grant_legal_session(intent_id, data)
+    intent_id = (request.json or {}).get('intent_id', '')
+    if not intent_id:
+        return jsonify({'paid': False, 'error': 'No intent_id'}), 400
+    r = _ziina_confirm(intent_id, 'lawyer')
+    if r['paid']:
+        paid_until = _grant_legal_session(intent_id, r['confirmed_at'])
+        if paid_until:
             return jsonify({'paid': True, 'paid_until': paid_until.isoformat()})
-        return jsonify({'paid': False, 'status': data.get('status', '')})
-    except Exception as e:
-        return jsonify({'paid': False, 'error': str(e)}), 500
+        return jsonify({'paid': False, 'status': 'expired'})
+    return jsonify({'paid': False, 'status': r['status']})
 
 
 @app.route('/legal-chat/payment-success')
@@ -1274,78 +1281,52 @@ def legal_payment_success():
     intent_id = request.args.get('intent_id', '')
     if not intent_id:
         return redirect('/legal-chat')
-    try:
-        resp = req_lib.get(f'{ZIINA_API}/payment_intent/{intent_id}', headers=ZIINA_HEADERS, timeout=10)
-        data = resp.json()
-        if data.get('status') == 'completed':
-            _grant_legal_session(intent_id, data)
-            return redirect(f'/legal-chat?unlocked=1&tid={intent_id}')
-        return redirect(f'/legal-chat?pending=1')
-    except Exception as e:
-        return f'Error verifying payment: {e}', 500
+    r = _ziina_confirm(intent_id, 'lawyer')
+    if r['paid'] and _grant_legal_session(intent_id, r['confirmed_at']):
+        return redirect(f'/legal-chat?unlocked=1&tid={intent_id}')
+    return redirect('/legal-chat?pending=1')
 
 
 @app.route('/legal-chat/files-payment', methods=['POST'])
 def legal_files_payment():
-    """Create Ziina payment intent for a 50 AED file-upload top-up (+3 files)."""
-    try:
-        base_url = request.host_url.rstrip('/')
-        payload = {
-            'amount': LEGAL_FILE_TOPUP_FILS,
-            'currency_code': 'AED',
-            'message': f'Ejari Helper — Legal Chat file uploads (+{LEGAL_FILE_TOPUP_FILES})',
-            'success_url': f'{base_url}/legal-chat/files-payment-success?intent_id={{PAYMENT_INTENT_ID}}',
-            'cancel_url':  f'{base_url}/legal-chat?files_cancelled=1',
-            'failure_url': f'{base_url}/legal-chat?files_failed=1',
-            'allow_tips': False,
-            'operation_id': str(uuid.uuid4()),
-        }
-        resp = req_lib.post(f'{ZIINA_API}/payment_intent', json=payload, headers=ZIINA_HEADERS, timeout=10)
-        data = resp.json()
-        if resp.status_code not in (200, 201) or 'embedded_url' not in data:
-            return jsonify({'error': data.get('message', 'Ziina error'), 'raw': data}), 502
-        return jsonify({
-            'ok': True,
-            'embedded_url': data['embedded_url'],
-            'redirect_url': data.get('redirect_url', ''),
-            'intent_id': data.get('id', ''),
-        })
-    except Exception as e:
-        import traceback
-        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+    """Create Ziina payment intent for a file-upload top-up (+3 files)."""
+    base_url = request.host_url.rstrip('/')
+    data, error = _ziina_create(
+        'lawyer_files',
+        success_url=f'{base_url}/legal-chat/files-payment-success?intent_id={{PAYMENT_INTENT_ID}}',
+        cancel_url=f'{base_url}/legal-chat?files_cancelled=1',
+        failure_url=f'{base_url}/legal-chat?files_failed=1',
+    )
+    if error:
+        return jsonify({'error': error}), 502
+    return jsonify({
+        'ok': True,
+        'embedded_url': data['embedded_url'],
+        'redirect_url': data.get('redirect_url', ''),
+        'intent_id': data.get('id', ''),
+    })
 
 
-def _grant_legal_files(intent_id, data):
+def _grant_legal_files(intent_id):
     """Grant +N uploads for a verified, completed top-up intent (idempotent)."""
     granted = set(session.get('legal_files_intents', []))
     if intent_id not in granted:
         session['legal_files_extra'] = int(session.get('legal_files_extra', 0)) + LEGAL_FILE_TOPUP_FILES
         granted.add(intent_id)
         session['legal_files_intents'] = list(granted)
-        email, _name = _ziina_customer_info(data)
-        _send_telegram(
-            f'📎 <b>Legal Chat file top-up</b>\n'
-            f'💵 AED {LEGAL_FILE_TOPUP_FILS // 100} · +{LEGAL_FILE_TOPUP_FILES} uploads\n'
-            f'📧 {email or "(no email)"}\n'
-            f'⏰ {datetime.now().strftime("%d %b %Y, %H:%M")}'
-        )
 
 
 @app.route('/legal-chat/files-verify-payment', methods=['POST'])
 def legal_files_verify_payment():
     """Embedded-checkout callback — verify the top-up intent and grant +3 uploads."""
-    try:
-        intent_id = (request.json or {}).get('intent_id', '')
-        if not intent_id:
-            return jsonify({'paid': False, 'error': 'No intent_id'}), 400
-        resp = req_lib.get(f'{ZIINA_API}/payment_intent/{intent_id}', headers=ZIINA_HEADERS, timeout=10)
-        data = resp.json()
-        if data.get('status') == 'completed':
-            _grant_legal_files(intent_id, data)
-            return jsonify({'paid': True, 'added': LEGAL_FILE_TOPUP_FILES})
-        return jsonify({'paid': False, 'status': data.get('status', '')})
-    except Exception as e:
-        return jsonify({'paid': False, 'error': str(e)}), 500
+    intent_id = (request.json or {}).get('intent_id', '')
+    if not intent_id:
+        return jsonify({'paid': False, 'error': 'No intent_id'}), 400
+    r = _ziina_confirm(intent_id, 'lawyer_files')
+    if r['paid']:
+        _grant_legal_files(intent_id)
+        return jsonify({'paid': True, 'added': LEGAL_FILE_TOPUP_FILES})
+    return jsonify({'paid': False, 'status': r['status']})
 
 
 @app.route('/legal-chat/files-payment-success')
@@ -1354,15 +1335,11 @@ def legal_files_payment_success():
     intent_id = request.args.get('intent_id', '')
     if not intent_id:
         return redirect('/legal-chat')
-    try:
-        resp = req_lib.get(f'{ZIINA_API}/payment_intent/{intent_id}', headers=ZIINA_HEADERS, timeout=10)
-        data = resp.json()
-        if data.get('status') == 'completed':
-            _grant_legal_files(intent_id, data)
-            return redirect('/legal-chat?files_unlocked=1')
-        return redirect('/legal-chat?files_pending=1')
-    except Exception as e:
-        return f'Error verifying payment: {e}', 500
+    r = _ziina_confirm(intent_id, 'lawyer_files')
+    if r['paid']:
+        _grant_legal_files(intent_id)
+        return redirect('/legal-chat?files_unlocked=1')
+    return redirect('/legal-chat?files_pending=1')
 
 
 @app.route('/how-it-works')
@@ -1534,9 +1511,279 @@ ZIINA_API_KEY = os.environ.get('ZIINA_API_KEY', '')
 ZIINA_API     = 'https://api-v2.ziina.com/api'
 ZIINA_HEADERS = {'Authorization': f'Bearer {ZIINA_API_KEY}', 'Content-Type': 'application/json'}
 
-# In-memory store of paid and used payment_intent ids (replace with DB in production)
-paid_intents = set()
 used_intents = set()  # intent_ids that have already been used for extraction
+
+PRODUCTS = {
+    'contract':     {'name': 'Ejari tenancy contract', 'amount_fils': CONTRACT_PRICE_FILS},
+    'lawyer':       {'name': f'AI rental lawyer — {LEGAL_SESSION_MINUTES} min', 'amount_fils': LEGAL_PRICE_FILS},
+    'lawyer_files': {'name': f'AI rental lawyer — +{LEGAL_FILE_TOPUP_FILES} file uploads', 'amount_fils': LEGAL_FILE_TOPUP_FILS},
+}
+
+_INTENT_ID_RE = re.compile(r'^[A-Za-z0-9_-]{8,64}$')
+
+
+# ── Payment errors → server log + Telegram ─────────────────────────────
+_ALERT_EVERY_SECONDS = 600
+_last_alert = {}  # stage -> epoch seconds, per worker
+
+
+def _payment_error(stage, product='', intent_id='', detail=''):
+    """Log a payment failure with context and alert Telegram (max once per stage per 10 min)."""
+    import time as _time
+    detail = str(detail)[:500]
+    print('[payment-error] ' + json.dumps({
+        'stage': stage, 'product': product, 'intent_id': intent_id,
+        'path': request.path if request else '', 'detail': detail,
+    }), flush=True)
+    now = _time.time()
+    if now - _last_alert.get(stage, 0) < _ALERT_EVERY_SECONDS:
+        return
+    _last_alert[stage] = now
+    _send_telegram(
+        f'⚠️ <b>Payment error: {stage}</b>\n'
+        f'🧾 {product or "?"} · {intent_id or "no intent"}\n'
+        f'{detail[:300]}\n'
+        f'⏰ {datetime.now().strftime("%d %b %Y, %H:%M")}'
+    )
+
+
+# ── Payment ledger ─────────────────────────────────────────────────────
+# One row per Ziina intent: id, product, amount, status, timestamps — no
+# email, name or documents. It makes confirmation idempotent across the two
+# gunicorn workers and restarts, and lets the front-end report each purchase
+# to GA4 exactly once. Without DATABASE_URL (local dev) a dict stands in.
+import threading
+_mem_payments = {}
+
+
+def _utcnow():
+    """Naive UTC, matching the ledger's NOW() AT TIME ZONE 'utc'."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
+_mem_lock = threading.Lock()
+
+
+def _ledger_record(intent_id, product, amount_fils):
+    conn = _get_conn()
+    if not conn:
+        with _mem_lock:
+            _mem_payments.setdefault(intent_id, {
+                'intent_id': intent_id, 'product': product, 'amount_fils': amount_fils,
+                'status': 'created', 'confirmed_at': None, 'ga_reported_at': None, 'generations': 0})
+        return
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute('INSERT INTO payments (intent_id, product, amount_fils) VALUES (%s, %s, %s) '
+                            'ON CONFLICT (intent_id) DO NOTHING', (intent_id, product, amount_fils))
+    finally:
+        conn.close()
+
+
+def _ledger_get(intent_id):
+    conn = _get_conn()
+    if not conn:
+        with _mem_lock:
+            row = _mem_payments.get(intent_id)
+            return dict(row) if row else None
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute('SELECT intent_id, product, amount_fils, status, confirmed_at, ga_reported_at, generations '
+                            'FROM payments WHERE intent_id = %s', (intent_id,))
+                r = cur.fetchone()
+    finally:
+        conn.close()
+    if not r:
+        return None
+    keys = ('intent_id', 'product', 'amount_fils', 'status', 'confirmed_at', 'ga_reported_at', 'generations')
+    return dict(zip(keys, r))
+
+
+def _ledger_mark_paid(intent_id, product, amount_fils):
+    """Mark an intent completed. Returns True only for the call that flipped it."""
+    conn = _get_conn()
+    if not conn:
+        with _mem_lock:
+            row = _mem_payments.setdefault(intent_id, {
+                'intent_id': intent_id, 'product': product, 'amount_fils': amount_fils,
+                'status': 'created', 'confirmed_at': None, 'ga_reported_at': None, 'generations': 0})
+            if row['confirmed_at']:
+                return False
+            row.update(status='completed', confirmed_at=_utcnow())
+            return True
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute('INSERT INTO payments (intent_id, product, amount_fils) VALUES (%s, %s, %s) '
+                            'ON CONFLICT (intent_id) DO NOTHING', (intent_id, product, amount_fils))
+                cur.execute("UPDATE payments SET status = 'completed', confirmed_at = NOW() AT TIME ZONE 'utc' "
+                            'WHERE intent_id = %s AND confirmed_at IS NULL RETURNING 1', (intent_id,))
+                return cur.fetchone() is not None
+    finally:
+        conn.close()
+
+
+def _ledger_claim_report(intent_id):
+    """Atomically claim the right to report this purchase to analytics (once ever)."""
+    conn = _get_conn()
+    if not conn:
+        with _mem_lock:
+            row = _mem_payments.get(intent_id)
+            if not row or row['status'] != 'completed' or row['ga_reported_at']:
+                return False
+            row['ga_reported_at'] = _utcnow()
+            return True
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("UPDATE payments SET ga_reported_at = NOW() AT TIME ZONE 'utc' WHERE intent_id = %s "
+                            "AND status = 'completed' AND ga_reported_at IS NULL RETURNING 1", (intent_id,))
+                return cur.fetchone() is not None
+    finally:
+        conn.close()
+
+
+def _ledger_safe(fn, *args):
+    """Run a ledger call; a DB hiccup must never block a paying customer."""
+    try:
+        return fn(*args)
+    except Exception as e:
+        _payment_error('ledger_db', args[1] if len(args) > 1 else '', args[0] if args else '', e)
+        return None
+
+
+def _product_for_amount(amount_fils):
+    for key, p in PRODUCTS.items():
+        if p['amount_fils'] == amount_fils:
+            return key
+    return 'unknown'
+
+
+def _notify_sale(product, intent_id, amount_fils, data):
+    """One-time side effects of a new sale: Telegram, plus a Trustpilot invite for chat."""
+    email, name = _ziina_customer_info(data or {})
+    label = {'contract': '💰 <b>Contract sold</b>', 'lawyer': '💼 <b>Legal Chat unlocked</b>',
+             'lawyer_files': '📎 <b>Legal Chat file top-up</b>'}.get(product, f'💳 <b>Payment ({product})</b>')
+    _send_telegram(
+        f'{label}\n'
+        f'💵 AED {amount_fils / 100:g}\n'
+        f'📧 {email or "(no email)"}\n'
+        f'🧾 {intent_id}\n'
+        f'⏰ {datetime.now().strftime("%d %b %Y, %H:%M")}'
+    )
+    if product == 'lawyer' and email:
+        trustpilot_invite(email, name, reference_id=f'legal-{intent_id}', delay_days=3)
+
+
+def _ziina_create(product, success_url, cancel_url, failure_url):
+    """Create a Ziina payment intent for a product. Returns (data, error_message)."""
+    p = PRODUCTS[product]
+    payload = {
+        'amount': p['amount_fils'],
+        'currency_code': 'AED',
+        'message': f'Ejari Helper — {p["name"]}',
+        'success_url': success_url,
+        'cancel_url': cancel_url,
+        'failure_url': failure_url,
+        'allow_tips': False,
+        'operation_id': str(uuid.uuid4()),
+    }
+    try:
+        resp = req_lib.post(f'{ZIINA_API}/payment_intent', json=payload, headers=ZIINA_HEADERS, timeout=10)
+    except Exception as e:
+        _payment_error('create_exception', product, '', e)
+        return None, 'Payment provider is unreachable. Please try again in a minute.'
+    try:
+        data = resp.json()
+    except ValueError:
+        data = {}
+    if resp.status_code not in (200, 201) or 'embedded_url' not in data:
+        _payment_error('create_http', product, '', f'HTTP {resp.status_code}: {str(data)[:300] or resp.text[:300]}')
+        return None, 'Could not start the payment. Please try again.'
+    intent_id = data.get('id', '')
+    print(f'[payment] created {product} intent {intent_id}', flush=True)
+    _ledger_safe(_ledger_record, intent_id, product, p['amount_fils'])
+    return data, None
+
+
+def _ziina_confirm(intent_id, expected_product=None):
+    """Confirm an intent with the ledger and, if needed, Ziina's API.
+
+    Returns {'paid', 'status', 'product', 'amount_fils', 'newly_paid', 'confirmed_at'}.
+    A sale notification goes out once, for whichever call first sees the
+    intent completed (redirect, polling or webhook).
+    """
+    result = {'paid': False, 'status': '', 'product': expected_product or '',
+              'amount_fils': 0, 'newly_paid': False, 'confirmed_at': None}
+    if not intent_id or not _INTENT_ID_RE.match(intent_id):
+        result['status'] = 'invalid'
+        return result
+    row = _ledger_safe(_ledger_get, intent_id)
+    if row and row['status'] == 'completed':
+        result.update(paid=True, status='completed', product=row['product'],
+                      amount_fils=row['amount_fils'], confirmed_at=row['confirmed_at'])
+    else:
+        try:
+            resp = req_lib.get(f'{ZIINA_API}/payment_intent/{intent_id}', headers=ZIINA_HEADERS, timeout=10)
+            data = resp.json()
+        except Exception as e:
+            _payment_error('confirm_exception', expected_product or '', intent_id, e)
+            result['status'] = 'error'
+            return result
+        if resp.status_code != 200:
+            _payment_error('confirm_http', expected_product or '', intent_id,
+                           f'HTTP {resp.status_code}: {str(data)[:300]}')
+            result['status'] = 'error'
+            return result
+        result['status'] = data.get('status', '')
+        if result['status'] != 'completed':
+            return result
+        amount = int(data.get('amount') or 0)
+        product = row['product'] if row else (expected_product or _product_for_amount(amount))
+        expected_amount = row['amount_fils'] if row else PRODUCTS.get(product, {}).get('amount_fils', amount)
+        if amount and amount != expected_amount:
+            _payment_error('amount_mismatch', product, intent_id, f'paid {amount} fils, expected {expected_amount}')
+            return result
+        newly = _ledger_safe(_ledger_mark_paid, intent_id, product, amount or expected_amount)
+        row = _ledger_safe(_ledger_get, intent_id) or {}
+        result.update(paid=True, product=product, amount_fils=amount or expected_amount,
+                      newly_paid=bool(newly), confirmed_at=row.get('confirmed_at'))
+        if newly:
+            _notify_sale(product, intent_id, result['amount_fils'], data)
+    if expected_product and result['product'] != expected_product:
+        # A completed intent for another product must not unlock this one.
+        _payment_error('product_mismatch', expected_product, intent_id, f'intent is for {result["product"]}')
+        result['paid'] = False
+    return result
+
+
+@app.route('/payment/confirm', methods=['POST'])
+def payment_confirm():
+    """Server-confirmed payment status for analytics.
+
+    `report` is true for exactly one call per transaction, ever — the
+    front-end fires `purchase` / `payment_success` / `chat_paid` only then.
+    """
+    body = request.json or {}
+    intent_id = (body.get('intent_id') or '').strip()
+    product = body.get('product') or None
+    if product not in PRODUCTS:
+        product = None
+    r = _ziina_confirm(intent_id, product)
+    if not r['paid']:
+        return jsonify({'paid': False, 'status': r['status']})
+    report = bool(_ledger_safe(_ledger_claim_report, intent_id))
+    return jsonify({
+        'paid': True,
+        'report': report,
+        'transaction_id': intent_id,
+        'product': r['product'],
+        'item_name': PRODUCTS.get(r['product'], {}).get('name', r['product']),
+        'value': r['amount_fils'] / 100,
+        'currency': 'AED',
+    })
 
 
 # Apple Pay domain verification — required by Ziina embedded checkout.
@@ -1561,89 +1808,45 @@ def apple_pay_domain_association():
 @app.route('/create-payment', methods=['POST'])
 def create_payment():
     """Create a Ziina Payment Intent and return redirect_url to frontend."""
-    try:
-        base_url = request.host_url.rstrip('/')
-        payload = {
-            'amount': 1500,          # 15 AED in fils (50% launch discount, was 30 AED)
-            'currency_code': 'AED',
-            'message': 'Ejari Helper — AI document extraction',
-            'success_url': f'{base_url}/?paid=1',
-            'cancel_url':  f'{base_url}/?cancelled=1',
-            'failure_url': f'{base_url}/?failed=1',
-            'allow_tips': False,
-            'operation_id': str(uuid.uuid4()),
-        }
-        resp = req_lib.post(f'{ZIINA_API}/payment_intent', json=payload, headers=ZIINA_HEADERS, timeout=10)
-        data = resp.json()
-
-        if resp.status_code not in (200, 201) or 'embedded_url' not in data:
-            return jsonify({'error': data.get('message', 'Ziina error'), 'raw': data}), 502
-
-        intent_id = data.get('id', '')
-
-        return jsonify({
-            'ok': True,
-            'embedded_url': data['embedded_url'],
-            'redirect_url': data.get('redirect_url', ''),
-            'intent_id': intent_id,
-        })
-
-    except Exception as e:
-        import traceback
-        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+    base_url = request.host_url.rstrip('/')
+    data, error = _ziina_create(
+        'contract',
+        # Ziina substitutes the intent id, so the return is verifiable even
+        # when it lands in a new tab or another browser (no sessionStorage).
+        success_url=f'{base_url}/?paid=1&intent_id={{PAYMENT_INTENT_ID}}',
+        cancel_url=f'{base_url}/?cancelled=1',
+        failure_url=f'{base_url}/?failed=1',
+    )
+    if error:
+        return jsonify({'error': error}), 502
+    return jsonify({
+        'ok': True,
+        'embedded_url': data['embedded_url'],
+        'redirect_url': data.get('redirect_url', ''),
+        'intent_id': data.get('id', ''),
+    })
 
 
 @app.route('/payment-success')
 def payment_success():
-    """Ziina redirects here after successful payment. Verify and mark as paid."""
+    """Legacy Ziina return URL — verify, then hand over to the homepage."""
     intent_id = request.args.get('intent_id', '')
     if not intent_id:
         return redirect('/')
-
-    try:
-        # Verify with Ziina API that payment is actually completed
-        resp = req_lib.get(f'{ZIINA_API}/payment_intent/{intent_id}', headers=ZIINA_HEADERS, timeout=10)
-        data = resp.json()
-        status = data.get('status', '')
-
-        if status == 'completed':
-            paid_intents.add(intent_id)
-            # Redirect to frontend with paid flag
-            return f'''<html><head><meta http-equiv="refresh" content="0;url=/?paid=1&intent_id={intent_id}"></head>
-            <body>Payment confirmed, redirecting...</body></html>'''
-        else:
-            return f'''<html><head><meta http-equiv="refresh" content="0;url=/?payment_pending=1&intent_id={intent_id}"></head>
-            <body>Payment status: {status}</body></html>'''
-
-    except Exception as e:
-        return f'Error verifying payment: {e}', 500
+    r = _ziina_confirm(intent_id, 'contract')
+    if r['paid']:
+        return redirect(f'/?paid=1&intent_id={intent_id}')
+    return redirect(f'/?payment_pending=1&intent_id={intent_id}')
 
 
 @app.route('/verify-payment', methods=['POST'])
 def verify_payment():
     """Frontend polls this to confirm payment is completed."""
-    try:
-        intent_id = (request.json or {}).get('intent_id', '')
-        if not intent_id:
-            return jsonify({'paid': False, 'error': 'No intent_id'}), 400
-
-        # Check in-memory cache first
-        if intent_id in paid_intents:
-            return jsonify({'paid': True})
-
-        # Double-check with Ziina API
-        resp = req_lib.get(f'{ZIINA_API}/payment_intent/{intent_id}', headers=ZIINA_HEADERS, timeout=10)
-        data = resp.json()
-        status = data.get('status', '')
-        paid = status == 'completed'
-
-        if paid:
-            paid_intents.add(intent_id)
-
-        return jsonify({'paid': paid, 'status': status})
-
-    except Exception as e:
-        return jsonify({'paid': False, 'error': str(e)}), 500
+    intent_id = (request.json or {}).get('intent_id', '')
+    if not intent_id:
+        return jsonify({'paid': False, 'error': 'No intent_id'}), 400
+    r = _ziina_confirm(intent_id, 'contract')
+    return jsonify({'paid': r['paid'], 'status': r['status']})
 
 
 @app.route('/webhook/ziina', methods=['POST'])
@@ -1655,24 +1858,24 @@ def ziina_webhook():
         sig = request.headers.get('X-Hmac-Signature', '')
         expected = hmac.new(webhook_secret.encode(), request.data, hashlib.sha256).hexdigest()
         if not hmac.compare_digest(sig, expected):
+            _payment_error('webhook_sig', '', '', 'invalid X-Hmac-Signature')
             return jsonify({'error': 'Invalid signature'}), 401
+    else:
+        print('[payment] WARNING: ZIINA_WEBHOOK_SECRET not set — webhook is unauthenticated', flush=True)
 
     try:
-        event = request.json
-        event_type = event.get('event')
+        event = request.json or {}
         data = event.get('data', {})
-
-        if event_type == 'payment_intent.status.updated':
+        if event.get('event') == 'payment_intent.status.updated':
             intent_id = data.get('id')
-            status    = data.get('status')
-            if status == 'completed' and intent_id:
-                paid_intents.add(intent_id)
-                print(f'[Ziina] Payment completed: {intent_id}')
-
+            print(f'[payment] webhook {intent_id} → {data.get("status")}', flush=True)
+            if data.get('status') == 'completed' and intent_id:
+                # Re-read the intent from Ziina rather than trusting the body.
+                _ziina_confirm(intent_id)
         return jsonify({'ok': True})
-
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        _payment_error('webhook_exception', '', '', e)
+        return jsonify({'error': 'Webhook processing failed'}), 500
 
 
 if __name__ == '__main__':
