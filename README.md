@@ -31,6 +31,8 @@ Every event carries `page_path` (added by `ehEvent`); product events also carry 
 | `payment_failed` | Intent creation error, Ziina `?failed` / `?cancelled`, embedded FAILED/CANCELED/closed, or not confirmed after 3 polls | `reason` |
 | `template_downloaded` | Any click on a `/download/...` link (Word/PDF template), site-wide | `file_name`, `source_page` |
 | `chat_started` | First message sent in `/legal-chat` (per browser session) | `source_page` |
+| `upsell_shown` | Post-download offer revealed under the template buttons (`/guide/tenancy-contract-dubai`, `/guide/ejari-registration`, `/guide/ejari-renewal`, `/ar/guide/ejari-renewal`) | `placement` |
+| `upsell_click` | "Fill it for me" in that offer (lands on `/#start`, which opens the form) | `placement` |
 | `cta_click` | Any guide/tool → product link (`/`, `/legal-chat`, `/ar/legal-chat`, `/#…`), or any `a[data-cta]` element site-wide | `source_page`, `cta_target` |
 
 **Purchase dedupe.** The page calls `POST /payment/confirm`; the server re-checks the intent with Ziina, and its answer has `report: true` for exactly one call per transaction, ever (`payments.ga_reported_at`). The page fires `purchase` (+ `payment_success` / `chat_paid`) only then, with a `localStorage` guard on top, and strips the payment params from the URL — reloads, new tabs and shared success links never re-count a sale.
@@ -39,7 +41,7 @@ Every event carries `page_path` (added by `ehEvent`); product events also carry 
 
 In **GA4 Admin → Events** (each name appears up to 24 h after it first fires, or create it via "Create event"):
 
-- **Mark as key event:** `purchase`, `begin_checkout`, `extraction_completed`, `contract_docs_uploaded`, `chat_started`.
+- **Mark as key event:** `purchase`, `begin_checkout`, `extraction_completed`, `contract_docs_uploaded`, `chat_started`, `upsell_click`.
 - **Unmark** `payment_success` and `chat_paid` if they are key events: they carry `value` and would double-count revenue next to `purchase`. They keep firing for continuity.
 
 `purchase` revenue shows in Monetisation reports without further setup.

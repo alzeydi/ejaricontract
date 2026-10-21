@@ -1257,6 +1257,12 @@ function openUpload(e){
   s.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
+// Deep link from guide upsells: /#start opens the contract form directly.
+if(location.hash==='#start'){
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>openUpload());
+  else openUpload();
+}
+
 function go(id){
   ['s1','s2'].forEach(s=>{$(s).style.display='none';});
   $(id).style.display='block';

@@ -171,6 +171,12 @@ a:hover{text-decoration:underline}
 .lang-sw a{padding:5px 12px;font-size:12px;font-weight:700;color:var(--sub);text-decoration:none;line-height:1.4}
 .lang-sw a.on{background:var(--accent);color:#fff}
 .lang-sw a:hover{text-decoration:none}
+.dl-upsell{margin-top:14px;padding:14px 16px;border-radius:10px;background:var(--accent-bg);border:1.5px solid var(--accent-mid)}
+.dl-upsell-ok{font-size:13.5px;font-weight:700;color:var(--accent-text);margin-bottom:6px}
+.dl-upsell p{font-size:13px;color:var(--text);line-height:1.55;margin:0 0 6px}
+.dl-upsell-btn{display:inline-block;margin-top:6px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;padding:10px 18px;border-radius:9px;text-decoration:none}
+.dl-upsell-btn:hover{opacity:.92;text-decoration:none}
+@media(max-width:540px){.dl-upsell-btn{display:block;text-align:center}}
 </style>
 <link rel="stylesheet" href="/static/css/base.css">
 </head>
@@ -206,6 +212,12 @@ a:hover{text-decoration:underline}
         <div class="dld-dl-desc">الصيغة الرسمية لدائرة الأراضي والأملاك في دبي — اطبعه واملأه يدوياً أو عبر أكروبات ثم قدمه لتسجيل إيجاري.</div>
       </div>
       <a href="/download/dld-tenancy-contract.pdf" class="dld-dl-btn" download>تحميل PDF</a>
+    </div>
+    <div class="dl-upsell" id="dlUpsell" data-placement="post_download_ejari_renewal_ar" hidden>
+      <div class="dl-upsell-ok">✓ تم تحميل النموذج.</div>
+      <p>تعبئته يدوياً تستغرق نحو 20 دقيقة — وأي اختلاف واحد عن سند الملكية يؤدي إلى رفضه في إيجاري.</p>
+      <p>ارفع الهويات الإماراتية وسند الملكية ← يُعبّأ خلال دقيقتين. جاهز للتوقيع خلال دقائق.</p>
+      <a href="/#start" class="dl-upsell-btn" data-cta="upsell_post_download_ejari_renewal_ar">املأه لي ←</a>
     </div>
     <div class="dld-dl-note">تفضّل الكتابة على الحاسوب؟ حمّل <a href="/download/dld-tenancy-contract.docx" download>نسخة Word القابلة للتعديل (.docx)</a>. تواجه صعوبة في تعبئته بشكل صحيح؟ <a href="/">استخدم أداتنا الذكية</a> — ارفع الهويات الإماراتية وسند الملكية واحصل على ملف PDF معبأ وجاهز لإيجاري خلال دقائق مقابل 15 درهماً.</div>
   </div>
@@ -550,5 +562,21 @@ a:hover{text-decoration:underline}
   <p class="eh-f-disc">&laquo;إيجاري هيلبر&raquo; خدمة مستقلة و<strong>غير تابعة لدائرة الأراضي والأملاك في دبي أو مؤسسة التنظيم العقاري (ريرا) أو أي جهة حكومية إماراتية</strong>، وغير معتمدة منها. &laquo;إيجاري&raquo; علامة تخص دائرة الأراضي والأملاك، وتُستخدم هنا للإشارة الوصفية إلى النظام. يتم التسجيل عبر القنوات الرسمية &mdash; <a href="https://dubailand.gov.ae" rel="nofollow noopener" target="_blank">dubailand.gov.ae</a> أو تطبيق دبي ريست أو مراكز الخدمة المعتمدة. لا شيء في هذا الموقع يُعد استشارة قانونية؛ راجع <a href="/terms" lang="en">الشروط</a>.</p>
 </footer>
 <script defer src="/static/js/toc.js"></script>
+<script>
+/* Post-download upsell: the download starts as normal; the offer appears once. */
+(function(){
+  var u = document.getElementById('dlUpsell');
+  if (!u) return;
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('a[href^="/download/"]') : null;
+    if (!a || !u.hidden) return;
+    u.hidden = false;
+    ehEvent('upsell_shown', {placement: u.getAttribute('data-placement')});
+  }, true);
+  u.querySelector('.dl-upsell-btn').addEventListener('click', function(){
+    ehEvent('upsell_click', {placement: u.getAttribute('data-placement')});
+  });
+})();
+</script>
 </body>
 </html>

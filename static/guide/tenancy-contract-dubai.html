@@ -159,6 +159,12 @@ a:hover{text-decoration:underline}
 .faq-item{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:10px}
 .faq-q{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
 .faq-a{font-size:13px;color:var(--sub);line-height:1.65;margin:0}
+.dl-upsell{margin-top:14px;padding:14px 16px;border-radius:10px;background:var(--accent-bg);border:1.5px solid var(--accent-mid)}
+.dl-upsell-ok{font-size:13.5px;font-weight:700;color:var(--accent-text);margin-bottom:6px}
+.dl-upsell p{font-size:13px;color:var(--text);line-height:1.55;margin:0 0 6px}
+.dl-upsell-btn{display:inline-block;margin-top:6px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;padding:10px 18px;border-radius:9px;text-decoration:none}
+.dl-upsell-btn:hover{opacity:.92;text-decoration:none}
+@media(max-width:540px){.dl-upsell-btn{display:block;text-align:center}}
 </style>
 <link rel="stylesheet" href="/static/css/base.css">
 </head>
@@ -196,6 +202,12 @@ a:hover{text-decoration:underline}
     <div class="dl-btns">
       <a href="/download/dld-tenancy-contract.pdf" class="dl-btn" download>Download PDF (free)</a>
       <a href="/download/dld-tenancy-contract.docx" class="dl-btn alt" download>Download Word (.docx, editable)</a>
+    </div>
+    <div class="dl-upsell" id="dlUpsell" data-placement="post_download_tenancy_contract" hidden>
+      <div class="dl-upsell-ok">✓ Template downloaded.</div>
+      <p>Filling it by hand takes ~20 minutes — and one mismatch with the Title Deed gets it rejected at Ejari.</p>
+      <p>Upload your Emirates IDs and Title Deed → filled in 2 minutes. Ready to sign in minutes.</p>
+      <a href="/#start" class="dl-upsell-btn" data-cta="upsell_post_download_tenancy_contract">Fill it for me →</a>
     </div>
     <p class="dl-note">Not sure how to fill it? <a href="/">Ejari Helper</a> reads your Emirates IDs and Title Deed and returns a pre-filled, Ejari-ready contract in minutes for AED 15.</p>
   </section>
@@ -630,5 +642,21 @@ a:hover{text-decoration:underline}
   <p class="eh-f-disc">Ejari Helper is an independent service and is <strong>not affiliated with, endorsed by, or connected to</strong> the Dubai Land Department, RERA, or any UAE government body. &ldquo;Ejari&rdquo; is a Dubai Land Department mark, used here descriptively. Registration is filed through the official channels &mdash; <a href="https://dubailand.gov.ae" rel="nofollow noopener" target="_blank">dubailand.gov.ae</a>, the Dubai REST app, or a trustee centre. Nothing on this site is legal advice; see the <a href="/terms">terms</a>.</p>
 </footer>
 <script defer src="/static/js/toc.js"></script>
+<script>
+/* Post-download upsell: the download starts as normal; the offer appears once. */
+(function(){
+  var u = document.getElementById('dlUpsell');
+  if (!u) return;
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('a[href^="/download/"]') : null;
+    if (!a || !u.hidden) return;
+    u.hidden = false;
+    ehEvent('upsell_shown', {placement: u.getAttribute('data-placement')});
+  }, true);
+  u.querySelector('.dl-upsell-btn').addEventListener('click', function(){
+    ehEvent('upsell_click', {placement: u.getAttribute('data-placement')});
+  });
+})();
+</script>
 </body>
 </html>
