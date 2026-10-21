@@ -23,13 +23,19 @@ TEMPLATE_PDF = os.path.join(os.path.dirname(__file__), 'template.pdf')
 claude = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from env
 
 # FREE_MODE=true  → no payment required; AI extraction is free
-# FREE_MODE=false (default) → users must pay 15 AED via Ziina before extraction
+# FREE_MODE=false (default) → users must pay CONTRACT_PRICE_AED via Ziina
 FREE_MODE = os.environ.get('FREE_MODE', 'false').lower() in ('1', 'true', 'yes')
 
-CONTRACT_PRICE_FILS = 1500  # 15 AED
+# ── Prices and public fees ─────────────────────────────────────────────
+# Every price and fee shown on the site comes from here: pages use the
+# __PLACEHOLDER__ tokens that render_page() substitutes (see PAGE_TOKENS).
+CONTRACT_PRICE_AED = int(os.environ.get('CONTRACT_PRICE_AED', '39'))
+LEGAL_PRICE_AED = int(os.environ.get('LEGAL_PRICE_AED', '50'))        # 30-minute chat session
+LEGAL_FILE_TOPUP_AED = int(os.environ.get('LEGAL_FILE_TOPUP_AED', '25'))
+CONTRACT_PRICE_FILS = CONTRACT_PRICE_AED * 100
 
 # LEGAL_FREE_MODE=true  → /legal-chat is unlimited and free (paywall hidden)
-# LEGAL_FREE_MODE=false (default) → users pay 50 AED for a 30-minute session
+# LEGAL_FREE_MODE=false (default) → users pay LEGAL_PRICE_AED for a 30-minute session
 LEGAL_FREE_MODE = os.environ.get('LEGAL_FREE_MODE', 'false').lower() in ('1', 'true', 'yes')
 
 # ZIINA_EMBEDDED=true  → pay inline via the embedded checkout widget (needs a
@@ -253,8 +259,17 @@ def save_rating(stars):
 
 # ── Routes ─────────────────────────────────────────────────────────────
 
+def page_tokens():
+    """Price and fee tokens substituted into every page (see the constants at the top)."""
+    return {
+        '__CONTRACT_PRICE__': str(CONTRACT_PRICE_AED),
+        '__LAWYER_PRICE__': str(LEGAL_PRICE_AED),
+        '__FILES_TOPUP_PRICE__': str(LEGAL_FILE_TOPUP_AED),
+    }
+
+
 def render_page(*rel_path):
-    """Serve a static HTML page with __BASE_URL__ and __GA4_ID__ injected.
+    """Serve a static HTML page with __BASE_URL__, __GA4_ID__ and the price tokens injected.
 
     GA4_MEASUREMENT_ID (a G-XXXXXXXXXX id) comes from the environment; when
     unset the placeholder stays as-is and the front-end guard skips the
@@ -265,6 +280,8 @@ def render_page(*rel_path):
     with open(os.path.join(app.static_folder, *rel_path), encoding='utf-8') as f:
         html = f.read()
     html = html.replace('__BASE_URL__', base_url)
+    for token, value in page_tokens().items():
+        html = html.replace(token, value)
     if ga4_id:
         html = html.replace('__GA4_ID__', ga4_id)
     return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
@@ -727,8 +744,8 @@ def llms_txt():
     content = f"""# Ejari Helper (ejarihelper.ae)
 
 > Dubai tenancy paperwork, done in minutes. Two paid products for Dubai tenants
-> and landlords: an AI-filled DLD tenancy contract generator (AED 15) and an AI
-> rental lawyer chat for Dubai tenancy-law questions (AED 50 per 30-minute
+> and landlords: an AI-filled DLD tenancy contract generator (AED {CONTRACT_PRICE_AED}) and an AI
+> rental lawyer chat for Dubai tenancy-law questions (AED {LEGAL_PRICE_AED} per 30-minute
 > session, first question free). All guidance is grounded in Dubai Law No. 26 of
 > 2007, Law No. 33 of 2008 and Decree No. 43 of 2013.
 
@@ -737,10 +754,10 @@ def llms_txt():
 - [Ejari tenancy contract generator]({base_url}/): upload Emirates IDs and the
   Title Deed; AI extracts the details and fills the official Dubai Land
   Department (DLD) Unified Tenancy Contract PDF, ready to sign and register
-  with Ejari. Price: AED 15, no account required.
+  with Ejari. Price: AED {CONTRACT_PRICE_AED}, no account required.
 - [AI rental lawyer chat]({base_url}/legal-chat): instant, citation-backed
   answers on Dubai rental disputes — security deposits, rent increases (RERA
-  index), eviction notices, RDC filings. Price: AED 50 for 30 minutes vs
+  index), eviction notices, RDC filings. Price: AED {LEGAL_PRICE_AED} for 30 minutes vs
   ~AED 1,500/hour at a law firm. Arabic landing: {base_url}/ar/legal-chat
 
 ## Start here
@@ -1018,12 +1035,12 @@ def page_not_found(_e):
 # ── Legal Chat (paid AI consultation on Dubai rental disputes) ─────────
 LEGAL_FREE_MESSAGES = 1
 LEGAL_SESSION_MINUTES = 30
-LEGAL_PRICE_FILS = 5000  # 50 AED (50% launch discount, was 100 AED)
+LEGAL_PRICE_FILS = LEGAL_PRICE_AED * 100
 
 # File-upload quota: first 3 files in a session are free, then each
-# 25 AED top-up grants 3 more uploads.
+# LEGAL_FILE_TOPUP_AED top-up grants 3 more uploads.
 LEGAL_FILE_FREE_LIMIT = 3
-LEGAL_FILE_TOPUP_FILS = 2500   # 25 AED (50% launch discount, was 50 AED)
+LEGAL_FILE_TOPUP_FILS = LEGAL_FILE_TOPUP_AED * 100
 LEGAL_FILE_TOPUP_FILES = 3
 LEGAL_FILE_MAX_BYTES = 8 * 1024 * 1024  # 8 MB per file (base64-decoded)
 LEGAL_FILE_ALLOWED_MIME = {'application/pdf', 'image/jpeg', 'image/png'}
@@ -1068,7 +1085,7 @@ def _legal_access_state():
 
 def _legal_files_state():
     """Return (used, allowance, remaining) for file uploads in this session.
-    allowance grows by LEGAL_FILE_TOPUP_FILES each successful 50 AED top-up.
+    allowance grows by LEGAL_FILE_TOPUP_FILES each successful paid top-up.
     """
     used = int(session.get('legal_files_used', 0))
     extra = int(session.get('legal_files_extra', 0))

@@ -181,7 +181,8 @@ def test_llms_txt(client):
     r = get(client, '/llms.txt')
     body = r.get_data(as_text=True)
     assert r.status_code == 200
-    assert 'AED 15' in body and 'AED 50' in body
+    from app import CONTRACT_PRICE_AED, LEGAL_PRICE_AED
+    assert f'AED {CONTRACT_PRICE_AED}' in body and f'AED {LEGAL_PRICE_AED}' in body
     assert f'{CANONICAL}/legal-chat' in body
     assert f'{CANONICAL}/guide/rental-dispute' in body
 
@@ -407,6 +408,31 @@ def test_fee_figure_is_consistent_sitewide(client):
             if bad in text:
                 stale.append(f'{f}: {bad}')
     assert not stale, 'superseded Ejari fee still on: ' + ', '.join(stale)
+
+
+def test_prices_come_from_config(client):
+    """Every price on every rendered page is the configured one: no stale
+    literal, no fake strike-through 'was' price, no unrendered token."""
+    import json
+    from app import CONTRACT_PRICE_AED, LEGAL_PRICE_AED, LEGAL_FILE_TOPUP_AED
+    allowed_offer_prices = {str(CONTRACT_PRICE_AED), str(LEGAL_PRICE_AED)}
+    problems = []
+    for path in PAGES + ['/404-check-page']:
+        body = client.get(path, base_url=CANONICAL, headers={'X-Forwarded-Proto': 'https'}).get_data(as_text=True)
+        for token in re.findall(r'__[A-Z0-9_]+__', body):
+            if token != '__GA4_ID__':
+                problems.append(f'{path}: unrendered {token}')
+        for stale in re.findall(r'(?:AED 15|15 AED|AED 30|30 AED)(?![\d,.]\d)(?!\d)', body):
+            if str(CONTRACT_PRICE_AED) not in ('15', '30'):
+                problems.append(f'{path}: stale price {stale!r}')
+        if 'line-through' in body and ('svc-old' in body or 'pay-old' in body):
+            problems.append(f'{path}: strike-through price')
+        for block in re.findall(r'<script type="application/ld\+json">(.*?)</script>', body, re.S):
+            for m in re.finditer(r'"price":\s*"([^"]+)"', block):
+                if m.group(1) not in allowed_offer_prices:
+                    problems.append(f'{path}: schema Offer price {m.group(1)}')
+    assert not problems, '\n'.join(problems)
+    assert LEGAL_FILE_TOPUP_AED > 0
 
 
 # ── live-site checks (opt in with LIVE_SEO_TESTS=1) ───────────────────

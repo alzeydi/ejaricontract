@@ -61,7 +61,7 @@
 {"@context": "https://schema.org", "@type": "Article", "headline": "Ejari Help: Fixing the Problems That Block Registration", "description": "Independent help with Dubai Ejari problems — rejected filings, expired registrations, uncooperative landlords and DEWA refusals.", "author": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/about"}, "publisher": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/"}, "mainEntityOfPage": "__BASE_URL__/ejari-help", "datePublished": "2026-08-20", "dateModified": "2026-08-20", "isAccessibleForFree": true, "inLanguage": "en"}
 </script>
 <script type="application/ld+json">
-{"@context": "https://schema.org", "@type": "Service", "name": "Ejari help — Dubai tenancy registration assistance", "serviceType": "Tenancy contract preparation and rental-law guidance", "provider": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/", "email": "hello@ejarihelper.ae"}, "areaServed": {"@type": "City", "name": "Dubai", "addressCountry": "AE"}, "audience": {"@type": "Audience", "audienceType": "Dubai tenants and landlords"}, "description": "Independent help with Dubai Ejari problems: rejected applications, expired registrations, missing landlord documents, DEWA refusals and rent-increase disputes.", "url": "__BASE_URL__/ejari-help", "offers": [{"@type": "Offer", "name": "DLD tenancy contract, auto-filled", "price": "15", "priceCurrency": "AED", "url": "__BASE_URL__/"}, {"@type": "Offer", "name": "AI rental lawyer, 30-minute session", "price": "50", "priceCurrency": "AED", "url": "__BASE_URL__/legal-chat"}]}
+{"@context": "https://schema.org", "@type": "Service", "name": "Ejari help — Dubai tenancy registration assistance", "serviceType": "Tenancy contract preparation and rental-law guidance", "provider": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/", "email": "hello@ejarihelper.ae"}, "areaServed": {"@type": "City", "name": "Dubai", "addressCountry": "AE"}, "audience": {"@type": "Audience", "audienceType": "Dubai tenants and landlords"}, "description": "Independent help with Dubai Ejari problems: rejected applications, expired registrations, missing landlord documents, DEWA refusals and rent-increase disputes.", "url": "__BASE_URL__/ejari-help", "offers": [{"@type": "Offer", "name": "DLD tenancy contract, auto-filled", "price": "__CONTRACT_PRICE__", "priceCurrency": "AED", "url": "__BASE_URL__/"}, {"@type": "Offer", "name": "AI rental lawyer, 30-minute session", "price": "__LAWYER_PRICE__", "priceCurrency": "AED", "url": "__BASE_URL__/legal-chat"}]}
 </script>
 <script type="application/ld+json">
 {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "__BASE_URL__/"}, {"@type": "ListItem", "position": 2, "name": "Ejari Help"}]}
@@ -226,7 +226,7 @@ a:hover{text-decoration:underline}
       <div class="fc-body">
         <strong>What you see:</strong> The application comes back refused, often with no useful reason given.<br>
         <strong>Why it happens:</strong> RERA cross-checks the tenancy contract against the Title Deed. Building name spelled differently, a missing unit number, an area of 92 m² on one and 92.3 m² on the other — any of these is enough.
-        <div class="fc-note"><strong>Fix:</strong> Open the Title Deed and copy its wording <em>exactly</em> into the contract: building name, unit number, plot number, area, property type. Refile — there is no penalty and no second fee. <a href="/">Ejari Helper reads both documents and fills the DLD contract so the fields match by construction, AED 15</a>.</div>
+        <div class="fc-note"><strong>Fix:</strong> Open the Title Deed and copy its wording <em>exactly</em> into the contract: building name, unit number, plot number, area, property type. Refile — there is no penalty and no second fee. <a href="/">Ejari Helper reads both documents and fills the DLD contract so the fields match by construction, AED __CONTRACT_PRICE__</a>.</div>
       </div>
     </div>
     <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
@@ -330,7 +330,7 @@ a:hover{text-decoration:underline}
 
   <div class="guide-cta" style="margin:26px 0;background:linear-gradient(180deg,#16423c 0%,#0f322c 100%);color:#fff;border:none">
     <div class="guide-cta-title" style="color:#fff">⚖️ Your case is not in the list?</div>
-    <div class="guide-cta-desc" style="color:#dfe9e6">Describe it to the AI rental lawyer — grounded in Law 26/2007, Law 33/2008 and Decree 43/2013, with the article numbers cited back to you. AED 50 for 30 minutes, <strong style="color:#fff">first question free</strong>.</div>
+    <div class="guide-cta-desc" style="color:#dfe9e6">Describe it to the AI rental lawyer — grounded in Law 26/2007, Law 33/2008 and Decree 43/2013, with the article numbers cited back to you. AED __LAWYER_PRICE__ for 30 minutes, <strong style="color:#fff">first question free</strong>.</div>
     <a href="/legal-chat" class="guide-cta-btn" style="background:#fff;color:#16423c" data-cta="ejari-help-legal-chat">Ask about my Ejari problem →</a>
   </div>
     <div class="fc-node info">

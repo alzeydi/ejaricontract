@@ -2,10 +2,22 @@
 
 Flask app with two products:
 
-1. **Ejari tenancy contract generator** — upload Emirates IDs + Title Deed, AI extracts the fields and fills the official DLD Unified Tenancy Contract PDF. **AED 15** per contract (Ziina checkout).
-2. **AI rental lawyer chat** (`/legal-chat`) — Dubai tenancy-law Q&A grounded in Law 26/2007, Law 33/2008 and Decree 43/2013. **AED 50** per 30-minute session.
+1. **Ejari tenancy contract generator** — upload Emirates IDs + Title Deed, AI extracts the fields and fills the official DLD Unified Tenancy Contract PDF. **`CONTRACT_PRICE_AED`** per contract (default AED 39, Ziina checkout).
+2. **AI rental lawyer chat** (`/legal-chat`) — Dubai tenancy-law Q&A grounded in Law 26/2007, Law 33/2008 and Decree 43/2013. **`LEGAL_PRICE_AED`** per 30-minute session (default AED 50).
 
 Static marketing/guide pages live in `static/` and are served through Flask routes that inject `__BASE_URL__` and `__GA4_ID__` placeholders.
+
+### Prices and fees live in config
+
+Pages never hard-code a price. They use tokens that `render_page()` fills from the constants at the top of `app.py` (`page_tokens()`):
+
+| Token | Constant | Env var | Default |
+|---|---|---|---|
+| `__CONTRACT_PRICE__` | `CONTRACT_PRICE_AED` | `CONTRACT_PRICE_AED` | 39 |
+| `__LAWYER_PRICE__` | `LEGAL_PRICE_AED` | `LEGAL_PRICE_AED` | 50 |
+| `__FILES_TOPUP_PRICE__` | `LEGAL_FILE_TOPUP_AED` | `LEGAL_FILE_TOPUP_AED` | 25 |
+
+The Ziina amount, GA4 `value`, schema `Offer` prices, `llms.txt` and the terms all follow. `test_prices_come_from_config` fails on any stale literal, strike-through price or unrendered token.
 
 ## Analytics (GA4)
 
