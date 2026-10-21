@@ -401,7 +401,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
         {
           "@type": "HowToStep", "position": 4,
           "name": "Register via Dubai REST app",
-          "text": "Sign and submit the contract through the Dubai REST app for Ejari certificate. Registration fee: AED 155."
+          "text": "Sign and submit the contract through the Dubai REST app for Ejari certificate. Registration fee: AED __EJARI_FEE_ONLINE__ online."
         }
       ]
     },
@@ -418,9 +418,9 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       "mainEntity": [
         {"@type":"Question","name":"What is Ejari and is registration mandatory?","acceptedAnswer":{"@type":"Answer","text":"Ejari is Dubai's official tenancy contract registration system run by RERA. All rental contracts in Dubai must be registered. Without Ejari you cannot connect DEWA, renew a residency visa, or file a rental dispute. The penalty for not registering is up to AED 50,000."}},
         {"@type":"Question","name":"What documents are needed for Ejari registration?","acceptedAnswer":{"@type":"Answer","text":"You need: a signed tenancy contract in DLD standard format, tenant's Emirates ID, landlord's Emirates ID or passport, the property Title Deed, and the previous Ejari certificate if renewing."}},
-        {"@type":"Question","name":"How much does Ejari registration cost in Dubai?","acceptedAnswer":{"@type":"Answer","text":"Online registration via the Dubai REST app costs AED 177.75 including VAT. At a typing centre the fee is AED 219.75. Renewal costs the same. Cancellation is free."}},
+        {"@type":"Question","name":"How much does Ejari registration cost in Dubai?","acceptedAnswer":{"@type":"Answer","text":"Online registration via the Dubai REST app costs AED __EJARI_FEE_ONLINE__ including VAT. At a typing centre the fee is AED __EJARI_FEE_TYPING__. Renewal costs the same. Cancellation is free."}},
         {"@type":"Question","name":"Who pays for Ejari — landlord or tenant?","acceptedAnswer":{"@type":"Answer","text":"UAE law does not specify which party pays. It is negotiated between landlord and tenant and should be stated in the tenancy contract."}},
-        {"@type":"Question","name":"How long does it take to receive the Ejari certificate?","acceptedAnswer":{"@type":"Answer","text":"Online registration via the Dubai REST app is instant — the certificate is issued by email as soon as documents are approved and payment is made."}},
+        {"@type":"Question","name":"How long does it take to receive the Ejari certificate?","acceptedAnswer":{"@type":"Answer","text":"Online registration via the Dubai REST app is fast — the certificate is issued by email __EJARI_CERT_TIMING__, once documents are approved and payment is made."}},
         {"@type":"Question","name":"What is the difference between a tenancy contract and an Ejari certificate?","acceptedAnswer":{"@type":"Answer","text":"The tenancy contract is the legal agreement between landlord and tenant. The Ejari certificate is the government's registration of that contract. Both are required — the contract alone is not recognised in DEWA, visa, or court systems."}},
         {"@type":"Question","name":"Do I need Ejari to connect DEWA?","acceptedAnswer":{"@type":"Answer","text":"Yes. DEWA requires your Ejari registration number and the 9-digit Premises Number to process your Move In application."}},
         {"@type":"Question","name":"Can a landlord increase rent mid-contract?","acceptedAnswer":{"@type":"Answer","text":"No. Under Dubai Law No. 26 of 2007, rent is fixed for the entire contract period. Increases can only happen at renewal with 90 days written notice and within RERA's permitted percentage limits."}},
@@ -763,12 +763,12 @@ main{max-width:1080px;padding:26px 24px 80px}
         <div class="hiw2-card">
           <div class="hiw2-num">3</div>
           <h3 class="hh">Register via Dubai REST app</h3>
-          <div class="pp">Submit the signed contract through the DLD app. Fee: AED 155.</div>
+          <div class="pp">Submit the signed contract through the DLD app. Fee: AED __EJARI_FEE_ONLINE__ online.</div>
         </div>
         <div class="hiw2-card">
           <div class="hiw2-num">4</div>
           <h3 class="hh">Receive Ejari certificate</h3>
-          <div class="pp">Issued in 1–2 days. Required for DEWA, visa &amp; disputes.</div>
+          <div class="pp">Issued __EJARI_CERT_TIMING__. Required for DEWA, visa &amp; disputes.</div>
         </div>
       </div>
     </section>
@@ -848,17 +848,17 @@ main{max-width:1080px;padding:26px 24px 80px}
 
         <details class="know-item">
           <summary class="know-q">How much does Ejari registration cost in Dubai?</summary>
-          <div class="know-a">Online registration via the Dubai REST app or DLD website costs <strong>AED 177.75 including VAT</strong>. At a typing centre the fee is AED 219.75. Renewal costs the same as first-time registration. Cancellation is free.</div>
+          <div class="know-a">Online registration via the Dubai REST app or DLD website costs <strong>AED __EJARI_FEE_ONLINE__ including VAT</strong>. At a typing centre the fee is AED __EJARI_FEE_TYPING__. Renewal costs the same as first-time registration. Cancellation is free.</div>
         </details>
 
         <details class="know-item">
           <summary class="know-q">Who pays for Ejari — landlord or tenant?</summary>
-          <div class="know-a">UAE law does not specify which party must pay. It is negotiated and should be stated in the tenancy contract. In practice, the landlord or agent typically pays for first registration, while renewal costs are often passed to the tenant. If you register online yourself the fee is only AED 177.75 — much less than a typing centre.</div>
+          <div class="know-a">UAE law does not specify which party must pay. It is negotiated and should be stated in the tenancy contract. In practice, the landlord or agent typically pays for first registration, while renewal costs are often passed to the tenant. If you register online yourself the fee is only AED __EJARI_FEE_ONLINE__ — much less than a typing centre.</div>
         </details>
 
         <details class="know-item">
           <summary class="know-q">How long does it take to receive the Ejari certificate?</summary>
-          <div class="know-a">Online registration via the Dubai REST app is <strong>instant</strong> — the certificate is issued by email as a PDF as soon as your documents are approved and payment is made. At a typing centre it is processed on-site the same day. If there is a rejection (e.g. address mismatch), fix the issue and resubmit at no extra charge.</div>
+          <div class="know-a">Online registration via the Dubai REST app is fast — the certificate is issued by email as a PDF <strong>__EJARI_CERT_TIMING__</strong>, once your documents are approved and payment is made. At a typing centre it is processed on-site the same day. If there is a rejection (e.g. address mismatch), fix the issue and resubmit at no extra charge.</div>
         </details>
 
         <details class="know-item">
@@ -1033,7 +1033,7 @@ main{max-width:1080px;padding:26px 24px 80px}
               <div class="ns-body">
                 <div class="ns-label">Register via Dubai REST app</div>
                 <div class="ns-desc">Open the <strong>Dubai REST</strong> app → Ejari → New Registration. Upload the signed contract. You'll need <strong>UAE Pass</strong> to log in.</div>
-                <span class="ns-tag gold">Fee: AED 155</span>
+                <span class="ns-tag gold">Fee: AED __EJARI_FEE_ONLINE__</span>
                 <span class="ns-tag gray" style="margin-left:4px">Dubai REST · UAE Pass</span>
               </div>
             </div>
@@ -1042,7 +1042,7 @@ main{max-width:1080px;padding:26px 24px 80px}
               <div class="ns-num">4</div>
               <div class="ns-body">
                 <div class="ns-label">Receive Ejari certificate</div>
-                <div class="ns-desc">Issued within <strong>1–2 working days</strong>. Required for DEWA connection, residency visa renewal, and any rental disputes at RERA.</div>
+                <div class="ns-desc">Issued <strong>__EJARI_CERT_TIMING__</strong>. Required for DEWA connection, residency visa renewal, and any rental disputes at RERA.</div>
                 <span class="ns-tag green">✓ You're done</span>
               </div>
             </div>

@@ -404,10 +404,32 @@ def test_fee_figure_is_consistent_sitewide(client):
     stale = []
     for f in pathlib.Path('static').rglob('*.html'):
         text = f.read_text(encoding='utf-8')
-        for bad in ('122.50', 'AED 215', 'AED 220'):
+        for bad in ('122.50', 'AED 215', 'AED 220', 'AED 155', '1–2 days', '1-2 days',
+                    '1–2 working days', '1-2 working days'):
             if bad in text:
                 stale.append(f'{f}: {bad}')
     assert not stale, 'superseded Ejari fee still on: ' + ', '.join(stale)
+
+
+def test_ejari_fee_constants_add_up_and_literals_match():
+    """Guide titles, meta and H1s keep the fee as a literal (they are not
+    templated); every one of them must equal the configured fee."""
+    import pathlib
+    from app import EJARI_FEE_ONLINE, EJARI_FEE_TYPING, EJARI_FEE_PARTS_ONLINE, EJARI_FEE_PARTS_TYPING
+    assert round(sum(EJARI_FEE_PARTS_ONLINE.values()), 2) == float(EJARI_FEE_ONLINE)
+    assert round(sum(EJARI_FEE_PARTS_TYPING.values()), 2) == float(EJARI_FEE_TYPING)
+    allowed = {EJARI_FEE_ONLINE, EJARI_FEE_TYPING}
+    bad = []
+    for f in pathlib.Path('static').rglob('*.html'):
+        for line in f.read_text(encoding='utf-8').split('\n'):
+            for fee in re.findall(r'AED (\d{3}\.\d{2})', line):
+                if float(fee) >= 120 and fee not in allowed:  # totals only, not components
+                    bad.append(f'{f}: AED {fee}')
+            if re.search(r'\d{3}\.\d{2}', line) and not re.search(r'<title|<meta |<h1', line):
+                for fee in re.findall(r'(?<![\d.])(1\d\d\.\d\d|2\d\d\.\d\d)(?![\d])', line):
+                    if fee in allowed:
+                        bad.append(f'{f}: literal {fee} outside title/meta/h1 — use the token')
+    assert not bad, '\n'.join(bad)
 
 
 def test_prices_come_from_config(client):

@@ -34,6 +34,14 @@ LEGAL_PRICE_AED = int(os.environ.get('LEGAL_PRICE_AED', '50'))        # 30-minut
 LEGAL_FILE_TOPUP_AED = int(os.environ.get('LEGAL_FILE_TOPUP_AED', '25'))
 CONTRACT_PRICE_FILS = CONTRACT_PRICE_AED * 100
 
+# Dubai Land Department Ejari fees (2026), shown sitewide. The components
+# must add up to the totals — tests/test_seo.py checks that.
+EJARI_FEE_PARTS_ONLINE = {'registration': 100, 'knowledge': 10, 'innovation': 10, 'service_partner': 55, 'vat': 2.75}
+EJARI_FEE_PARTS_TYPING = {'registration': 100, 'knowledge': 10, 'innovation': 10, 'service_partner': 95, 'vat': 4.75}
+EJARI_FEE_ONLINE = '177.75'   # AED, Dubai REST / DLD portal
+EJARI_FEE_TYPING = '219.75'   # AED, trustee / typing centre
+EJARI_CERT_TIMING = 'the same day, usually within minutes'
+
 # LEGAL_FREE_MODE=true  → /legal-chat is unlimited and free (paywall hidden)
 # LEGAL_FREE_MODE=false (default) → users pay LEGAL_PRICE_AED for a 30-minute session
 LEGAL_FREE_MODE = os.environ.get('LEGAL_FREE_MODE', 'false').lower() in ('1', 'true', 'yes')
@@ -265,6 +273,9 @@ def page_tokens():
         '__CONTRACT_PRICE__': str(CONTRACT_PRICE_AED),
         '__LAWYER_PRICE__': str(LEGAL_PRICE_AED),
         '__FILES_TOPUP_PRICE__': str(LEGAL_FILE_TOPUP_AED),
+        '__EJARI_FEE_ONLINE__': EJARI_FEE_ONLINE,
+        '__EJARI_FEE_TYPING__': EJARI_FEE_TYPING,
+        '__EJARI_CERT_TIMING__': EJARI_CERT_TIMING,
     }
 
 
@@ -782,11 +793,11 @@ def llms_txt():
 ## Guides (canonical URLs)
 
 - [Ejari registration]({base_url}/guide/ejari-registration): how to make an
-  Ejari online via Dubai REST, AED 177.75, documents checklist.
+  Ejari online via Dubai REST, AED {EJARI_FEE_ONLINE}, documents checklist.
 - [Ejari cost]({base_url}/guide/ejari-cost): the full 2026 fee breakdown —
-  AED 177.75 filed yourself (AED 100 registration + AED 10 knowledge +
+  AED {EJARI_FEE_ONLINE} filed yourself (AED 100 registration + AED 10 knowledge +
   AED 10 innovation + AED 55 service partner + AED 2.75 VAT) versus
-  AED 219.75 at a trustee centre. Cancellation is free.
+  AED {EJARI_FEE_TYPING} at a trustee centre. Cancellation is free.
 - [Ejari check]({base_url}/guide/ejari-check): check status in Dubai REST, by
   SMS to 4488 or on the DLD portal; re-download the certificate free; verify
   authenticity via the QR code.
