@@ -15,29 +15,40 @@ Set the env var **`GA4_MEASUREMENT_ID`** (e.g. `G-XXXXXXXXXX`) in Railway. Every
 
 ### Events fired by the front-end
 
+Every event carries `page_path` (added by `ehEvent`); product events also carry `product: 'contract' | 'lawyer'`.
+
 | Event | Where it fires | Params |
 |---|---|---|
 | `contract_started` | Contract form opened or first document chosen (homepage) | `source`: `form_opened` \| `first_document` |
+| `doc_uploaded` | Each document chosen (homepage) | `doc_type`: `tenant_eid` \| `lessor_eid` \| `title_deed` \| `prev_ejari` |
 | `contract_docs_uploaded` | All 3 required documents selected (homepage) | `docs_count` |
-| `payment_success` | Ziina success (embedded callback **and** `?paid=1` redirect return), deduped per intent | `value: 15`, `currency: 'AED'`, `transaction_id`, `product: 'contract'` |
+| `extraction_completed` | `/extract` returned fields | `fields_filled`, `fields_missing`, `docs_failed` |
+| `extraction_failed` | `/extract` errored or every document failed | `reason` |
+| `begin_checkout` | Pay button pressed, before the Ziina intent is created (contract, chat, chat file top-up) | `value`, `currency`, `items` |
+| `purchase` | **Server-confirmed** payment, exactly once per `transaction_id` (see below) | `transaction_id`, `value`, `currency`, `items[{item_id, item_name, price, quantity}]` |
+| `payment_success` | Same moment and same dedupe as `purchase` (contract) | `value`, `currency`, `transaction_id` |
+| `chat_paid` | Same moment and same dedupe as `purchase` (chat unlock); the Google Ads conversion fires with it | `value`, `currency`, `transaction_id` |
+| `payment_failed` | Intent creation error, Ziina `?failed` / `?cancelled`, embedded FAILED/CANCELED/closed, or not confirmed after 3 polls | `reason` |
 | `template_downloaded` | Any click on a `/download/...` link (Word/PDF template), site-wide | `file_name`, `source_page` |
 | `chat_started` | First message sent in `/legal-chat` (per browser session) | `source_page` |
-| `chat_paid` | Legal-chat unlock — `?unlocked=1&tid=` redirect return **and** embedded verify success, deduped per intent | `value: 50`, `currency: 'AED'`, `transaction_id` |
 | `cta_click` | Any guide/tool → product link (`/`, `/legal-chat`, `/ar/legal-chat`, `/#…`), or any `a[data-cta]` element site-wide | `source_page`, `cta_target` |
 
-### ⚠️ Manual step: mark each as a Key Event
+**Purchase dedupe.** The page calls `POST /payment/confirm`; the server re-checks the intent with Ziina, and its answer has `report: true` for exactly one call per transaction, ever (`payments.ga_reported_at`). The page fires `purchase` (+ `payment_success` / `chat_paid`) only then, with a `localStorage` guard on top, and strips the payment params from the URL — reloads, new tabs and shared success links never re-count a sale.
 
-GA4 does **not** treat custom events as conversions automatically. In **GA4 Admin → Events** (wait up to 24 h for each event name to appear after first firing, or create them manually via "Create event"), toggle **"Mark as key event"** for **all seven**:
+### ⚠️ Manual step: key events
 
-`contract_started`, `contract_docs_uploaded`, `payment_success`, `template_downloaded`, `chat_started`, `chat_paid`, `cta_click`
+In **GA4 Admin → Events** (each name appears up to 24 h after it first fires, or create it via "Create event"):
 
-`payment_success` and `chat_paid` carry `value` + `currency` (AED 15 / AED 50), so revenue reporting works once they're key events.
+- **Mark as key event:** `purchase`, `begin_checkout`, `extraction_completed`, `contract_docs_uploaded`, `chat_started`.
+- **Unmark** `payment_success` and `chat_paid` if they are key events: they carry `value` and would double-count revenue next to `purchase`. They keep firing for continuity.
+
+`purchase` revenue shows in Monetisation reports without further setup.
 
 ### Verifying on mobile (majority of converting traffic)
 
-1. Open **GA4 Admin → DebugView** on desktop. On the phone, load any page with **`?_ga_debug=1`** in the URL (e.g. `https://ejarihelper.ae/legal-chat?_ga_debug=1`) — the gtag config then sets `debug_mode: true` and every event from that page-load shows up in DebugView.
-2. On mobile Safari and mobile Chrome, walk the funnel: open the contract form (`contract_started`), pick 3 documents (`contract_docs_uploaded`), tap a guide CTA (`cta_click`), download the template (`template_downloaded`), send a chat message (`chat_started`).
-3. Payment events are best verified with a real AED 1 test intent or by loading `/legal-chat?unlocked=1&tid=test123` (fires `chat_paid` once per `tid`) and `/?paid=1` after a stored intent.
+1. Open **GA4 Admin → DebugView** on desktop. On the phone, load any page with **`?_ga_debug=1`** in the URL (e.g. `https://ejarihelper.ae/?_ga_debug=1`) — the gtag config then sets `debug_mode: true` and every event from that page-load shows up in DebugView.
+2. On mobile Safari and mobile Chrome, walk the funnel: open the contract form (`contract_started`), pick 3 documents (`doc_uploaded` ×3, `contract_docs_uploaded`), tap a guide CTA (`cta_click`), download the template (`template_downloaded`), send a chat message (`chat_started`).
+3. Payments need a real intent: complete one, check `purchase` arrives once with its `transaction_id`, then reload the page and re-open the success URL — no second `purchase`.
 4. All navigation-time events (`cta_click`, `template_downloaded`) rely on gtag's default `sendBeacon` transport, which survives page unload on iOS Safari.
 
 ## Other env vars
@@ -47,7 +58,7 @@ GA4 does **not** treat custom events as conversions automatically. In **GA4 Admi
 ## Post-deploy checklist (after each SEO-relevant deploy)
 
 1. **GSC**: resubmit `sitemap.xml` (Search Console → Sitemaps), then use *URL Inspection → Request indexing* for changed/new URLs. Priority order for the current cluster: `/what-is-ejari`, `/ejari-help`, `/guide/ejari-cost`, `/guide/ejari-check`, `/guide/ejari-number`, `/guides`, `/about`, `/guide/ejari-registration`, then the rest.
-2. **GA4**: confirm the 7 key events are marked (see Analytics above); walk the funnel once on a phone with `?_ga_debug=1` and watch DebugView.
+2. **GA4**: confirm the key events are marked (see Analytics above); walk the funnel once on a phone with `?_ga_debug=1` and watch DebugView.
 3. **Rich Results Test**: run the edited guide URLs (FAQ + HowTo should be detected).
 4. **Redirects**: `curl -sI http://ejarihelper.ae/guide/ejari-renewal` → exactly one `301` to the https URL, which returns `200`.
 5. **404s**: in GSC → *Pages → Not found (404)*, open the URL list and check each entry now 301s to a live page **in one hop** (`curl -sIL` and count the hops — a 301 into a 404 still counts as a 404). Anything left should be a URL that genuinely never existed — those are fine to leave as 404s and can be marked *Validate fix*.

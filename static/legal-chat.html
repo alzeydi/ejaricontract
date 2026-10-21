@@ -11,7 +11,7 @@
   var GA4_ID = '__GA4_ID__';
   if (/^G-[A-Z0-9]+$/.test(GA4_ID)) gtag('config', GA4_ID, (location.search.indexOf('_ga_debug=1') > -1) ? {debug_mode: true} : {});
   // GA4 key-event helper. Each event below must be marked as a Key Event in GA4 admin — see README.md.
-  function ehEvent(name, params){ try { gtag('event', name, params || {}); } catch(e) {} }
+  function ehEvent(name, params){ try { params = params || {}; if (!params.page_path) params.page_path = location.pathname; gtag('event', name, params); } catch(e) {} }
   // Delegated tracking: template downloads everywhere; guide/tool → product CTA clicks.
   document.addEventListener('click', function(e){
     var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
@@ -26,23 +26,36 @@
       ehEvent('cta_click', {source_page: location.pathname, cta_target: href});
     }
   }, true);
+  // Purchase reporting after a Ziina redirect (?unlocked / ?files_unlocked).
+  // The server answers report=true for exactly one call per transaction, so
+  // reloads, back-navigation and shared links never re-count a sale.
+  function ehReportChatPurchase(d){
+    if (!d || !d.paid || !d.report) return;
+    var key = 'eh_purchase_' + d.transaction_id;
+    try { if (localStorage.getItem(key)) return; localStorage.setItem(key, '1'); } catch(e) {}
+    ehEvent('purchase', {transaction_id: d.transaction_id, value: d.value, currency: d.currency, product: 'lawyer',
+      items: [{item_id: d.product, item_name: d.item_name, price: d.value, quantity: 1}]});
+    if (d.product === 'lawyer') {
+      gtag('event', 'conversion', {
+        'send_to': 'AW-18223357108/KX3fCLTfo7scELS5yfFD',
+        'value': d.value,
+        'currency': d.currency,
+        'transaction_id': d.transaction_id
+      });
+      ehEvent('chat_paid', {value: d.value, currency: d.currency, transaction_id: d.transaction_id, product: 'lawyer'});
+    }
+  }
+  function ehConfirmChatPayment(tid, product){
+    return fetch('/payment/confirm', {method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({intent_id: tid, product: product})})
+      .then(function(r){ return r.json(); }).then(ehReportChatPurchase).catch(function(){});
+  }
   (function(){
     try {
       var p = new URLSearchParams(window.location.search);
-      if (p.get('unlocked') === '1') {
-        var tid = p.get('tid') || '';
-        var key = 'gads_conv_' + tid;
-        if (!tid || !sessionStorage.getItem(key)) {
-          gtag('event', 'conversion', {
-            'send_to': 'AW-18223357108/KX3fCLTfo7scELS5yfFD',
-            'value': 50.0,
-            'currency': 'AED',
-            'transaction_id': tid
-          });
-          ehEvent('chat_paid', {value: 50, currency: 'AED', transaction_id: tid});
-          if (tid) sessionStorage.setItem(key, '1');
-        }
-      }
+      var tid = p.get('tid') || '';
+      if (tid && p.get('unlocked') === '1') ehConfirmChatPayment(tid, 'lawyer');
+      else if (tid && p.get('files_unlocked') === '1') ehConfirmChatPayment(tid, 'lawyer_files');
     } catch(e) {}
   })();
 </script>
@@ -1045,7 +1058,7 @@ function openZiinaCheckout(embeddedUrl, opts){
     try {
       if (!sessionStorage.getItem('gads_first_msg_fired')) {
         sessionStorage.setItem('gads_first_msg_fired', '1');
-        ehEvent('chat_started', {source_page: location.pathname});
+        ehEvent('chat_started', {source_page: location.pathname, product: 'lawyer'});
         var FIRST_MSG_CONV_LABEL = 'AW-18223357108/jdTVCPyl-7wcELS5yfFD';
         if (FIRST_MSG_CONV_LABEL && window.gtag) {
           gtag('event', 'conversion', { 'send_to': FIRST_MSG_CONV_LABEL });
@@ -1140,6 +1153,9 @@ function openZiinaCheckout(embeddedUrl, opts){
     payBtn.disabled = true;
     const origHtml = payBtn.innerHTML;
     payBtn.textContent = 'Opening payment…';
+    const priceAed = (state && state.price_aed) || 0;
+    ehEvent('begin_checkout', {value: priceAed, currency: 'AED', product: 'lawyer',
+      items: [{item_id: 'lawyer', item_name: 'AI rental lawyer', price: priceAed, quantity: 1}]});
     try{
       const r = await fetch('/legal-chat/create-payment', {method:'POST', credentials:'same-origin'});
       const j = await r.json();
@@ -1154,6 +1170,7 @@ function openZiinaCheckout(embeddedUrl, opts){
       try{
         await openZiinaCheckout(j.embedded_url);
       }catch(e){
+        ehEvent('payment_failed', {reason: e.message, product: 'lawyer'});
         if(e.message==='failed')        showToast('Payment failed — please try again.');
         else if(e.message==='cancelled') showToast('Payment cancelled.');
         payBtn.disabled = false;
@@ -1169,14 +1186,7 @@ function openZiinaCheckout(embeddedUrl, opts){
       });
       const vj = await v.json();
       if (vj.paid && vj.paid_until){
-        // GA4 key event — embedded-checkout path (redirect path fires in the head snippet).
-        try{
-          var cpKey = 'gads_conv_' + (j.intent_id || '');
-          if (!sessionStorage.getItem(cpKey)){
-            sessionStorage.setItem(cpKey, '1');
-            ehEvent('chat_paid', {value: 50, currency: 'AED', transaction_id: j.intent_id || ''});
-          }
-        }catch(e){}
+        ehConfirmChatPayment(j.intent_id, 'lawyer');
         showToast('✓ Unlocked — 30 minutes of legal chat.');
         unlockPaid(vj.paid_until);
       } else {
@@ -1185,6 +1195,7 @@ function openZiinaCheckout(embeddedUrl, opts){
         payBtn.innerHTML = origHtml;
       }
     } catch(e){
+      ehEvent('payment_failed', {reason: 'create_error', product: 'lawyer'});
       showToast('Could not start payment. Try again.');
       payBtn.disabled = false;
       payBtn.innerHTML = origHtml;
@@ -1195,6 +1206,8 @@ function openZiinaCheckout(embeddedUrl, opts){
     filesPayBtn.disabled = true;
     const orig = filesPayBtn.innerHTML;
     filesPayBtn.textContent = 'Opening payment…';
+    ehEvent('begin_checkout', {value: filesInfo.topup_aed, currency: 'AED', product: 'lawyer',
+      items: [{item_id: 'lawyer_files', item_name: 'AI rental lawyer file uploads', price: filesInfo.topup_aed, quantity: 1}]});
     try{
       const r = await fetch('/legal-chat/files-payment', {method:'POST', credentials:'same-origin'});
       const j = await r.json();
@@ -1209,6 +1222,7 @@ function openZiinaCheckout(embeddedUrl, opts){
       try{
         await openZiinaCheckout(j.embedded_url);
       }catch(e){
+        ehEvent('payment_failed', {reason: e.message, product: 'lawyer'});
         if(e.message==='failed')        showToast('File top-up failed — please try again.');
         else if(e.message==='cancelled') showToast('File top-up cancelled.');
         filesPayBtn.disabled = false;
@@ -1224,6 +1238,7 @@ function openZiinaCheckout(embeddedUrl, opts){
       });
       const vj = await v.json();
       if (vj.paid){
+        ehConfirmChatPayment(j.intent_id, 'lawyer_files');
         showToast('✓ +3 file uploads added.');
         hideFilesPaywall();
         filesPayBtn.disabled = false;
@@ -1234,6 +1249,7 @@ function openZiinaCheckout(embeddedUrl, opts){
         filesPayBtn.innerHTML = orig;
       }
     } catch(e){
+      ehEvent('payment_failed', {reason: 'create_error', product: 'lawyer'});
       showToast('Could not start payment. Try again.');
       filesPayBtn.disabled = false;
       filesPayBtn.innerHTML = orig;
@@ -1258,6 +1274,18 @@ function openZiinaCheckout(embeddedUrl, opts){
     showToast('File top-up failed — please try again.');
   } else if (qs.get('files_pending') === '1'){
     showToast('Top-up is processing. Refresh in a moment.');
+  }
+  const PAY_PARAMS = ['unlocked','tid','cancelled','failed','pending','files_unlocked','files_cancelled','files_failed','files_pending'];
+  if (qs.get('cancelled') === '1' || qs.get('failed') === '1'){
+    ehEvent('payment_failed', {reason: qs.get('cancelled') === '1' ? 'cancelled' : 'failed', product: 'lawyer'});
+  } else if (qs.get('files_cancelled') === '1' || qs.get('files_failed') === '1'){
+    ehEvent('payment_failed', {reason: qs.get('files_cancelled') === '1' ? 'cancelled' : 'failed', product: 'lawyer'});
+  }
+  // Strip payment params so a reload never re-runs the toasts or reporting.
+  if (PAY_PARAMS.some(k => qs.has(k))){
+    const clean = new URL(location.href);
+    PAY_PARAMS.forEach(k => clean.searchParams.delete(k));
+    window.history.replaceState(null, '', clean.pathname + clean.search + clean.hash);
   }
 
   // Restore previously persisted conversation from localStorage

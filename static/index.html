@@ -12,7 +12,7 @@
   var GA4_ID = '__GA4_ID__';
   if (/^G-[A-Z0-9]+$/.test(GA4_ID)) gtag('config', GA4_ID, (location.search.indexOf('_ga_debug=1') > -1) ? {debug_mode: true} : {});
   // GA4 key-event helper. Each event below must be marked as a Key Event in GA4 admin — see README.md.
-  function ehEvent(name, params){ try { gtag('event', name, params || {}); } catch(e) {} }
+  function ehEvent(name, params){ try { params = params || {}; if (!params.page_path) params.page_path = location.pathname; gtag('event', name, params); } catch(e) {} }
   // Delegated tracking: template downloads everywhere; guide/tool → product CTA clicks.
   document.addEventListener('click', function(e){
     var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
@@ -1128,8 +1128,32 @@ main{max-width:1080px;padding:26px 24px 80px}
 const GEN_URL     = '/generate';
 const EXTRACT_URL = '/extract';
 const PAY_URL     = '/create-payment';
-const VERIFY_URL  = '/verify-payment';
+const CONFIRM_URL = '/payment/confirm';
 const EXT_URL = '/extract';
+
+// ── Server-confirmed payments → analytics ───────────────────────────
+// Polls until Ziina reports the intent completed (it can lag the redirect).
+async function confirmPayment(intentId, product, tries=3){
+  for(let i=0;i<tries;i++){
+    try{
+      const d=await fetch(CONFIRM_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({intent_id:intentId,product})}).then(r=>r.json());
+      if(d.paid) return d;
+    }catch(_){}
+    if(i<tries-1) await new Promise(r=>setTimeout(r,2000));
+  }
+  return {paid:false};
+}
+// purchase + payment_success fire only for the single server response that
+// claimed the report (d.report), with a per-browser guard on top.
+function reportPurchase(d){
+  if(!d||!d.paid||!d.report) return;
+  const key='eh_purchase_'+d.transaction_id;
+  try{ if(localStorage.getItem(key)) return; localStorage.setItem(key,'1'); }catch(_){}
+  ehEvent('purchase',{transaction_id:d.transaction_id,value:d.value,currency:d.currency,product:d.product,
+    items:[{item_id:d.product,item_name:d.item_name,price:d.value,quantity:1}]});
+  ehEvent('payment_success',{value:d.value,currency:d.currency,transaction_id:d.transaction_id,product:d.product});
+}
 
 // ── Ziina embedded checkout ─────────────────────────────────────────
 // Opens the Ziina payment widget in an in-page iframe modal (no redirect).
@@ -1166,8 +1190,10 @@ function openZiinaCheckout(embeddedUrl, opts={}){
 }
 
 let ext = {}, cvHeld = false;
+let intentId = '';
 let FREE_MODE = false;
 let ZIINA_EMBEDDED = false;
+let CONTRACT_PRICE = 15;
 
 // Load server config and apply mode
 (async () => {
@@ -1175,6 +1201,7 @@ let ZIINA_EMBEDDED = false;
     const cfg = await fetch('/config').then(r => r.json());
     FREE_MODE = !!cfg.free_mode;
     ZIINA_EMBEDDED = !!cfg.ziina_embedded;
+    if (cfg.contract_price_aed) CONTRACT_PRICE = cfg.contract_price_aed;
   } catch(_) {}
   if (FREE_MODE) {
     const pb = $('payBlock');
@@ -1207,7 +1234,19 @@ let contractStartedFired=false, docsUploadedFired=false;
 function fireContractStarted(source){
   if(contractStartedFired) return;
   contractStartedFired=true;
-  ehEvent('contract_started',{source:source});
+  ehEvent('contract_started',{source:source,product:'contract'});
+}
+
+const DOC_TYPES={fTEID:'tenant_eid',fLEID:'lessor_eid',fTD:'title_deed',fEJ:'prev_ejari'};
+
+// Extraction outcome. A response where every document failed is a failure
+// even though the request itself succeeded.
+function reportExtraction(res, docCount){
+  const vals=Object.values(res.data||{});
+  const filled=vals.filter(x=>x&&String(x).trim()).length;
+  const failed=(res.failed_docs||[]).length;
+  if(docCount && failed>=docCount) ehEvent('extraction_failed',{reason:'all_docs_failed',product:'contract'});
+  else ehEvent('extraction_completed',{fields_filled:filled,fields_missing:vals.length-filled,docs_failed:failed,product:'contract'});
 }
 
 function openUpload(e){
@@ -1228,7 +1267,10 @@ function go(id){
 
 function onFile(fid,bid,sid){
   const f=$(fid).files[0];
-  if(f) fireContractStarted('first_document');
+  if(f){
+    fireContractStarted('first_document');
+    ehEvent('doc_uploaded',{doc_type:DOC_TYPES[fid],product:'contract'});
+  }
   $(bid).classList.toggle('has-file',!!f);
   $(sid).textContent=f?'✓ '+f.name:'';
   checkPayReady();
@@ -1240,7 +1282,7 @@ function checkPayReady(){
   const ready=done===3;
   if(ready && !docsUploadedFired){
     docsUploadedFired=true;
-    ehEvent('contract_docs_uploaded',{docs_count:done});
+    ehEvent('contract_docs_uploaded',{docs_count:done,product:'contract'});
   }
   if(FREE_MODE){
     $('ocrBtn').disabled=!ready;
@@ -1256,6 +1298,8 @@ async function doPay(){
   const btn=$('payBtn');
   btn.disabled=true;
   $('payTxt').textContent='Creating payment…';
+  ehEvent('begin_checkout',{value:CONTRACT_PRICE,currency:'AED',product:'contract',
+    items:[{item_id:'contract',item_name:'Ejari tenancy contract',price:CONTRACT_PRICE,quantity:1}]});
 
   try{
     const resp = await fetch(PAY_URL, {
@@ -1295,6 +1339,7 @@ async function doPay(){
     }catch(e){
       btn.disabled=false;
       $('payTxt').textContent='Pay 15 AED & Extract →';
+      ehEvent('payment_failed',{reason:e.message,product:'contract'});
       if(e.message==='failed')    toast('Payment failed — please try again','fail');
       else if(e.message==='cancelled') toast('Payment cancelled','fail');
       return; // user closed the widget — nothing else to do
@@ -1302,17 +1347,14 @@ async function doPay(){
 
     // Payment completed in the widget — confirm with backend, then extract.
     $('payTxt').textContent='Confirming payment…';
-    try{
-      await fetch(VERIFY_URL, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({intent_id: intentId})
-      });
-    }catch(_){ /* backend webhook is the safety net */ }
+    const confirmed=await confirmPayment(intentId,'contract');
+    if(confirmed.paid) reportPurchase(confirmed);
+    else ehEvent('payment_failed',{reason:'not_confirmed',product:'contract'});
 
     await paidOK();
 
   }catch(err){
+    ehEvent('payment_failed',{reason:'create_error',product:'contract'});
     toast('Payment error: '+err.message, 'fail');
     btn.disabled=false;
     $('payTxt').textContent='Pay 15 AED & Extract →';
@@ -1320,15 +1362,6 @@ async function doPay(){
 }
 
 async function paidOK(){
-  // GA4 key event — deduped per payment intent so redirect + verify don't double-count.
-  try{
-    var iid=(typeof intentId!=='undefined'&&intentId)||sessionStorage.getItem('ejari_intent_id')||'';
-    var payKey='ga4_pay_'+(iid||'na');
-    if(!sessionStorage.getItem(payKey)){
-      sessionStorage.setItem(payKey,'1');
-      ehEvent('payment_success',{value:15,currency:'AED',transaction_id:iid,product:'contract'});
-    }
-  }catch(e){}
   $('payBlock').style.display='none';
   $('payConfirm').classList.add('on');
 
@@ -1372,12 +1405,14 @@ async function runOCRWithData(files){
     const res=await r.json();
     if(!res.ok) throw new Error(res.error||'Extraction failed');
     ext=res.data;
+    reportExtraction(res,files.length);
     const n=Object.values(ext).filter(x=>x&&String(x).trim()).length;
     setSt('ok',`✓ Extracted ${n} fields from ${files.length} document(s)`);
     $('payConfirmSub').textContent=`Extraction complete — ${n} fields filled automatically`;
     sessionStorage.removeItem('ejari_files');
     setTimeout(buildScreen2,700);
   }catch(err){
+    ehEvent('extraction_failed',{reason:String(err.message).slice(0,100),product:'contract'});
     setSt('err','⚠ '+err.message);
     $('payConfirmSub').textContent='Extraction failed — try again below';
     $('ocrBtn').style.display='flex';
@@ -1389,36 +1424,34 @@ async function runOCRWithData(files){
 window.addEventListener('load', async ()=>{
   const params = new URLSearchParams(location.search);
 
-  if(params.has('paid')){
-    // intent_id is only in sessionStorage (success_url doesn't include it)
-    intentId = sessionStorage.getItem('ejari_intent_id') || '';
-
-    if(intentId){
-      // Verify with backend
-      try{
-        const r = await fetch(VERIFY_URL, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({intent_id: intentId})
-        });
-        const d = await r.json();
-        if(d.paid){
-          sessionStorage.removeItem('ejari_intent_id');
-          await paidOK();
-        } else {
-          // Not confirmed yet — still unlock (Ziina redirected here = payment accepted)
-          await paidOK();
-        }
-      }catch(e){
-        await paidOK(); // network error — unlock anyway
-      }
-    } else {
-      // No intent_id stored — still unlock (user did reach success_url)
-      await paidOK();
-    }
+  // Strip the payment params so a reload, bookmark or shared link never
+  // re-runs this handler (the old cause of duplicate payment_success).
+  if(['paid','intent_id','cancelled','failed','payment_pending'].some(k=>params.has(k))){
+    const clean=new URL(location.href);
+    ['paid','intent_id','cancelled','failed','payment_pending'].forEach(k=>clean.searchParams.delete(k));
+    history.replaceState(null,'',clean.pathname+clean.search+clean.hash);
   }
-  if(params.has('cancelled')) toast('Payment cancelled','fail');
-  if(params.has('failed'))    toast('Payment failed — please try again','fail');
+
+  if(params.has('paid')){
+    // success_url carries the intent id; sessionStorage is the fallback for
+    // tabs opened before that change.
+    intentId = params.get('intent_id') || sessionStorage.getItem('ejari_intent_id') || '';
+    if(intentId) sessionStorage.setItem('ejari_intent_id', intentId);
+
+    const d = intentId ? await confirmPayment(intentId,'contract') : {paid:false};
+    if(d.paid) reportPurchase(d);
+    else ehEvent('payment_failed',{reason:intentId?'not_confirmed':'no_intent_id',product:'contract'});
+    // Unlock either way — Ziina only redirects to success_url after payment.
+    await paidOK();
+  }
+  if(params.has('cancelled')){
+    ehEvent('payment_failed',{reason:'cancelled',product:'contract'});
+    toast('Payment cancelled','fail');
+  }
+  if(params.has('failed')){
+    ehEvent('payment_failed',{reason:'failed',product:'contract'});
+    toast('Payment failed — please try again','fail');
+  }
 });
 
 // Reset button if page is restored from bfcache (Back button after Ziina redirect)
@@ -1465,6 +1498,7 @@ async function runOCR(){
     const res=await r.json();
     if(!res.ok) throw new Error(res.error||'Extraction failed');
     ext=res.data;
+    reportExtraction(res,files.length);
 
     // Invalidate payment session — one payment = one extraction
     sessionStorage.removeItem('ejari_intent_id');
@@ -1475,6 +1509,7 @@ async function runOCR(){
     setTimeout(buildScreen2,700);
 
   }catch(err){
+    ehEvent('extraction_failed',{reason:String(err.message).slice(0,100),product:'contract'});
     setSt('err','⚠ '+err.message);
     btn.disabled=false;
     $('ocrTxt').textContent='✨ Try again';

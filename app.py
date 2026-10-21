@@ -1338,7 +1338,7 @@ def legal_files_payment_success():
     r = _ziina_confirm(intent_id, 'lawyer_files')
     if r['paid']:
         _grant_legal_files(intent_id)
-        return redirect('/legal-chat?files_unlocked=1')
+        return redirect(f'/legal-chat?files_unlocked=1&tid={intent_id}')
     return redirect('/legal-chat?files_pending=1')
 
 
@@ -1384,7 +1384,8 @@ def health():
 
 @app.route('/config')
 def config():
-    return jsonify({'free_mode': FREE_MODE, 'legal_free_mode': LEGAL_FREE_MODE, 'ziina_embedded': ZIINA_EMBEDDED})
+    return jsonify({'free_mode': FREE_MODE, 'legal_free_mode': LEGAL_FREE_MODE, 'ziina_embedded': ZIINA_EMBEDDED,
+                    'contract_price_aed': CONTRACT_PRICE_FILS // 100})
 
 
 def build_content_block(f):
@@ -1451,6 +1452,7 @@ def extract():
         # Run all documents in parallel threads
         from concurrent.futures import ThreadPoolExecutor, as_completed
         results = {}
+        failed_docs = []
         with ThreadPoolExecutor(max_workers=4) as pool:
             futures = {pool.submit(extract_one, f): f['label'] for f in files}
             for future in as_completed(futures):
@@ -1459,6 +1461,8 @@ def extract():
                     results[label] = future.result()
                 except Exception as e:
                     results[label] = {}  # skip failed doc, don't break whole request
+                    failed_docs.append(label)
+                    print(f'[extract] {label} failed: {type(e).__name__}: {str(e)[:200]}', flush=True)
 
         # Merge all results — later docs override earlier for same key
         merged = {}
@@ -1481,7 +1485,7 @@ def extract():
         if not FREE_MODE and intent_id:
             used_intents.add(intent_id)
 
-        return jsonify({'ok': True, 'data': merged})
+        return jsonify({'ok': True, 'data': merged, 'failed_docs': failed_docs})
 
     except Exception as e:
         import traceback

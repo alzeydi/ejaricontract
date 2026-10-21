@@ -12,7 +12,7 @@
   var GA4_ID = '__GA4_ID__';
   if (/^G-[A-Z0-9]+$/.test(GA4_ID)) gtag('config', GA4_ID, (location.search.indexOf('_ga_debug=1') > -1) ? {debug_mode: true} : {});
   // GA4 key-event helper. Each event below must be marked as a Key Event in GA4 admin — see README.md.
-  function ehEvent(name, params){ try { gtag('event', name, params || {}); } catch(e) {} }
+  function ehEvent(name, params){ try { params = params || {}; if (!params.page_path) params.page_path = location.pathname; gtag('event', name, params); } catch(e) {} }
   // Delegated tracking: template downloads everywhere; guide/tool → product CTA clicks.
   document.addEventListener('click', function(e){
     var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
