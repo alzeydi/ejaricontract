@@ -222,6 +222,13 @@ main{max-width:780px;margin:0 auto;padding:36px 24px 80px}
 input.invalid,select.invalid{border-color:#c0392b!important;background:#fff6f5!important}
 .ei-input.invalid{border-bottom:1px solid #c0392b!important}
 .err-msg{font-size:11px;color:#c0392b;margin-top:3px;font-weight:500}
+.draft-box{margin:0;padding:14px 16px;background:var(--accent-bg);border-top:1px solid var(--border)}
+.draft-title{font-size:13.5px;font-weight:700;color:var(--accent);margin-bottom:3px}
+.draft-desc{font-size:12px;color:var(--sub);line-height:1.5;margin-bottom:10px}
+.btn.draft-btn,.btn.draft-copy{background:var(--white);color:var(--accent);border:1.5px solid var(--accent);box-shadow:none;padding:11px 14px;font-size:13px}
+.btn.draft-wa{background:#1f8f66;color:#fff;padding:11px 14px;font-size:13px;text-decoration:none}
+.draft-share input{width:100%;font-size:12px;padding:9px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:#fff}
+.draft-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
 .link-btn{display:block;margin:10px auto 0;background:none;border:none;color:var(--accent-text);font-size:13px;font-weight:600;text-decoration:underline;cursor:pointer;font-family:inherit}
 .ei-input::placeholder{color:#ccc;font-style:normal}
 
@@ -723,7 +730,7 @@ main{max-width:1080px;padding:26px 24px 80px}
         <div class="trust-cell"><div class="th">Official DLD format</div><div class="td">Unified tenancy contract</div></div>
         <div class="trust-cell"><div class="th">Filled in seconds</div><div class="td">AI extraction engine</div></div>
         <div class="trust-cell"><div class="th">No account needed</div><div class="td">Start in one click</div></div>
-        <div class="trust-cell"><div class="th">Nothing stored</div><div class="td">Files deleted after use</div></div>
+        <div class="trust-cell"><div class="th">Files never stored</div><div class="td">Deleted after use</div></div>
       </div>
     </div>
 
@@ -885,6 +892,19 @@ main{max-width:1080px;padding:26px 24px 80px}
       </div>
       <div class="ext-warn"><span class="eh-ic" style="color:var(--gold)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4.5"/><path d="M12 17.4h.01" stroke-width="2.4"/></svg></span> <strong>Check every field carefully</strong> — AI recognition can make mistakes. Click any field to correct it.</div>
       <div class="ext-grid" id="extGrid"></div>
+      <div class="draft-box" id="draftBox" style="display:none">
+        <div class="draft-title">Missing the landlord's Emirates ID or Title Deed?</div>
+        <div class="draft-desc">Send the landlord a link: they add their documents and you both see the merged draft. Text details only — no files — encrypted and deleted after 72 hours.</div>
+        <button type="button" class="btn draft-btn" id="draftBtn" onclick="createDraft()">Ask the landlord to add their documents</button>
+        <div class="draft-share" id="draftShare" style="display:none">
+          <input id="draftUrl" readonly aria-label="Draft link">
+          <div class="draft-actions">
+            <a class="btn draft-wa" id="draftWa" target="_blank" rel="noopener" onclick="ehEvent('draft_shared',{channel:'whatsapp',product:'contract'})">Send on WhatsApp</a>
+            <button type="button" class="btn draft-copy" onclick="copyDraft()">Copy link</button>
+          </div>
+          <div class="draft-desc">Open the same link later to see what the landlord added.</div>
+        </div>
+      </div>
     </div>
 
     <!-- Completion form -->
@@ -1203,6 +1223,7 @@ let intentId = '';
 let FREE_MODE = false;
 let ZIINA_EMBEDDED = false;
 let CONTRACT_PRICE = Number('__CONTRACT_PRICE__');
+let DRAFTS_ENABLED = false;
 
 // Load server config and apply mode
 (async () => {
@@ -1212,6 +1233,8 @@ let CONTRACT_PRICE = Number('__CONTRACT_PRICE__');
     ZIINA_EMBEDDED = !!cfg.ziina_embedded;
     if (cfg.contract_price_aed) CONTRACT_PRICE = cfg.contract_price_aed;
     TS_KEY = cfg.turnstile_site_key || '';
+    DRAFTS_ENABLED = !!cfg.drafts_enabled;
+    if ($('draftBox') && $('s2').style.display === 'block') $('draftBox').style.display = DRAFTS_ENABLED ? 'block' : 'none';
   } catch(_) {}
   if ($('start').style.display === 'block') ensureTurnstile();
 })();
@@ -1345,7 +1368,7 @@ function restoreForm(d){
   ext=d.ext||{};
   $('start').style.display='block';
   buildScreen2();
-  FORM_IDS.forEach(id=>{ if(d.f && d.f[id]!=null) $(id).value=d.f[id]; });
+  FORM_IDS.forEach(id=>{ if(d.f && d.f[id]) $(id).value=d.f[id]; });
   cvHeld=!!d.cvHeld;
   recalc();
 }
@@ -1425,6 +1448,14 @@ window.addEventListener('load', async ()=>{
     const clean=new URL(location.href);
     ['paid','intent_id','cancelled','failed','payment_pending'].forEach(k=>clean.searchParams.delete(k));
     history.replaceState(null,'',clean.pathname+clean.search+clean.hash);
+  }
+
+  // Shared landlord-link draft (#draft=<token>; a fragment never reaches logs or analytics).
+  const dm=/^#draft=([0-9a-f]{32})$/.exec(location.hash);
+  if(dm){
+    history.replaceState(null,'',location.pathname+location.search);
+    await loadDraft(dm[1]);
+    return;
   }
 
   const saved=loadForm();
@@ -1616,7 +1647,44 @@ function buildScreen2(){
   if(ext.security_deposit) $('security_deposit').value=normalizeField('security_deposit',ext.security_deposit);
   if(ext.tenant_phone)     $('tenant_phone').value=ext.tenant_phone;
 
+  $('draftBox').style.display=DRAFTS_ENABLED?'block':'none';
   recalc();step(1);go('s2');
+}
+
+// ── Landlord link: a shared draft the landlord completes with their documents ──
+function formSnapshot(){ const f={}; FORM_IDS.forEach(id=>{f[id]=$(id).value;}); return f; }
+async function createDraft(){
+  const btn=$('draftBtn'); btn.disabled=true; btn.textContent='Creating link…';
+  try{
+    const d=await fetch('/contract/draft',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ext,form:formSnapshot()})}).then(r=>r.json());
+    if(!d.ok) throw new Error(d.error||'Could not create the link');
+    $('draftUrl').value=d.url;
+    $('draftWa').href='https://wa.me/?text='+encodeURIComponent(
+      "Hi, I'm preparing our tenancy contract for Ejari. Please add your Emirates ID and Title Deed here — "+
+      "only the text details are read, and the link deletes itself in 72 hours: "+d.url);
+    $('draftShare').style.display='block';
+    btn.style.display='none';
+    ehEvent('draft_link_created',{product:'contract'});
+  }catch(err){
+    toast(err.message,'fail');
+    btn.disabled=false; btn.textContent='Ask the landlord to add their documents';
+  }
+}
+function copyDraft(){
+  const inp=$('draftUrl'); inp.select();
+  (navigator.clipboard?navigator.clipboard.writeText(inp.value):Promise.reject()).catch(()=>document.execCommand('copy'));
+  toast('Link copied');
+  ehEvent('draft_shared',{channel:'copy',product:'contract'});
+}
+async function loadDraft(token){
+  try{
+    const d=await fetch('/contract/draft/'+token).then(r=>r.json());
+    if(!d.ok) throw new Error(d.error||'This link has expired');
+    restoreForm({ext:d.ext||{},f:d.form||{},cvHeld:!!(d.form||{}).contract_value});
+    ehEvent('draft_resumed',{product:'contract'});
+    toast('Draft loaded — check every field, then preview');
+  }catch(err){ openUpload(); toast(err.message,'fail'); }
 }
 
 function updateExtCount(){

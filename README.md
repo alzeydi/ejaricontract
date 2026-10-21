@@ -38,6 +38,11 @@ Every event carries `page_path` (added by `ehEvent`); product events also carry 
 | `extraction_failed` | `/extract` errored or every document failed | `reason` |
 | `preview_viewed` | Free watermarked preview rendered (homepage generator) | `pages` |
 | `manual_entry_started` | "Fill in by hand" (no documents, or the free limit is used up) | — |
+| `draft_link_created` | Tenant created a landlord link (generator) | — |
+| `draft_shared` | Link sent | `channel`: `whatsapp` \| `copy` |
+| `draft_opened` | Draft page opened (page_location masked to `/contract/d/`) | — |
+| `draft_docs_added` | Landlord added documents on the draft page | `docs_count` |
+| `draft_resumed` | Draft opened in the generator (`/#draft=<token>`) | — |
 | `begin_checkout` | Pay button pressed, before the Ziina intent is created (contract, chat, chat file top-up) | `value`, `currency`, `items` |
 | `purchase` | **Server-confirmed** payment, exactly once per `transaction_id` (see below) | `transaction_id`, `value`, `currency`, `items[{item_id, item_name, price, quantity}]` |
 | `payment_success` | Same moment and same dedupe as `purchase` (contract) | `value`, `currency`, `transaction_id` |
@@ -77,9 +82,16 @@ In **GA4 Admin → Events** (each name appears up to 24 h after it first fires, 
 
 Every document is optional, and "Fill in by hand" skips upload entirely. The review form lists every DLD field; required ones are marked and highlighted when empty. The same rules run in the browser (`FIELD_RULES` in `static/index.html`) and on the server (`validate_contract()` in `app.py`, 422 with per-field messages on `/preview` and `/generate`): Emirates ID `784-XXXX-XXXXXXX-X` (15 bare digits are auto-formatted), DEWA premise number 9 digits (leading zeros kept), Makani 10 digits, amounts digits only (separators stripped), dates `DD/MM/YYYY` with the end after the start.
 
+## Landlord link (`/contract/d/<token>`)
+
+Off until **`DRAFT_ENC_KEY`** is set (a Fernet key: `python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`). The tenant creates a link from the review form and sends it (WhatsApp share or copy); the landlord uploads their Emirates ID and Title Deed on that page, the extracted values merge into the draft, and either side opens it in the generator (`/#draft=<token>` — a fragment, so the token never reaches server logs or analytics) to preview and pay.
+
+- stored: whitelisted text field values only (never files), Fernet-encrypted, keyed by a SHA-256 of the 128-bit token; deleted 72 h after creation (merging never extends it)
+- the page is `noindex` (meta + `X-Robots-Tag`), `Disallow: /contract/` in robots.txt, `Referrer-Policy: no-referrer`, and its GA4/Ads hits report `/contract/d/` instead of the real URL
+
 ## Other env vars
 
-`BASE_URL`, `ANTHROPIC_API_KEY`, `ZIINA_API_KEY`, `SECRET_KEY`, `ADMIN_PASSWORD`, `DATABASE_URL`, `FREE_MODE`, `LEGAL_FREE_MODE`, `ZIINA_EMBEDDED`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, Trustpilot keys — see comments in `app.py`.
+`BASE_URL`, `ANTHROPIC_API_KEY`, `ZIINA_API_KEY`, `SECRET_KEY`, `ADMIN_PASSWORD`, `DATABASE_URL`, `FREE_MODE`, `LEGAL_FREE_MODE`, `ZIINA_EMBEDDED`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `ZIINA_WEBHOOK_SECRET`, `CONTRACT_PRICE_AED`, `LEGAL_PRICE_AED`, `LEGAL_FILE_TOPUP_AED`, `EXTRACT_DAILY_LIMIT`, `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET`, `DRAFT_ENC_KEY`, Trustpilot keys — see comments in `app.py`.
 
 ## Post-deploy checklist (after each SEO-relevant deploy)
 

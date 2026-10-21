@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18223357108"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  // The link token is a secret: analytics only ever sees /contract/d/.
+  var EH_SAFE_URL = location.origin + '/contract/d/';
+  gtag('set', {page_location: EH_SAFE_URL, page_path: '/contract/d/', page_referrer: ''});
+  gtag('config', 'AW-18223357108', {page_location: EH_SAFE_URL});
+  // GA4 — measurement ID injected server-side from GA4_MEASUREMENT_ID env var (see README.md).
+  var GA4_ID = '__GA4_ID__';
+  if (/^G-[A-Z0-9]+$/.test(GA4_ID)) { var ehCfg = {page_location: EH_SAFE_URL, page_path: '/contract/d/'}; if (location.search.indexOf('_ga_debug=1') > -1) ehCfg.debug_mode = true; gtag('config', GA4_ID, ehCfg); }
+  // GA4 key-event helper. Each event below must be marked as a Key Event in GA4 admin — see README.md.
+  function ehEvent(name, params){ try { params = params || {}; if (!params.page_path) params.page_path = '/contract/d/'; gtag('event', name, params); } catch(e) {} }
+  // Delegated tracking: template downloads everywhere; guide/tool → product CTA clicks.
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a) return;
+    var href = a.getAttribute('href') || '';
+    if (href.indexOf('/download/') === 0){
+      ehEvent('template_downloaded', {file_name: href.split('/').pop(), source_page: '/contract/d/'});
+    } else if (a.hasAttribute('data-cta')){
+      ehEvent('cta_click', {source_page: '/contract/d/', cta_target: a.getAttribute('data-cta')});
+    } else if ((location.pathname.indexOf('/guide/') === 0 || location.pathname.indexOf('/ar/guide/') === 0 || location.pathname.indexOf('/tools/') === 0) &&
+               (href === '/' || href.indexOf('/legal-chat') === 0 || href.indexOf('/ar/legal-chat') === 0 || href.indexOf('/#') === 0)){
+      ehEvent('cta_click', {source_page: '/contract/d/', cta_target: href});
+    }
+  }, true);
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<title>Tenancy Contract Draft — Ejari Helper</title>
+<meta name="description" content="A shared tenancy contract draft. It deletes itself after 72 hours.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbfaf7;--white:#fff;--text:#1a1a1a;--sub:#55554f;--muted:#86867e;--border:#e7e6df;--accent:#16423c;--accent-bright:#2fd18d;--grad:linear-gradient(135deg,#1f8f66,#16423c);--grad-bright:linear-gradient(135deg,#2fd18d,#1f8f66);--accent-bg:#eaf2ec;--accent-mid:#1f8f66;--r:10px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+nav{background:rgba(251,250,247,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border);min-height:62px;display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:780px;width:100%;margin:0 auto;display:flex;align-items:center}
+.brand-name{display:inline-flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:var(--accent);letter-spacing:-.01em;text-decoration:none}.brand-name::before{content:'';width:32px;height:32px;border-radius:9px;flex-shrink:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none'%3E%3Cpath d='M4 11l8-6 8 6' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M6 10v9h12v-9' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M9.4 14.3l1.9 2 3.4-3.5' stroke='%235be0a8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/19px no-repeat,linear-gradient(135deg,#1f8f66,#16423c);box-shadow:0 4px 14px rgba(22,66,60,.28)}
+main{max-width:780px;margin:0 auto;padding:40px 24px 80px}
+.page-title{font-family:'IBM Plex Sans',sans-serif;font-size:32px;font-weight:700;color:var(--accent);margin-bottom:6px;letter-spacing:-.3px}
+.page-meta{font-size:12px;color:var(--muted);margin-bottom:32px}
+h2{font-size:15px;font-weight:600;color:var(--text);margin:28px 0 8px}
+p{color:var(--sub);margin-bottom:12px}
+ul{color:var(--sub);padding-left:20px;margin-bottom:12px}
+ul li{margin-bottom:6px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.site-footer{background:var(--white);border-top:1px solid var(--border);padding:24px;margin-top:48px}
+.site-footer-inner{max-width:780px;margin:0 auto;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.footer-copy{font-size:11px;color:var(--muted)}
+.footer-copy a{color:var(--muted)}
+</style>
+<style>
+.d-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:16px}
+.d-card h2{margin:0 0 10px}
+.d-row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--border);font-size:13px}
+.d-row:last-child{border-bottom:none}
+.d-k{color:var(--muted)}
+.d-v{font-weight:600;color:var(--text);text-align:right;word-break:break-word}
+.d-v.miss{color:#c0392b;font-weight:500}
+.d-up{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.d-up label{display:block;border:1.5px dashed var(--border);border-radius:10px;padding:14px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;color:var(--accent)}
+.d-up label.has{border-color:var(--accent);background:var(--accent-bg)}
+.d-up input{display:none}
+.d-btn{display:block;width:100%;padding:13px 16px;border:none;border-radius:11px;background:linear-gradient(135deg,#1f8f66,#16423c);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px}
+.d-btn[disabled]{opacity:.5;cursor:default}
+.d-btn.alt{background:var(--white);color:var(--accent);border:1.5px solid var(--accent)}
+.d-note{font-size:12px;color:var(--muted);margin-top:8px}
+.d-status{font-size:13px;margin-top:8px;min-height:18px}
+.d-status.err{color:#c0392b}
+.ts-box:not(:empty){display:flex;justify-content:center;margin:8px 0}
+@media(max-width:540px){.d-up{grid-template-columns:1fr}}
+</style>
+<link rel="stylesheet" href="/static/css/base.css">
+</head>
+<body>
+<nav class="eh-nav" aria-label="Main">
+  <div class="eh-nav-in">
+    <a href="/" class="eh-brand"><span class="eh-logo" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 11l8-6 8 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9h12v-9" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.4 14.3l1.9 2 3.4-3.5" stroke="#5be0a8" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="eh-brand-name">Ejari Helper</span></a>
+    <div class="eh-links">
+      <a href="/what-is-ejari">What is Ejari</a>
+      <a href="/guides">Guides</a>
+      <a href="/ejari-help">Ejari help</a>
+      <a href="/tools/rent-increase-calculator">Rent calculator</a>
+      
+      <a class="eh-cta" href="/legal-chat" data-cta="ask-ai-lawyer">Ask AI Lawyer →</a>
+    </div>
+  </div>
+</nav>
+<main>
+  <h1 class="page-title">Tenancy contract draft</h1>
+  <p class="page-meta" id="dMeta">Loading…</p>
+
+  <div id="dGone" class="d-card" style="display:none">
+    <h2>This link has expired</h2>
+    <p>Drafts delete themselves 72 hours after they are created. Ask the tenant for a new link, or <a href="/#start">start a contract</a>.</p>
+  </div>
+
+  <div id="dBody" style="display:none">
+    <div class="d-card" id="dLandlord">
+      <h2>Landlord: add your details</h2>
+      <p>The tenant is preparing the DLD tenancy contract and needs your Emirates ID and the Title Deed. Upload them here — only the text details are read into the draft; the files are not stored.</p>
+      <div class="d-up">
+        <label id="lLEID">Lessor Emirates ID<input type="file" id="fLEID" accept="image/*,.pdf"></label>
+        <label id="lTD">Title Deed<input type="file" id="fTD" accept="image/*,.pdf"></label>
+      </div>
+      <div class="ts-box" id="tsBox"></div>
+      <button class="d-btn" id="addBtn" disabled>Add my details to the draft</button>
+      <div class="d-status" id="addSt"></div>
+    </div>
+
+    <div class="d-card">
+      <h2>What the draft has so far</h2>
+      <div id="dRows"></div>
+      <button class="d-btn alt" id="contBtn">Open in the generator — preview free →</button>
+      <p class="d-note">Either side can open it, check every field and pay __CONTRACT_PRICE__ AED to download the contract.</p>
+    </div>
+    <p class="d-note">🔒 Anyone with this link can see the draft. It holds text details only — no files — and deletes itself <span id="dExp">72 hours after it was created</span>.</p>
+  </div>
+</main>
+
+<footer class="eh-footer">
+  <div class="eh-footer-in">
+    <div class="eh-f-col">
+      <div class="eh-f-name">Ejari Helper</div>
+      <p class="eh-f-desc">AI-powered Dubai tenancy contract generator and rental-law assistant. DLD format, filled from your documents in minutes — no account needed.</p>
+      <a href="https://www.trustpilot.com/review/ejarihelper.ae" target="_blank" rel="noopener" class="eh-f-review">Leave us a review</a>
+    </div>
+    <div class="eh-f-col">
+      <div class="eh-f-h">Product</div>
+      <a href="/">Generate contract</a>
+      <a href="/legal-chat">AI rental lawyer</a>
+      <a href="/tools/rent-increase-calculator">Rent increase calculator</a>
+      <a href="/how-it-works">How it works</a>
+    </div>
+    <div class="eh-f-col">
+      <div class="eh-f-h">Guides</div>
+      <a href="/what-is-ejari">What is Ejari</a>
+      <a href="/guide/ejari-registration">Ejari registration</a>
+      <a href="/guide/ejari-cost">Ejari cost</a>
+      <a href="/guide/ejari-check">Check &amp; verify Ejari</a>
+      <a href="/guide/ejari-renewal">Ejari renewal</a>
+      <a href="/guides">All guides</a>
+    </div>
+    <div class="eh-f-col" lang="ar" dir="rtl">
+      <div class="eh-f-h">بالعربية</div>
+      <a href="/ar/legal-chat">المحامي الذكي للإيجارات</a>
+      <a href="/ar/guide/ejari-renewal">تجديد إيجاري</a>
+      <a href="/ar/guide/rental-dispute">المنازعات الإيجارية</a>
+      <a href="/ar/guide/dewa-premises-number">رقم المبنى ديوا</a>
+    </div>
+  </div>
+  <div class="eh-f-meta">
+    <span>© 2026 Ejari Helper · Dubai, UAE</span>
+    <a href="mailto:hello@ejarihelper.ae" onclick="this.href='mailto:'+atob('YWx6ZXlkaUBnbWFpbC5jb20=')">hello@ejarihelper.ae</a>
+    <a href="/about">About</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+  </div>
+  <p class="eh-f-disc">Ejari Helper is an independent service and is <strong>not affiliated with, endorsed by, or connected to</strong> the Dubai Land Department, RERA, or any UAE government body. &ldquo;Ejari&rdquo; is a Dubai Land Department mark, used here descriptively. Registration is filed through the official channels &mdash; <a href="https://dubailand.gov.ae" rel="nofollow noopener" target="_blank">dubailand.gov.ae</a>, the Dubai REST app, or a trustee centre. Nothing on this site is legal advice; see the <a href="/terms">terms</a>.</p>
+</footer>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var token = location.pathname.split('/').pop();
+  var ROWS = [
+    ['Tenant', 'tenant_name'], ['Tenant Emirates ID', 'tenant_emirates_id'],
+    ['Lessor', 'lessor_name'], ['Lessor Emirates ID', 'lessor_emirates_id'], ['Owner (Title Deed)', 'owner_name'],
+    ['Building', 'building_name'], ['Unit No.', 'property_no'], ['Property type', 'property_type'],
+    ['Location', 'location'], ['Plot No.', 'plot_no'], ['DEWA premise No.', 'premises_no_dewa'], ['Makani No.', 'makani_no']
+  ];
+  var draft = null, tsKey = '', tsToken = '', tsWidget = null;
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function render(d){
+    draft = d;
+    $('dBody').style.display = 'block';
+    var exp = new Date(d.expires_at);
+    $('dMeta').textContent = 'Shared draft · deletes itself on ' + exp.toLocaleString('en-GB', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+    $('dExp').textContent = 'on ' + exp.toLocaleString('en-GB', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+    $('dRows').innerHTML = ROWS.map(function(r){
+      var v = (d.ext || {})[r[1]] || '';
+      return '<div class="d-row"><span class="d-k">' + r[0] + '</span><span class="d-v' + (v ? '' : ' miss') + '">' + (v ? esc(v) : 'missing') + '</span></div>';
+    }).join('');
+  }
+  function gone(){ $('dMeta').textContent = ''; $('dGone').style.display = 'block'; }
+  fetch('/contract/draft/' + token).then(function(r){ return r.json(); }).then(function(d){
+    if (!d.ok) return gone();
+    render(d);
+    ehEvent('draft_opened', {product: 'contract'});
+  }).catch(gone);
+
+  fetch('/config').then(function(r){ return r.json(); }).then(function(c){ tsKey = c.turnstile_site_key || ''; if (tsKey) loadTurnstile(); }).catch(function(){});
+  function loadTurnstile(){
+    window.onTurnstileLoad = function(){
+      tsWidget = turnstile.render('#tsBox', {sitekey: tsKey, size: 'flexible',
+        callback: function(t){ tsToken = t; }, 'expired-callback': function(){ tsToken = ''; }});
+    };
+    var sc = document.createElement('script');
+    sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad';
+    sc.async = true; document.head.appendChild(sc);
+  }
+
+  function onPick(){
+    $('lLEID').classList.toggle('has', !!$('fLEID').files[0]);
+    $('lTD').classList.toggle('has', !!$('fTD').files[0]);
+    $('addBtn').disabled = !($('fLEID').files[0] || $('fTD').files[0]);
+  }
+  $('fLEID').addEventListener('change', onPick);
+  $('fTD').addEventListener('change', onPick);
+  function b64(file){ return new Promise(function(ok, fail){ var r = new FileReader(); r.onload = function(){ ok(r.result.split(',')[1]); }; r.onerror = fail; r.readAsDataURL(file); }); }
+  function mtype(f){ return f.type === 'application/pdf' ? 'application/pdf' : f.type === 'image/png' ? 'image/png' : f.type === 'image/webp' ? 'image/webp' : 'image/jpeg'; }
+
+  $('addBtn').addEventListener('click', async function(){
+    var st = $('addSt'), btn = $('addBtn');
+    if (tsKey && !tsToken){ st.className = 'd-status err'; st.textContent = 'Please complete the security check above.'; return; }
+    btn.disabled = true; st.className = 'd-status'; st.textContent = 'Reading your documents…';
+    try {
+      var files = [];
+      if ($('fLEID').files[0]) files.push({label: 'LESSOR_EMIRATES_ID', data: await b64($('fLEID').files[0]), mime_type: mtype($('fLEID').files[0])});
+      if ($('fTD').files[0]) files.push({label: 'TITLE_DEED', data: await b64($('fTD').files[0]), mime_type: mtype($('fTD').files[0])});
+      var r = await fetch('/extract', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({files: files, turnstile_token: tsToken})});
+      var res = await r.json();
+      if (!r.ok || !res.ok) throw new Error(res.error || 'Could not read the documents');
+      var m = await fetch('/contract/draft/' + token + '/merge', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ext: res.data})});
+      var d = await m.json();
+      if (!d.ok) throw new Error(d.error || 'Could not update the draft');
+      render(d);
+      ehEvent('draft_docs_added', {docs_count: files.length, product: 'contract'});
+      st.textContent = '✓ Added. The tenant sees the same draft through this link.';
+      $('fLEID').value = ''; $('fTD').value = ''; onPick();
+    } catch (e) {
+      st.className = 'd-status err'; st.textContent = '⚠ ' + e.message; btn.disabled = false;
+    } finally {
+      tsToken = ''; try { if (tsWidget) turnstile.reset(tsWidget); } catch(_) {}
+    }
+  });
+
+  // Fragment, not query: it never reaches the server logs or analytics.
+  $('contBtn').addEventListener('click', function(){ location.href = '/#draft=' + token; });
+})();
+</script>
+</body>
+</html>

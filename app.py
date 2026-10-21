@@ -229,6 +229,17 @@ def _init_db():
                         PRIMARY KEY (ip_hash, day)
                     )
                 ''')
+                # Landlord-link drafts: contract field values only (never
+                # files), encrypted, keyed by a hash of the link token,
+                # deleted 72 h after creation.
+                cur.execute('''
+                    CREATE TABLE IF NOT EXISTS drafts (
+                        token_hash TEXT PRIMARY KEY,
+                        ciphertext TEXT NOT NULL,
+                        created_at TIMESTAMP NOT NULL,
+                        expires_at TIMESTAMP NOT NULL
+                    )
+                ''')
                 # OCR spend per extraction — token counts only.
                 cur.execute('''
                     CREATE TABLE IF NOT EXISTS ocr_costs (
@@ -714,6 +725,7 @@ _ROBOTS_DISALLOW = [
     '/legal-chat/verify-payment', '/legal-chat/message', '/legal-chat/state',
     '/legal-chat/files-payment', '/legal-chat/files-payment-success',
     '/legal-chat/files-verify-payment',
+    '/contract/',
 ]
 
 # Citation/search AI crawlers — explicitly allowed. AI assistants already drive
@@ -1058,7 +1070,7 @@ def page_not_found(_e):
     Now the status is honest and the page routes people to the real content.
     JSON for API paths so front-end fetch() callers still get JSON.
     """
-    if request.path.startswith(('/legal-chat/', '/admin/', '/webhook/')):
+    if request.path.startswith(('/legal-chat/', '/admin/', '/webhook/', '/contract/draft/')):
         return jsonify({'ok': False, 'error': 'Not found'}), 404
     body, _status, headers = render_page('404.html')
     return body, 404, headers
@@ -1434,7 +1446,8 @@ def health():
 @app.route('/config')
 def config():
     return jsonify({'free_mode': FREE_MODE, 'legal_free_mode': LEGAL_FREE_MODE, 'ziina_embedded': ZIINA_EMBEDDED,
-                    'contract_price_aed': CONTRACT_PRICE_AED, 'turnstile_site_key': TURNSTILE_SITE_KEY})
+                    'contract_price_aed': CONTRACT_PRICE_AED, 'turnstile_site_key': TURNSTILE_SITE_KEY,
+                    'drafts_enabled': drafts_enabled()})
 
 
 def build_content_block(f):
@@ -1806,6 +1819,152 @@ def generate():
     name = f"ejari_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
     return send_file(io.BytesIO(pdf_bytes), mimetype='application/pdf',
                      as_attachment=True, download_name=name)
+
+
+# ── Landlord link: a shared, short-lived contract draft ─────────────────
+# The tenant creates /contract/d/<token> and sends it to the landlord, who
+# adds their Emirates ID and Title Deed on that page. Only the extracted text
+# values are kept — never files — encrypted with DRAFT_ENC_KEY (Fernet) and
+# deleted DRAFT_TTL_HOURS after creation. The feature is off until the key is
+# set. The DB row is keyed by a hash of the token, so the table alone does not
+# reveal working links.
+DRAFT_TTL_HOURS = 72
+DRAFT_EXT_KEYS = [
+    'tenant_name', 'tenant_emirates_id', 'tenant_phone', 'lessor_name', 'lessor_emirates_id', 'owner_name',
+    'property_usage', 'building_name', 'property_no', 'property_type', 'property_area', 'location', 'plot_no',
+    'premises_no_dewa', 'makani_no', 'tenant_license_no', 'tenant_licensing_authority', 'lessor_license_no',
+    'lessor_licensing_authority', 'annual_rent', 'security_deposit', 'contract_from', 'contract_to',
+]
+DRAFT_FORM_KEYS = [
+    'tenant_phone', 'tenant_email', 'lessor_phone', 'lessor_email', 'contract_date', 'contract_from',
+    'contract_to', 'annual_rent', 'contract_value', 'security_deposit', 'mode_of_payment', 't1', 't2', 't3', 't4', 't5',
+]
+_DRAFT_TOKEN_RE = re.compile(r'^[0-9a-f]{32}$')  # lowercase hex survives canonical_path()
+_mem_drafts = {}
+
+
+def _draft_cipher():
+    key = os.environ.get('DRAFT_ENC_KEY', '')
+    if not key:
+        return None
+    try:
+        from cryptography.fernet import Fernet
+        return Fernet(key.encode())
+    except Exception as e:
+        print(f'[drafts] DRAFT_ENC_KEY is not a valid Fernet key: {e}', flush=True)
+        return None
+
+
+def drafts_enabled():
+    return _draft_cipher() is not None
+
+
+def _draft_clean(payload):
+    def pick(src, keys):
+        src = src if isinstance(src, dict) else {}
+        return {k: str(src.get(k) or '').strip()[:300] for k in keys}
+    return {'ext': pick(payload.get('ext'), DRAFT_EXT_KEYS), 'form': pick(payload.get('form'), DRAFT_FORM_KEYS)}
+
+
+def _token_hash(token):
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def _draft_save(token, draft, expires_at=None):
+    cipher = _draft_cipher()
+    now = _utcnow()
+    expires_at = expires_at or now + timedelta(hours=DRAFT_TTL_HOURS)
+    blob = cipher.encrypt(json.dumps(draft).encode()).decode()
+    conn = _get_conn()
+    if not conn:
+        _mem_drafts[_token_hash(token)] = (blob, expires_at)
+        return expires_at
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute('DELETE FROM drafts WHERE expires_at < %s', (now,))
+                cur.execute('INSERT INTO drafts (token_hash, ciphertext, created_at, expires_at) VALUES (%s, %s, %s, %s) '
+                            'ON CONFLICT (token_hash) DO UPDATE SET ciphertext = EXCLUDED.ciphertext',
+                            (_token_hash(token), blob, now, expires_at))
+    finally:
+        conn.close()
+    return expires_at
+
+
+def _draft_load(token):
+    """(draft, expires_at) or (None, None) when unknown, expired or undecryptable."""
+    cipher = _draft_cipher()
+    if not cipher or not _DRAFT_TOKEN_RE.match(token or ''):
+        return None, None
+    now = _utcnow()
+    conn = _get_conn()
+    if not conn:
+        for k in [k for k, (_, exp) in _mem_drafts.items() if exp < now]:
+            del _mem_drafts[k]
+        row = _mem_drafts.get(_token_hash(token))
+    else:
+        try:
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute('DELETE FROM drafts WHERE expires_at < %s', (now,))
+                    cur.execute('SELECT ciphertext, expires_at FROM drafts WHERE token_hash = %s', (_token_hash(token),))
+                    row = cur.fetchone()
+        finally:
+            conn.close()
+    if not row:
+        return None, None
+    try:
+        return json.loads(cipher.decrypt(row[0].encode(), ttl=DRAFT_TTL_HOURS * 3600)), row[1]
+    except Exception:
+        return None, None
+
+
+def _draft_response(token, draft, expires_at):
+    return jsonify({'ok': True, 'token': token, 'url': f'{request.host_url.rstrip("/")}/contract/d/{token}',
+                    'expires_at': expires_at.replace(tzinfo=timezone.utc).isoformat(), **draft})
+
+
+@app.route('/contract/draft', methods=['POST'])
+def draft_create():
+    if not drafts_enabled():
+        return jsonify({'error': 'Not available'}), 404
+    import secrets
+    token = secrets.token_hex(16)
+    draft = _draft_clean(request.json or {})
+    expires_at = _draft_save(token, draft)
+    return _draft_response(token, draft, expires_at)
+
+
+@app.route('/contract/draft/<token>')
+def draft_get(token):
+    draft, expires_at = _draft_load(token)
+    if draft is None:
+        return jsonify({'error': 'This link has expired or does not exist.', 'code': 'not_found'}), 404
+    return _draft_response(token, draft, expires_at)
+
+
+@app.route('/contract/draft/<token>/merge', methods=['POST'])
+def draft_merge(token):
+    """Add the landlord's extracted values. Non-empty values win: the Title Deed is authoritative."""
+    draft, expires_at = _draft_load(token)
+    if draft is None:
+        return jsonify({'error': 'This link has expired or does not exist.', 'code': 'not_found'}), 404
+    incoming = _draft_clean(request.json or {})
+    for part in ('ext', 'form'):
+        for k, v in incoming[part].items():
+            if v:
+                draft[part][k] = v
+    _draft_save(token, draft, expires_at)  # same expiry: merging never extends the 72 h
+    return _draft_response(token, draft, expires_at)
+
+
+@app.route('/contract/d/<token>')
+def draft_page(token):
+    draft, _ = _draft_load(token)
+    body, _status, headers = render_page('contract-draft.html')
+    headers = dict(headers, **{'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'no-referrer',
+                               'Cache-Control': 'no-store'})
+    return body, (200 if draft is not None else 404), headers
 
 
 import requests as req_lib
