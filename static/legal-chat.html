@@ -42,7 +42,7 @@
         'currency': d.currency,
         'transaction_id': d.transaction_id
       });
-      ehEvent('chat_paid', {value: d.value, currency: d.currency, transaction_id: d.transaction_id, product: 'lawyer'});
+      ehEvent('chat_paid', {currency: d.currency, transaction_id: d.transaction_id, product: 'lawyer'});  // revenue is on purchase
     }
   }
   function ehConfirmChatPayment(tid, product){

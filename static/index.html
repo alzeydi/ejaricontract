@@ -1181,7 +1181,8 @@ function reportPurchase(d){
   try{ if(localStorage.getItem(key)) return; localStorage.setItem(key,'1'); }catch(_){}
   ehEvent('purchase',{transaction_id:d.transaction_id,value:d.value,currency:d.currency,product:d.product,
     items:[{item_id:d.product,item_name:d.item_name,price:d.value,quantity:1}]});
-  ehEvent('payment_success',{value:d.value,currency:d.currency,transaction_id:d.transaction_id,product:d.product});
+  // No value here: revenue is counted once, on purchase.
+  ehEvent('payment_success',{currency:d.currency,transaction_id:d.transaction_id,product:d.product});
 }
 
 // ── Ziina embedded checkout ─────────────────────────────────────────

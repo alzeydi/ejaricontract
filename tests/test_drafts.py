@@ -44,7 +44,8 @@ def _create(client):
 
 
 def test_off_without_a_key(client, monkeypatch):
-    monkeypatch.delenv('DRAFT_ENC_KEY', raising=False)
+    for var in ('DRAFT_ENC_KEY', 'SECRET_KEY', 'ADMIN_PASSWORD'):
+        monkeypatch.delenv(var, raising=False)
     assert client.post('/contract/draft', json={}).status_code == 404
     assert client.get('/config').get_json()['drafts_enabled'] is False
 
@@ -101,3 +102,12 @@ def test_unknown_or_malformed_tokens(client, drafts):
 
 def test_robots_keeps_drafts_out_of_search(client):
     assert 'Disallow: /contract/' in client.get('/robots.txt').get_data(as_text=True)
+
+
+def test_key_derived_from_secret_key(client, monkeypatch):
+    monkeypatch.delenv('DRAFT_ENC_KEY', raising=False)
+    monkeypatch.setenv('SECRET_KEY', 'prod-secret')
+    monkeypatch.setattr(appmod, '_DB_URL', '')
+    appmod._mem_drafts.clear()
+    token = client.post('/contract/draft', json={'ext': TENANT}).get_json()['token']
+    assert client.get(f'/contract/draft/{token}').get_json()['ext']['tenant_name'] == 'TEST TENANT'

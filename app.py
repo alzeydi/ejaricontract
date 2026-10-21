@@ -1825,8 +1825,8 @@ def generate():
 # The tenant creates /contract/d/<token> and sends it to the landlord, who
 # adds their Emirates ID and Title Deed on that page. Only the extracted text
 # values are kept — never files — encrypted with DRAFT_ENC_KEY (Fernet) and
-# deleted DRAFT_TTL_HOURS after creation. The feature is off until the key is
-# set. The DB row is keyed by a hash of the token, so the table alone does not
+# deleted DRAFT_TTL_HOURS after creation. The key is DRAFT_ENC_KEY or, if unset,
+# derived from SECRET_KEY; with neither the feature is off. The DB row is keyed by a hash of the token, so the table alone does not
 # reveal working links.
 DRAFT_TTL_HOURS = 72
 DRAFT_EXT_KEYS = [
@@ -1844,15 +1844,21 @@ _mem_drafts = {}
 
 
 def _draft_cipher():
+    """Fernet cipher from DRAFT_ENC_KEY, or derived from SECRET_KEY when that is set.
+    None (feature off) only with neither — never with the 'dev-key' fallback."""
+    from cryptography.fernet import Fernet
     key = os.environ.get('DRAFT_ENC_KEY', '')
-    if not key:
+    if key:
+        try:
+            return Fernet(key.encode())
+        except Exception as e:
+            print(f'[drafts] DRAFT_ENC_KEY is not a valid Fernet key: {e}', flush=True)
+            return None
+    secret = os.environ.get('SECRET_KEY') or os.environ.get('ADMIN_PASSWORD', '')
+    if not secret:
         return None
-    try:
-        from cryptography.fernet import Fernet
-        return Fernet(key.encode())
-    except Exception as e:
-        print(f'[drafts] DRAFT_ENC_KEY is not a valid Fernet key: {e}', flush=True)
-        return None
+    derived = hashlib.sha256(b'ejarihelper-drafts-v1:' + secret.encode()).digest()
+    return Fernet(base64.urlsafe_b64encode(derived))
 
 
 def drafts_enabled():

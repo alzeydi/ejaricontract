@@ -45,8 +45,8 @@ Every event carries `page_path` (added by `ehEvent`); product events also carry 
 | `draft_resumed` | Draft opened in the generator (`/#draft=<token>`) | — |
 | `begin_checkout` | Pay button pressed, before the Ziina intent is created (contract, chat, chat file top-up) | `value`, `currency`, `items` |
 | `purchase` | **Server-confirmed** payment, exactly once per `transaction_id` (see below) | `transaction_id`, `value`, `currency`, `items[{item_id, item_name, price, quantity}]` |
-| `payment_success` | Same moment and same dedupe as `purchase` (contract) | `value`, `currency`, `transaction_id` |
-| `chat_paid` | Same moment and same dedupe as `purchase` (chat unlock); the Google Ads conversion fires with it | `value`, `currency`, `transaction_id` |
+| `payment_success` | Same moment and same dedupe as `purchase` (contract) | `currency`, `transaction_id` (no `value` — revenue is on `purchase` only) |
+| `chat_paid` | Same moment and same dedupe as `purchase` (chat unlock); the Google Ads conversion (with value) fires with it | `currency`, `transaction_id` (no `value` — revenue is on `purchase` only) |
 | `payment_failed` | Intent creation error, Ziina `?failed` / `?cancelled`, embedded FAILED/CANCELED/closed, or not confirmed after 3 polls | `reason` |
 | `template_downloaded` | Any click on a `/download/...` link (Word/PDF template), site-wide | `file_name`, `source_page` |
 | `chat_started` | First message sent in `/legal-chat` (per browser session) | `source_page` |
@@ -61,7 +61,7 @@ Every event carries `page_path` (added by `ehEvent`); product events also carry 
 In **GA4 Admin → Events** (each name appears up to 24 h after it first fires, or create it via "Create event"):
 
 - **Mark as key event:** `purchase`, `begin_checkout`, `extraction_completed`, `contract_docs_uploaded`, `chat_started`, `upsell_click`.
-- **Unmark** `payment_success` and `chat_paid` if they are key events: they carry `value` and would double-count revenue next to `purchase`. They keep firing for continuity.
+- `payment_success` and `chat_paid` no longer carry `value`, so they cannot double-count revenue next to `purchase` even if they stay marked as key events. They keep firing for continuity.
 
 `purchase` revenue shows in Monetisation reports without further setup.
 
@@ -84,7 +84,7 @@ Every document is optional, and "Fill in by hand" skips upload entirely. The rev
 
 ## Landlord link (`/contract/d/<token>`)
 
-Off until **`DRAFT_ENC_KEY`** is set (a Fernet key: `python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`). The tenant creates a link from the review form and sends it (WhatsApp share or copy); the landlord uploads their Emirates ID and Title Deed on that page, the extracted values merge into the draft, and either side opens it in the generator (`/#draft=<token>` — a fragment, so the token never reaches server logs or analytics) to preview and pay.
+Encrypted with **`DRAFT_ENC_KEY`** when set (a Fernet key: `python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`), otherwise with a key derived from `SECRET_KEY`; off only when neither is set. Note: rotating `SECRET_KEY` without `DRAFT_ENC_KEY` makes open drafts unreadable (they expire in 72 h anyway). The tenant creates a link from the review form and sends it (WhatsApp share or copy); the landlord uploads their Emirates ID and Title Deed on that page, the extracted values merge into the draft, and either side opens it in the generator (`/#draft=<token>` — a fragment, so the token never reaches server logs or analytics) to preview and pay.
 
 - stored: whitelisted text field values only (never files), Fernet-encrypted, keyed by a SHA-256 of the 128-bit token; deleted 72 h after creation (merging never extends it)
 - the page is `noindex` (meta + `X-Robots-Tag`), `Disallow: /contract/` in robots.txt, `Referrer-Policy: no-referrer`, and its GA4/Ads hits report `/contract/d/` instead of the real URL
