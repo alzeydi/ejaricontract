@@ -27,7 +27,10 @@ stale fees) and **the payment funnel is untouched**.
 ## 1. Data (≈15 min)
 
 Search Console = the `gscServer` tools on Ivan's Mac, property `sc-domain:ejarihelper.ae`. If they
-are missing or fail twice → the Mac is offline: change nothing, report one line, end.
+are missing or fail twice → the Mac is offline: skip data, title audit, evaluation and Chrome
+indexing, but still do the content work that doesn't need fresh data (§4: new articles from the
+backlog, depth upgrades, Arabic page, internal links), ship it, and say in the report that GSC was
+unreachable.
 Large tool results are saved to a file automatically (the error message gives the path) — parse
 that JSON with python instead of re-requesting smaller pieces.
 
@@ -87,13 +90,18 @@ For every indexable page (EN + AR, hubs, tools; skip privacy/terms/404):
   bumping `dateModified` without real changes. More than 3 new pages a week starts to look like
   scaled content — stay at 2–3.
 
-## 5. Indexing
+## 5. Indexing (the agent does it — Ivan does nothing by hand)
 
 * Any sitemap URL not indexed → (a) add 2–3 contextual links to it from indexed, high-traffic
-  pages; (b) if a browser tool for Ivan's Chrome is available, open Search Console → URL Inspection
-  → *Request indexing* for it (≤ 10 URLs per day, new and changed pages first); (c) list the rest
-  in the report so Ivan can click it.
+  pages; (b) request indexing yourself in Ivan's Chrome (Claude in Chrome tools, load them via
+  ToolSearch): search.google.com/search-console → property `sc-domain:ejarihelper.ae` → type the URL
+  in the top “Inspect any URL” bar → Enter → wait ~9 s → click **REQUEST INDEXING** → wait ~30 s →
+  click the dialog's **Dismiss** (use `find` “Dismiss button”; Escape doesn't close it) → open the
+  overview page again before the next URL. New and changed pages first.
+* Google allows roughly 10 requests a day. “Oops! Something went wrong” = quota or a transient error:
+  stop, log the remaining URLs in the ledger and retry them next run. Never ask Ivan to do it.
 * Resubmit the sitemap after every deploy (`submit_sitemap`).
+* If Chrome isn't reachable, rely on (a) + sitemap and retry next run.
 
 ## 6. Facts rule
 
@@ -140,5 +148,5 @@ SEO-агент · <дата>
 Изменил заголовки: N страниц (главные: …)
 Новые статьи: … (под какие запросы, ожидаемые показы)
 Итоги прошлых изменений: что выросло/упало, что откатил
-Нужно от тебя: (только если есть — индексация вручную, ссылки, доступы)
+(Никаких поручений Ивану — агент делает все сам; если что-то заблокировано, напиши, что именно и что агент сделает в следующий прогон)
 ```

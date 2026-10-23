@@ -63,7 +63,7 @@ Internal links added: hub `/guides` cards for N-001..003; related cards from ren
 Arabic candidates: shared housing, tenant-rights hub, bounced cheque / non-payment.
 
 ## Backlog — existing pages
-* **Indexing:** eviction-notice, security-deposit-refund, ejari-number, rent calculator, about — not indexed (unknown / discovered). Request indexing; more internal links from dewa-premises-number and tenancy-contract.
+* **Indexing:** requested 2026-10-23 for dubai-housing-fee, early-termination, tenancy-contract-addendum, security-deposit-refund, ejari-number, rent calculator. **Still to request next run:** /guide/eviction-notice-dubai (GSC error twice, likely daily quota), /about. Check whether requested pages got crawled.
 * `/guide/ejari-renewal` — add a “Who pays for Ejari renewal?” section (2 Gulf News pages rank for it).
 * `/guide/security-deposit-refund-dubai` — add RDC monetary-claim fee (3.5%, AED 500–15,000) and “rent deposit vs DEWA deposit” box.
 * `/guide/dewa-premises-number`, `/index.html` still say DEWA connects “within 24 hours” (official: 15 working hours).
