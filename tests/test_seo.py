@@ -406,9 +406,33 @@ def test_fee_figure_is_consistent_sitewide(client):
         text = f.read_text(encoding='utf-8')
         for bad in ('122.50', 'AED 215', 'AED 220', 'AED 155', '1–2 days', '1-2 days',
                     '1–2 working days', '1-2 working days'):
+            # AED 155 is also DEWA's real Move-in fee total (see DEWA_FEES_*).
+            if bad == 'AED 155' and f.name.startswith('dewa-'):
+                continue
             if bad in text:
                 stale.append(f'{f}: {bad}')
     assert not stale, 'superseded Ejari fee still on: ' + ', '.join(stale)
+
+
+def test_dewa_fees_are_consistent_sitewide():
+    """DEWA fees as published on dewa.gov.ae (checked 23 Oct 2026):
+    Move-in AED 125 + 30 = AED 155; Move-to AED 112.50 x2 + 20 + 30 = AED 275;
+    supply live within 15 working hours. The old 'AED 100 connection fee' and
+    'deposit does not move' claims were wrong and must not come back."""
+    import pathlib
+    bad = []
+    for f in pathlib.Path('static').rglob('*.html'):
+        text = f.read_text(encoding='utf-8')
+        for stale in ('AED 100 connection', 'connection fee of AED 100', 'AED 100 fee',
+                      'deposit does not move', 'no single transfer button',
+                      'no single "transfer DEWA account" button'):
+            if stale in text:
+                bad.append(f'{f}: {stale}')
+    act = pathlib.Path('static/guide/dewa-activation.html').read_text(encoding='utf-8')
+    mov = pathlib.Path('static/guide/dewa-transfer.html').read_text(encoding='utf-8')
+    assert 'AED 155' in act and '15 working hours' in act
+    assert 'AED 275' in mov and 'AED 112.50' in mov and '15 working hours' in mov
+    assert not bad, '\n'.join(bad)
 
 
 def test_ejari_fee_constants_add_up_and_literals_match():
@@ -445,6 +469,8 @@ def test_prices_come_from_config(client):
             if token != '__GA4_ID__':
                 problems.append(f'{path}: unrendered {token}')
         for stale in re.findall(r'(?:AED 15|15 AED|AED 30|30 AED)(?![\d,.]\d)(?!\d)', body):
+            if '30' in stale and '/dewa-' in path:
+                continue  # DEWA's AED 30 registration+knowledge+innovation fees
             if str(CONTRACT_PRICE_AED) not in ('15', '30'):
                 problems.append(f'{path}: stale price {stale!r}')
         if 'line-through' in body and ('svc-old' in body or 'pay-old' in body):

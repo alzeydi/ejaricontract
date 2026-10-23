@@ -159,6 +159,10 @@ figure (`122.50`, `AED 215`, `AED 220`) reappears anywhere in `static/`.
   the owner (Cloudflare dashboard, trade-licence details, Dubai REST screenshots).
 - `SEO-OFFSITE-PLAYBOOK.md` — link-building targets and digital-PR pitches, plus the
   Google Ads campaign structure, keyword lists, negatives and ad copy.
+- `seo-agent/` — the weekly SEO agent: `AGENT.md` (the playbook each scheduled run
+  follows), `ledger.md` (experiments, baselines, verdicts, run log) and
+  `opportunities.py` (ranks pages by click opportunity; judges before/after tests
+  against a site-wide control).
 
 ### Live-site checks
 
