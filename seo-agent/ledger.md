@@ -75,4 +75,5 @@ Arabic candidates: shared housing, tenant-rights hub, bounced cheque / non-payme
 
 ## Run log
 * 2026-10-23 (setup) — baseline pulled; C-001, C-002 shipped; DEWA fee consistency test added.
+* 2026-10-23 — indexing requested via Search Console (Chrome): dubai-housing-fee, early-termination, tenancy-contract-addendum, security-deposit-refund. Eviction-notice failed (GSC error); ejari-number, rent calculator, about not yet requested (Chrome disconnected).
 * 2026-10-23 (growth mode) — full competitor sweep (18 clusters), titles rewritten on 14 pages (C-003..C-016), 3 new articles (N-001..003), indexing gaps found (5 URLs), playbook switched to growth mode.
