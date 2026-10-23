@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18223357108"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-18223357108');
+  // GA4 — measurement ID injected server-side from GA4_MEASUREMENT_ID env var (see README.md).
+  var GA4_ID = '__GA4_ID__';
+  if (/^G-[A-Z0-9]+$/.test(GA4_ID)) gtag('config', GA4_ID, (location.search.indexOf('_ga_debug=1') > -1) ? {debug_mode: true} : {});
+  // GA4 key-event helper. Each event below must be marked as a Key Event in GA4 admin — see README.md.
+  function ehEvent(name, params){ try { params = params || {}; if (!params.page_path) params.page_path = location.pathname; gtag('event', name, params); } catch(e) {} }
+  // Delegated tracking: template downloads everywhere; guide/tool → product CTA clicks.
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a) return;
+    var href = a.getAttribute('href') || '';
+    if (href.indexOf('/download/') === 0){
+      ehEvent('template_downloaded', {file_name: href.split('/').pop(), source_page: location.pathname});
+    } else if (a.hasAttribute('data-cta')){
+      ehEvent('cta_click', {source_page: location.pathname, cta_target: a.getAttribute('data-cta')});
+    } else if ((location.pathname.indexOf('/guide/') === 0 || location.pathname.indexOf('/ar/guide/') === 0 || location.pathname.indexOf('/tools/') === 0) &&
+               (href === '/' || href.indexOf('/legal-chat') === 0 || href.indexOf('/ar/legal-chat') === 0 || href.indexOf('/#') === 0)){
+      ehEvent('cta_click', {source_page: location.pathname, cta_target: href});
+    }
+  }, true);
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<title>Dubai Housing Fee 2026: 5% of Rent on Your DEWA Bill</title>
+<meta name="description" content="Dubai's housing fee is 5% of your Ejari rent, billed monthly by DEWA. Instant calculator, owners' rate, exemptions and how to fix a wrong fee in 3 days.">
+<link rel="canonical" href="__BASE_URL__/guide/dubai-housing-fee">
+<link rel="alternate" hreflang="en" href="__BASE_URL__/guide/dubai-housing-fee">
+<link rel="alternate" hreflang="x-default" href="__BASE_URL__/guide/dubai-housing-fee">
+<meta property="og:type" content="article">
+<meta property="og:url" content="__BASE_URL__/guide/dubai-housing-fee">
+<meta property="og:title" content="Dubai Housing Fee 2026: 5% of Rent on Your DEWA Bill">
+<meta property="og:description" content="Dubai's housing fee is 5% of your Ejari rent, billed monthly by DEWA. Instant calculator, owners' rate, exemptions and how to fix a wrong fee in 3 days.">
+<meta property="og:site_name" content="Ejari Helper">
+<meta property="og:image" content="__BASE_URL__/static/og-image.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ejari Helper — Dubai tenancy contracts in minutes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dubai Housing Fee 2026: 5% of Rent on Your DEWA Bill">
+<meta name="twitter:description" content="Dubai's housing fee is 5% of your Ejari rent, billed monthly by DEWA. Instant calculator, owners' rate, exemptions and how to fix a wrong fee in 3 days.">
+<meta name="twitter:image" content="__BASE_URL__/static/og-image.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet"></noscript>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "Article", "headline": "Dubai Housing Fee 2026: 5% of Rent on Your DEWA Bill", "description": "Dubai's housing fee is 5% of your Ejari rent, billed monthly by DEWA. Instant calculator, owners' rate, exemptions and how to fix a wrong fee in 3 days.", "author": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/about"}, "publisher": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/"}, "mainEntityOfPage": "__BASE_URL__/guide/dubai-housing-fee", "datePublished": "2026-10-23", "dateModified": "2026-10-23", "isAccessibleForFree": true, "inLanguage": "en"}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "__BASE_URL__/"}, {"@type": "ListItem", "position": 2, "name": "Guides", "item": "__BASE_URL__/guides"}, {"@type": "ListItem", "position": 3, "name": "Housing Fee"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How is the Dubai housing fee calculated?", "acceptedAnswer": {"@type": "Answer", "text": "Tenants pay 5% of the annual rent registered on Ejari, divided into 12 monthly instalments on the DEWA bill. For AED 100,000 rent that is AED 5,000 a year, or AED 416.67 a month."}}, {"@type": "Question", "name": "Why is my DEWA housing fee still based on my old rent?", "acceptedAnswer": {"@type": "Answer", "text": "Usually because the renewal at the new rent wasn’t registered on Ejari or didn’t sync to DEWA. Check the rent on your Ejari, then apply to amend the fee with Dubai Municipality if it is still wrong."}}, {"@type": "Question", "name": "Do property owners pay the housing fee in Dubai?", "acceptedAnswer": {"@type": "Answer", "text": "Owners living in their own home pay 5% of the property’s estimated annual rental value under the RERA rental index. When the property is rented out, the tenant pays through their DEWA account."}}, {"@type": "Question", "name": "Do UAE nationals pay the housing fee?", "acceptedAnswer": {"@type": "Answer", "text": "No. UAE nationals are exempt; if you are charged, update the DEWA account to citizen status and apply for an amendment."}}, {"@type": "Question", "name": "How do I reduce my housing fee after renewing at a lower rent?", "acceptedAnswer": {"@type": "Answer", "text": "Make sure the renewal is registered on Ejari. If the fee doesn’t update, use Dubai Municipality’s “Apply to Amend Dubai Municipality Residential Fee” service with UAE PASS; it is free and takes about three working days."}}, {"@type": "Question", "name": "Is the housing fee charged on a vacant apartment?", "acceptedAnswer": {"@type": "Answer", "text": "Most sources say yes, to the owner, while a DEWA account is active. Deactivating DEWA when the unit is empty stops the charge."}}]}
+</script>
+<style>
+:root{--bg:#fbfaf7;--white:#fff;--text:#1a1a1a;--sub:#55554f;--muted:#86867e;--border:#e7e6df;--accent:#16423c;--accent-bright:#2fd18d;--grad:linear-gradient(135deg,#1f8f66,#16423c);--grad-bright:linear-gradient(135deg,#2fd18d,#1f8f66);--accent-bg:#eaf2ec;--accent-mid:#1f8f66;--red:#c0392b;--red-bg:#fdf2f2;--blue:#1a4f8a;--blue-bg:#eef3fa;--gold:#b8860b;--gold-bg:#fdfaf0;--r:10px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+nav{background:rgba(251,250,247,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border);min-height:62px;display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:780px;width:100%;margin:0 auto;display:flex;align-items:center;gap:16px}
+.brand-name{display:inline-flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:var(--accent);letter-spacing:-.01em;text-decoration:none}.brand-name::before{content:'';width:32px;height:32px;border-radius:9px;flex-shrink:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none'%3E%3Cpath d='M4 11l8-6 8 6' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M6 10v9h12v-9' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M9.4 14.3l1.9 2 3.4-3.5' stroke='%235be0a8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/19px no-repeat,linear-gradient(135deg,#1f8f66,#16423c);box-shadow:0 4px 14px rgba(22,66,60,.28)}
+.nav-sep{color:var(--border)}
+.nav-cur{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+main{max-width:720px;margin:0 auto;padding:32px 20px 80px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.bc{font-size:12px;color:var(--muted);margin-bottom:20px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.bc a{color:var(--muted)}
+.bc a:hover{color:var(--accent);text-decoration:none}
+.bc-sep{color:var(--border)}
+.guide-badge{font-size:11px;font-weight:600;color:var(--accent-mid);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.guide-title{font-family:'IBM Plex Sans',sans-serif;font-size:30px;font-weight:700;color:var(--accent);letter-spacing:-.02em;line-height:1.25;margin-bottom:8px}
+.guide-meta{font-size:12px;color:var(--muted);margin-bottom:12px}
+.guide-intro{font-size:14px;color:var(--sub);margin-bottom:28px;line-height:1.7}
+.fc{display:flex;flex-direction:column}
+.fc-conn{display:flex;flex-direction:column;align-items:center;gap:0;padding:2px 0}
+.fc-conn-line{width:2px;height:16px;background:var(--border)}
+.fc-conn-arr{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--border)}
+.fc-conn-label{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);padding:2px 0}
+.fc-node{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:16px 18px}
+.fc-node-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.fc-title{font-size:14px;font-weight:600;color:var(--text)}
+.fc-body{font-size:13px;color:var(--sub);line-height:1.6;padding-left:32px}
+.fc-body ul{padding-left:16px;margin-top:4px}
+.fc-body ol{padding-left:16px;margin-top:4px}
+.fc-body li{margin-bottom:3px}
+.fc-node.step{border-left:4px solid var(--accent)}
+.fc-num{width:22px;height:22px;background:var(--accent);color:white;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-node.decision{border-left:4px solid var(--gold);background:var(--gold-bg)}
+.fc-dicon{width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-branch{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fc-branch-item{border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;background:var(--white)}
+.fc-branch-item.yes{border-color:#a5c8a5;background:#f6fbf6}
+.fc-branch-item.no{border-color:#e8bebe;background:#fdf5f5}
+.fc-branch-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.fc-branch-tag.yes{color:#2e7d32}
+.fc-branch-tag.no{color:var(--red)}
+.fc-branch-title{font-size:13px;font-weight:600;color:var(--text)}
+.fc-branch-desc{font-size:12px;color:var(--sub);margin-top:4px;line-height:1.5}
+.fc-node.success{border-left:4px solid #2e7d32;background:#f1f8f1}
+.fc-sicon{width:22px;height:22px;background:#2e7d32;color:white;border-radius:50%;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-node.warn{border-left:4px solid var(--red);background:var(--red-bg)}
+.fc-wicon{width:22px;height:22px;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-node.info{border-left:4px solid var(--blue);background:var(--blue-bg)}
+.fc-iicon{width:22px;height:22px;background:var(--blue);color:white;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-note{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:10px 12px;font-size:12px;color:var(--sub);margin-top:10px;line-height:1.6}
+.fc-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+.fc-table td{padding:6px 8px;border-bottom:1px solid var(--bg);color:var(--sub);vertical-align:top}
+.fc-table td:first-child{font-weight:500;color:var(--text);width:55%}
+.fc-table tr:last-child td{border-bottom:none}
+.fc-tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:8px}
+.fc-tag.green{background:#e8f5e9;color:#2e7d32}
+.fc-tag.blue{background:var(--blue-bg);color:var(--blue)}
+.fc-tag.amber{background:var(--gold-bg);color:var(--gold)}
+.guide-cta{background:linear-gradient(120deg,#16423c,#0f322c);color:white;border-radius:18px;padding:30px 28px;margin-top:36px;text-align:center;box-shadow:0 16px 40px rgba(22,66,60,.18)}
+.guide-cta-title{font-size:16px;font-weight:600;margin-bottom:6px}
+.guide-cta-desc{font-size:13px;opacity:.85;margin-bottom:16px;line-height:1.5}
+.guide-cta-btn{display:inline-block;background:linear-gradient(135deg,#2fd18d,#1f8f66);color:#04140d;font-size:13.5px;font-weight:700;padding:12px 26px;border-radius:10px;text-decoration:none;box-shadow:0 6px 20px rgba(46,200,140,.35)}
+.related{margin-top:32px}
+.related-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.rc{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px;text-decoration:none;display:block;box-shadow:0 2px 10px rgba(22,66,60,.05);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.rc:hover{border-color:#cfe6d8;text-decoration:none;transform:translateY(-3px);box-shadow:0 14px 34px rgba(22,66,60,.12)}
+.rc-icon{font-size:18px;margin-bottom:6px}
+.rc-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.rc-desc{font-size:11px;color:var(--muted)}
+.site-footer{background:var(--white);border-top:1px solid var(--border);padding:24px;margin-top:48px}
+.site-footer-inner{max-width:780px;margin:0 auto;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.footer-copy{font-size:11px;color:var(--muted)}
+.footer-copy a{color:var(--muted)}
+@media(max-width:540px){
+  .fc-branch{grid-template-columns:1fr}
+  .guide-title{font-size:22px}
+}
+.dld-dl{background:var(--white);border:1.5px solid var(--accent);border-radius:var(--r);padding:16px 18px;margin-bottom:24px}
+.dld-dl-row{display:flex;align-items:center;gap:14px}
+.dld-dl-icon{font-size:28px;flex-shrink:0}
+.dld-dl-body{flex:1;min-width:0}
+.dld-dl-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.dld-dl-desc{font-size:12px;color:var(--sub);line-height:1.5}
+.dld-dl-btn{background:var(--accent);color:#fff;font-size:13px;font-weight:600;padding:9px 16px;border-radius:7px;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.dld-dl-btn:hover{opacity:.9;text-decoration:none}
+.dld-dl-note{font-size:12px;color:var(--sub);margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);line-height:1.55}
+.dld-dl-note a{color:var(--accent);font-weight:600}
+@media(max-width:540px){.dld-dl-row{flex-wrap:wrap}.dld-dl-btn{width:100%;text-align:center}}
+.faq{margin-top:36px}
+.faq-title{font-size:18px;font-weight:700;color:var(--accent);letter-spacing:-.01em;margin-bottom:12px}
+.faq-item{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:10px}
+.faq-q{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
+.faq-a{font-size:13px;color:var(--sub);line-height:1.65;margin:0}
+
+.lang-sw{margin-inline-start:auto;display:inline-flex;border:1.5px solid var(--border);border-radius:999px;overflow:hidden;flex-shrink:0;background:var(--white)}
+.lang-sw a{padding:5px 12px;font-size:12px;font-weight:700;color:var(--sub);text-decoration:none;line-height:1.4}
+.lang-sw a.on{background:var(--accent);color:#fff}
+.lang-sw a:hover{text-decoration:none}
+.fc-table td:first-child{width:36%}
+</style>
+<link rel="stylesheet" href="/static/css/base.css">
+</head>
+<body>
+<nav class="eh-nav" aria-label="Main">
+  <div class="eh-nav-in">
+    <a href="/" class="eh-brand"><span class="eh-logo" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 11l8-6 8 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9h12v-9" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.4 14.3l1.9 2 3.4-3.5" stroke="#5be0a8" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="eh-brand-name">Ejari Helper</span></a>
+    <div class="eh-links">
+      <a href="/what-is-ejari">What is Ejari</a>
+      <a href="/guides">Guides</a>
+      <a href="/ejari-help">Ejari help</a>
+      <a href="/tools/rent-increase-calculator">Rent calculator</a>
+      
+      <a class="eh-cta" href="/legal-chat" data-cta="ask-ai-lawyer">Ask AI Lawyer →</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <nav class="bc" aria-label="Breadcrumb">
+    <a href="/">Home</a><span class="bc-sep">›</span>
+    <a href="/guides">Guides</a><span class="bc-sep">›</span>
+    <span>Housing Fee</span>
+  </nav>
+
+  <div class="guide-badge">DEWA Guide · Dubai</div>
+  <h1 class="guide-title">Dubai housing fee:<br>how the 5% on your DEWA bill works</h1>
+  <div class="guide-meta">Updated October 2026 · checked against DEWA and Dubai Municipality sources</div>
+  <p class="guide-intro"><strong>Seeing a “housing fee” on your DEWA bill?</strong> It’s Dubai Municipality’s charge of <strong>5% of your annual rent</strong>, taken from your Ejari and collected in 12 monthly instalments by DEWA — about <strong>AED 417 a month on AED 100,000 rent</strong>. Owners pay 5% of the RERA rental value, UAE nationals are exempt. Use the calculator below, check why your fee may be wrong (old rent, missing Ejari) and fix it with Dubai Municipality in about three working days.</p>
+
+  <div class="fc">
+
+    <div class="fc-node info" id="short-answer">
+      <div class="fc-node-head">
+        <div class="fc-iicon">i</div>
+        <h2 class="fc-title">The short answer</h2>
+      </div>
+      <div class="fc-body">
+        The Dubai housing fee is a <strong>Dubai Municipality charge collected by DEWA</strong>, as a separate line on your monthly electricity and water bill.
+        <table class="fc-table">
+          <tr><td><strong>Tenants</strong></td><td><strong>5% of the annual rent</strong> on your Ejari, split into 12 monthly instalments.</td></tr>
+          <tr><td><strong>Owners living in their own home</strong></td><td>5% of the property’s estimated annual rental value under the RERA rental index. (The old “0.5% of the purchase price” method dates from 2008 and is no longer how it is described.)</td></tr>
+          <tr><td><strong>UAE nationals</strong></td><td>Exempt.</td></tr>
+          <tr><td><strong>Commercial units</strong></td><td>The 5% residential formula doesn’t apply; businesses pay Dubai Municipality fees assessed at trade-licence renewal.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+
+    <div class="fc-node step" id="calculator">
+      <div class="fc-node-head">
+        <div class="fc-num">=</div>
+        <h2 class="fc-title">Calculate your housing fee</h2>
+      </div>
+      <div class="fc-body">
+        Monthly fee = annual Ejari rent × 5% ÷ 12.
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin:6px 0 10px">
+          <label style="font-size:12px;color:var(--sub);flex:1;min-width:180px">Annual rent on your Ejari (AED)
+            <input id="hf-rent" type="number" inputmode="numeric" min="0" step="1000" value="100000" style="display:block;width:100%;margin-top:4px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:15px">
+          </label>
+          <div style="flex:1;min-width:180px;background:var(--accent-bg);border-radius:8px;padding:10px 12px">
+            <div style="font-size:12px;color:var(--sub)">Housing fee</div>
+            <div style="font-size:18px;font-weight:700;color:var(--accent)"><span id="hf-month">AED 416.67</span> / month</div>
+            <div style="font-size:12px;color:var(--sub)"><span id="hf-year">AED 5,000</span> a year</div>
+          </div>
+        </div>
+        <script>(function(){var i=document.getElementById('hf-rent'),m=document.getElementById('hf-month'),y=document.getElementById('hf-year');function f(n,d){return 'AED '+n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});}function u(){var r=Math.max(0,parseFloat(i.value)||0),a=r*0.05;m.textContent=f(a/12,2);y.textContent=f(a,0);}i.addEventListener('input',u);u();})();</script>
+        <table class="fc-table">
+          <tr><td>AED 50,000 rent</td><td>AED 2,500 a year · <strong>AED 208.33 / month</strong></td></tr>
+          <tr><td>AED 80,000 rent</td><td>AED 4,000 a year · <strong>AED 333.33 / month</strong></td></tr>
+          <tr><td>AED 100,000 rent</td><td>AED 5,000 a year · <strong>AED 416.67 / month</strong></td></tr>
+          <tr><td>AED 150,000 rent</td><td>AED 7,500 a year · <strong>AED 625 / month</strong></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+
+    <div class="fc-node info" id="how-collected">
+      <div class="fc-node-head">
+        <div class="fc-iicon">i</div>
+        <h2 class="fc-title">How it gets onto your DEWA bill</h2>
+      </div>
+      <div class="fc-body">
+        DEWA’s systems have been linked to Ejari since 2015. When a new Ejari is registered, the tenant’s data — including the annual rent — is transferred to DEWA automatically, and DEWA says the rent value is also updated automatically at annual renewals (<a href="https://www.dewa.gov.ae/en/about-us/media-publications/latest-news/2024/02/dewa-electronically-received-data-of-over" target="_blank" rel="noopener">DEWA, February 2024</a>). Dubai Municipality sets the amount; DEWA only collects it. That is why the single most important thing for a correct fee is a correct, current <a href="/guide/ejari-registration">Ejari registration</a>.
+      </div>
+    </div>
+
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+
+    <div class="fc-node warn" id="wrong-fee">
+      <div class="fc-node-head">
+        <div class="fc-wicon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4.5"/><path d="M12 17.4h.01" stroke-width="2.4"/></svg></div>
+        <h2 class="fc-title">Why your housing fee might be wrong</h2>
+      </div>
+      <div class="fc-body">
+        <ul>
+          <li>You renewed at a <strong>lower rent</strong> but DEWA still bills on the last registered rent.</li>
+          <li>The renewal wasn’t registered, so an <strong>old contract</strong> is still applied.</li>
+          <li>There is <strong>no Ejari</strong> on the account, so the fee may be estimated from the RERA index for the area — often higher than your real rent.</li>
+          <li>The previous tenant’s data is still linked, or the unit is classified wrongly.</li>
+          <li>You are a UAE national but the DEWA account isn’t marked as such.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+
+    <div class="fc-node step" id="fix-1">
+      <div class="fc-node-head">
+        <div class="fc-num">1</div>
+        <h2 class="fc-title">Check the rent on your Ejari</h2>
+      </div>
+      <div class="fc-body">
+        Open the Dubai REST app or your Ejari certificate and compare the annual rent with your contract. If the renewal was never registered, <a href="/guide/ejari-renewal">renew the Ejari</a> first — the corrected rent should then flow to DEWA.
+      </div>
+    </div>
+
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+
+    <div class="fc-node step" id="fix-2">
+      <div class="fc-node-head">
+        <div class="fc-num">2</div>
+        <h2 class="fc-title">Apply to amend the fee with Dubai Municipality</h2>
+      </div>
+      <div class="fc-body">
+        If the fee is still wrong, use Dubai Municipality’s service <strong>“Apply to Amend Dubai Municipality Residential Fee”</strong> on dm.gov.ae (sign in with UAE PASS), the Dubai Now app or the DM app. You’ll need the DEWA account and premises numbers, the Ejari number, the property type, area and number of bedrooms; owners may be asked for the title deed. The service is free and DM says it takes about <strong>three working days</strong>. Helpline: 800 900.
+        <div class="fc-note">Housing-fee amounts are a Dubai Municipality matter — not the Rental Dispute Centre and not DEWA’s call centre.</div>
+      </div>
+    </div>
+
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+
+    <div class="fc-node success" id="refund">
+      <div class="fc-node-head">
+        <div class="fc-sicon">✓</div>
+        <h2 class="fc-title">Overpaid? You get it back</h2>
+      </div>
+      <div class="fc-body">
+        Once the fee is amended, past overpayments are normally credited to your DEWA account. For fees paid under an earlier wrong calculation, Dubai Municipality runs a <a href="https://www.dm.gov.ae/easy-payments/refund-of-fines-or-already-paid-fees/" target="_blank" rel="noopener">refund service</a>; approved refunds are paid in the first week of each month.
+      </div>
+    </div>
+
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+
+    <div class="fc-node info" id="special-cases">
+      <div class="fc-node-head">
+        <div class="fc-iicon">i</div>
+        <h2 class="fc-title">Who pays in special cases</h2>
+      </div>
+      <div class="fc-body">
+        <ul>
+          <li><strong>Bills included in the rent</strong> — the fee is billed to whoever holds the DEWA account, so a landlord who keeps DEWA in their name pays it (and usually prices it into the rent). If your contract is unclear on who bears it, that’s a tenancy question for the <a href="/guide/rental-dispute">RDC</a>.</li>
+          <li><strong>Vacant apartment</strong> — most sources agree the owner keeps paying while a DEWA account is active, so owners deactivate DEWA between tenants.</li>
+          <li><strong>Moving out mid-year</strong> — the fee is billed monthly with DEWA, so it stops or moves with your account (see <a href="/guide/dewa-transfer">DEWA Move-to</a>); there is no prepaid lump sum to refund.</li>
+          <li><strong>Shared housing</strong> — under Dubai’s 2026 shared-housing law the landlord pays electricity and water by default.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+
+    <div class="guide-cta" style="margin:26px 0;background:linear-gradient(180deg,#16423c 0%,#0f322c 100%);color:#fff;border:none">
+    <div class="guide-cta-title" style="color:#fff">💬 Landlord and you disagree about bills?</div>
+    <div class="guide-cta-desc" style="color:#dfe9e6">Ask the AI rental lawyer who bears DEWA and the housing fee under your contract and Law 26/2007. AED __LAWYER_PRICE__ per session — <strong style="color:#fff">first question free</strong>.</div>
+    <a href="/legal-chat" class="guide-cta-btn" style="background:#fff;color:#16423c" data-cta="housing-fee-legal-chat">Ask about my contract →</a>
+  </div>
+
+  </div>
+
+  <section class="faq">
+    <h2 class="faq-title">Frequently asked questions</h2>
+    <div class="faq-item">
+      <h3 class="faq-q">How is the Dubai housing fee calculated?</h3>
+      <p class="faq-a">Tenants pay 5% of the annual rent registered on Ejari, divided into 12 monthly instalments on the DEWA bill. For AED 100,000 rent that is AED 5,000 a year, or AED 416.67 a month.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">Why is my DEWA housing fee still based on my old rent?</h3>
+      <p class="faq-a">Usually because the renewal at the new rent wasn’t registered on Ejari or didn’t sync to DEWA. Check the rent on your Ejari, then apply to amend the fee with Dubai Municipality if it is still wrong.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">Do property owners pay the housing fee in Dubai?</h3>
+      <p class="faq-a">Owners living in their own home pay 5% of the property’s estimated annual rental value under the RERA rental index. When the property is rented out, the tenant pays through their DEWA account.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">Do UAE nationals pay the housing fee?</h3>
+      <p class="faq-a">No. UAE nationals are exempt; if you are charged, update the DEWA account to citizen status and apply for an amendment.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">How do I reduce my housing fee after renewing at a lower rent?</h3>
+      <p class="faq-a">Make sure the renewal is registered on Ejari. If the fee doesn’t update, use Dubai Municipality’s “Apply to Amend Dubai Municipality Residential Fee” service with UAE PASS; it is free and takes about three working days.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">Is the housing fee charged on a vacant apartment?</h3>
+      <p class="faq-a">Most sources say yes, to the owner, while a DEWA account is active. Deactivating DEWA when the unit is empty stops the charge.</p>
+    </div>
+  </section>
+
+  <div class="related">
+    <div class="related-title">Related guides</div>
+    <div class="related-grid">
+      <a href="/guide/dewa-activation" class="rc">
+        <div class="rc-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg></div>
+        <div class="rc-title">Activate DEWA</div>
+        <div class="rc-desc">Deposit, fees, timing</div>
+      </a>
+      <a href="/guide/dewa-transfer" class="rc">
+        <div class="rc-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg></div>
+        <div class="rc-title">DEWA transfer</div>
+        <div class="rc-desc">Move-to keeps your deposit</div>
+      </a>
+      <a href="/guide/dewa-premises-number" class="rc">
+        <div class="rc-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg></div>
+        <div class="rc-title">DEWA premise number</div>
+        <div class="rc-desc">Where to find it</div>
+      </a>
+      <a href="/guide/ejari-renewal" class="rc">
+        <div class="rc-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg></div>
+        <div class="rc-title">Renew Ejari</div>
+        <div class="rc-desc">So DEWA gets your new rent</div>
+      </a>
+      <a href="/guide/rent-increase-dubai" class="rc">
+        <div class="rc-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg></div>
+        <div class="rc-title">Rent increase rules</div>
+        <div class="rc-desc">Caps and notice</div>
+      </a>
+      <a href="/guide/early-termination-tenancy-contract-dubai" class="rc">
+        <div class="rc-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg></div>
+        <div class="rc-title">Breaking a lease</div>
+        <div class="rc-desc">Penalty and rules</div>
+      </a>
+    </div>
+  </div>
+
+
+</main>
+
+<footer class="eh-footer">
+  <div class="eh-footer-in">
+    <div class="eh-f-col">
+      <div class="eh-f-name">Ejari Helper</div>
+      <p class="eh-f-desc">AI-powered Dubai tenancy contract generator and rental-law assistant. DLD format, filled from your documents in minutes — no account needed.</p>
+      <a href="https://www.trustpilot.com/review/ejarihelper.ae" target="_blank" rel="noopener" class="eh-f-review">Leave us a review</a>
+    </div>
+    <div class="eh-f-col">
+      <div class="eh-f-h">Product</div>
+      <a href="/">Generate contract</a>
+      <a href="/legal-chat">AI rental lawyer</a>
+      <a href="/tools/rent-increase-calculator">Rent increase calculator</a>
+      <a href="/how-it-works">How it works</a>
+    </div>
+    <div class="eh-f-col">
+      <div class="eh-f-h">Guides</div>
+      <a href="/what-is-ejari">What is Ejari</a>
+      <a href="/guide/ejari-registration">Ejari registration</a>
+      <a href="/guide/ejari-cost">Ejari cost</a>
+      <a href="/guide/ejari-check">Check &amp; verify Ejari</a>
+      <a href="/guide/ejari-renewal">Ejari renewal</a>
+      <a href="/guides">All guides</a>
+    </div>
+    <div class="eh-f-col" lang="ar" dir="rtl">
+      <div class="eh-f-h">بالعربية</div>
+      <a href="/ar/legal-chat">المحامي الذكي للإيجارات</a>
+      <a href="/ar/guide/ejari-renewal">تجديد إيجاري</a>
+      <a href="/ar/guide/rental-dispute">المنازعات الإيجارية</a>
+      <a href="/ar/guide/dewa-premises-number">رقم المبنى ديوا</a>
+    </div>
+  </div>
+  <div class="eh-f-meta">
+    <span>© 2026 Ejari Helper · Dubai, UAE</span>
+    <a href="mailto:hello@ejarihelper.ae" onclick="this.href='mailto:'+atob('YWx6ZXlkaUBnbWFpbC5jb20=')">hello@ejarihelper.ae</a>
+    <a href="/about">About</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+  </div>
+  <p class="eh-f-disc">Ejari Helper is an independent service and is <strong>not affiliated with, endorsed by, or connected to</strong> the Dubai Land Department, RERA, or any UAE government body. &ldquo;Ejari&rdquo; is a Dubai Land Department mark, used here descriptively. Registration is filed through the official channels &mdash; <a href="https://dubailand.gov.ae" rel="nofollow noopener" target="_blank">dubailand.gov.ae</a>, the Dubai REST app, or a trustee centre. Nothing on this site is legal advice; see the <a href="/terms">terms</a>.</p>
+</footer>
+<script defer src="/static/js/toc.js"></script>
+</body>
+</html>

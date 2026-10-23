@@ -25,6 +25,8 @@ PAGES = [
     '/guide/security-deposit-refund-dubai', '/guide/rent-increase-dubai',
     '/guide/eviction-notice-dubai', '/guide/dewa-premises-number',
     '/guide/dewa-activation', '/guide/dewa-transfer',
+    '/guide/early-termination-tenancy-contract-dubai',
+    '/guide/tenancy-contract-addendum-dubai', '/guide/dubai-housing-fee',
     '/tools/rent-increase-calculator',
     '/ar/guide/rental-dispute', '/ar/guide/ejari-renewal', '/ar/guide/dewa-premises-number',
 ]
@@ -144,6 +146,8 @@ def test_json_ld_parses(client, path):
     '/guide/ejari-check', '/guide/ejari-cost', '/guide/ejari-number',
     '/what-is-ejari', '/ejari-help', '/about',
     '/tools/rent-increase-calculator', '/ar/legal-chat', '/how-it-works',
+    '/guide/early-termination-tenancy-contract-dubai',
+    '/guide/tenancy-contract-addendum-dubai', '/guide/dubai-housing-fee',
 ])
 def test_faq_schema_present(client, path):
     body = get(client, path, headers={'X-Forwarded-Proto': 'https'}).get_data(as_text=True)
@@ -445,6 +449,8 @@ def test_ejari_fee_constants_add_up_and_literals_match():
     allowed = {EJARI_FEE_ONLINE, EJARI_FEE_TYPING}
     bad = []
     for f in pathlib.Path('static').rglob('*.html'):
+        if f.name == 'dubai-housing-fee.html':
+            continue  # worked housing-fee examples (5% of rent), not Ejari fees
         for line in f.read_text(encoding='utf-8').split('\n'):
             for fee in re.findall(r'AED (\d{3}\.\d{2})', line):
                 if float(fee) >= 120 and fee not in allowed:  # totals only, not components

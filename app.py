@@ -965,6 +965,9 @@ def sitemap_xml():
         ('/guide/security-deposit-refund-dubai', None),
         ('/guide/rent-increase-dubai', None),
         ('/guide/eviction-notice-dubai', None),
+        ('/guide/early-termination-tenancy-contract-dubai', None),
+        ('/guide/tenancy-contract-addendum-dubai', None),
+        ('/guide/dubai-housing-fee', None),
         ('/guide/dewa-activation', None),
         ('/guide/dewa-premises-number', guide_pair('dewa-premises-number')),
         ('/guide/dewa-transfer', None),
@@ -996,7 +999,9 @@ _GUIDE_SLUGS = {'ejari-registration', 'dewa-activation', 'rental-dispute',
                 'dewa-transfer', 'ejari-cancellation',
                 'security-deposit-refund-dubai', 'rent-increase-dubai',
                 'eviction-notice-dubai', 'ejari-fine',
-                'ejari-check', 'ejari-cost', 'ejari-number'}
+                'ejari-check', 'ejari-cost', 'ejari-number',
+                'early-termination-tenancy-contract-dubai',
+                'tenancy-contract-addendum-dubai', 'dubai-housing-fee'}
 
 _TOOL_SLUGS = {'rent-increase-calculator'}
 

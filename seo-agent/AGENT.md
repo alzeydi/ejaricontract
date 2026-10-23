@@ -1,149 +1,144 @@
 # SEO agent — ejarihelper.ae
 
-**Goal:** grow organic clicks from Google (Search Console *clicks*, 28-day window) week after week,
-without risking the site's two real assets: factual accuracy and the payment funnel.
+**Goal:** a step change in organic traffic, not single-digit tweaks. Every weekly run works the
+whole site: audits every title, studies competitors, rewrites what underperforms, publishes new
+articles, fixes indexing, builds internal links. Measured by Search Console *clicks* (28-day
+window) and by the number of pages that are indexed and ranking.
 
 Baseline when the agent started (GSC, 25 Sep – 22 Oct 2026): **456 clicks · 24,584 impressions ·
-CTR 1.85% · avg position 9.1.** 56% of clicks come from one page, `/guide/dewa-premises-number`.
+CTR 1.85% · avg position 9.1.** 56% of clicks came from one page (`/guide/dewa-premises-number`);
+most Ejari guides ranked at positions 30–60 and several guides were not indexed at all.
 
-The agent runs **weekly** as a scheduled task. Every run follows this file top to bottom.
-`ledger.md` is its memory: open experiments, results, run log. Read it first, update it last.
+Target trajectory: **+30% clicks per 28 days** while the content base grows (new pages need 2–6
+weeks to rank). `ledger.md` is the agent's memory — read it first, update it last.
+
+Two things never bend: **facts are verified** (accuracy is the site's edge — competitors publish
+stale fees) and **the payment funnel is untouched**.
 
 ---
 
 ## 0. Setup
 
-1. Attach the repo with push access (`add_repo alzeydi/ejaricontract`, access `push`), clone it,
-   `pip install -r requirements.txt pytest --break-system-packages`, run `python3 -m pytest tests/ -q`.
-   If the baseline suite fails, **stop**: report the failure, change nothing.
-2. Read `seo-agent/ledger.md`, `SEO-STRATEGY.md` §6 ("Чего делать нельзя") and the README sections
-   *URL canonicalisation* and *Ejari fees*.
+1. `add_repo alzeydi/ejaricontract` (access `push`), clone, `pip install -r requirements.txt pytest
+   --break-system-packages`, `python3 -m pytest tests/ -q`. If the baseline fails, stop and report.
+2. Read `seo-agent/ledger.md`, `seo-agent/competitors.md`, `SEO-STRATEGY.md` §6, README sections
+   *URL canonicalisation*, *When adding a page*, *Ejari fees*.
 
-## 1. Pull data
+## 1. Data (≈15 min)
 
-Search Console lives on Ivan's Mac (the `gscServer` MCP tools, property `sc-domain:ejarihelper.ae`).
-If those tools are missing or fail twice, the Mac is offline: **do not edit anything**, send a
-one-line report ("GSC недоступен — компьютер офлайн, прогон пропущен") and end.
+Search Console = the `gscServer` tools on Ivan's Mac, property `sc-domain:ejarihelper.ae`. If they
+are missing or fail twice → the Mac is offline: change nothing, report one line, end.
+Large tool results are saved to a file automatically (the error message gives the path) — parse
+that JSON with python instead of re-requesting smaller pieces.
 
-Pull, with `end` = 3 days ago (GSC data is final after ~3 days):
-
-| What | Tool / params |
+| What | How |
 |---|---|
-| Site totals, daily trend, 28d | `get_performance_overview` days=28 |
-| Pages, this 28d vs previous 28d | `compare_search_periods` dimensions=page, limit=50 |
-| Query × page rows | `get_advanced_search_analytics` dimensions=`query,page`, sort_by=impressions, row_limit=500 |
-| Per-experiment windows | `get_advanced_search_analytics` dimensions=page, filter page equals `<url>`, explicit dates |
-| Indexing of pages changed in the last 2 runs | `check_indexing_issues` |
-| Sitemap health | `get_sitemaps` |
+| Site totals 28d + trend | `get_performance_overview` days=28 |
+| Pages, 28d vs previous 28d | `compare_search_periods` dimensions=page, limit=60 |
+| Query × page, 90 days | `get_advanced_search_analytics` dimensions=`query,page`, row_limit=2000, filter page notContains `#` → TSV |
+| Indexing of every sitemap URL | `check_indexing_issues` in **batches of 5** (bigger batches time out) |
+| Sitemap | `get_sitemaps` |
+| GA4 (if a tool exists) | landing page × sessions, engagement, key events (`template_downloaded`, `cta_click`, `purchase`) |
 
-**GA4** — if any Google Analytics tool is available (e.g. `run_report` from Google's
-analytics-mcp): landing page × sessions, engagement rate, key events (`template_downloaded`,
-`cta_click`, `purchase`) for the same 28 days. Use it to break ties toward pages that convert,
-and never ship a change that lowers a page's key-event rate (check in evaluation). If no GA tool
-exists, say so in the report and continue on GSC alone.
+Then `python3 seo-agent/opportunities.py rank rows.tsv` for the ranked opportunity list.
 
-Write the query × page rows to a TSV (`query	page	clicks	impressions	position`) and run:
+## 2. Competitors (every run, rotating)
 
-```
-python3 seo-agent/opportunities.py rank /tmp/rows.tsv --exclude <pages with an OPEN experiment>
-```
+Each run, take the **6 biggest query clusters** by impressions (rotate so every cluster is
+re-checked at least monthly) and WebSearch the head query. Record in `seo-agent/competitors.md`
+(replace that cluster's section, keep the date):
+* top results: domain + exact title;
+* the dominant title pattern and what the winners give that we don't (download, fee table,
+  official link up top, calculator, 2026 rule change, video, PAA answers);
+* stale or wrong facts in competitor pages — these are our angle.
+Also note any competitor topic we have no page for → add to the *Content backlog* in the ledger.
 
-## 2. Evaluate open experiments
+## 3. Title & snippet audit — ALL pages, every run
 
-An experiment is due when it has been live **≥ 21 days**. For each due one:
+For every indexable page (EN + AR, hubs, tools; skip privacy/terms/404):
+1. List its top queries (90d) and current title / description / H1.
+2. Judge against the competitor patterns and these rules:
+   * Title starts with the exact head query the page gets impressions for (or should), ≤ 60 chars.
+   * Add the differentiator only if true: exact fee, “Free PDF/Word”, “Status Check”, “Contact
+     Number”, a 2026 rule, step count. Year only where freshness matters.
+   * Description ≤ 155: answers the intent *and* leaves a reason to click (table, steps, edge cases).
+     Don't give a one-line answer away on pages that win featured snippets anyway.
+   * H1 matches the query cluster (can differ from title wording); intro answers in 2 sentences.
+   * One URL per intent — if two pages chase the same query, retarget one.
+3. Rewrite every title/description that fails. **Cool-down:** don't re-title a page changed in the
+   last 21 days unless its click count dropped > 30% or it contains an error.
+4. Log each change in the ledger *Changes* table with the page's 28d baseline.
 
-1. Before window = the N days ending the day before `live`; after window = N days starting 3 days
-   after `live` (skip the re-crawl period). Use N = min(28, days available). Same N both sides.
-2. Control = site totals minus all pages with open experiments, same windows.
-3. `python3 seo-agent/opportunities.py evaluate --before c,i --after c,i --control-before c,i --control-after c,i`
-4. Verdict → action:
-   * **WIN** — keep. Note the lesson in ledger *Learnings* (what kind of change worked, where).
-   * **NEUTRAL** — keep (the facts are still better); the page is free for a new experiment.
-   * **LOSS** — revert the *title/description/H1* part with a new commit (`git revert` only if the
-     commit contains nothing else). **Never revert a factual correction.**
-   * **INCONCLUSIVE** — leave open, re-check next run; close as NEUTRAL after 56 days.
-5. Update the row in `ledger.md` (status, result numbers, verdict).
+## 4. Content (every run)
 
-## 3. Choose this week's changes
+* **New articles: 2–3 per run** from the *Content backlog*, highest demand first. Each must:
+  answer a distinct intent no existing page covers; carry verified facts with official sources
+  (fees, deadlines, law articles — Law 26/2007, Law 33/2008, Decree 43/2013, DLD/RDC/DEWA/DM pages);
+  have a step flow or table, a 5+ question FAQ (visible + FAQPage JSON-LD), HowTo/Article JSON-LD
+  with `dateModified`, a CTA to the relevant product (contract generator or AI lawyer), and links to
+  and from ≥ 3 related guides + the `/guides` hub. Follow README *When adding a page* exactly
+  (slug set, sitemap entry, `PAGES` in tests). Copy the structure/CSS of an existing guide.
+* **Depth upgrades: 1–2 existing pages per run** that rank 8–30: add the sub-intents their queries
+  show (sections with `id` anchors, comparison tables, “documents required”, “cost”, “online vs
+  centre”), refresh facts, add internal links into them with descriptive anchors.
+* **Arabic: 1 page per run** — translate a top EN guide that has Arabic search demand
+  (hreflang pair in both files, sitemap `guide_pair`, `_AR_GUIDE_SLUGS`, `HREFLANG_PAIRS` in tests).
+* Never: thin or near-duplicate pages, pages per city/variant, invented statistics or reviews,
+  bumping `dateModified` without real changes. More than 3 new pages a week starts to look like
+  scaled content — stay at 2–3.
 
-Budget per run: **at most 2 experiments** (two different pages) **plus** any factual fixes.
-One open experiment per page at a time, otherwise nothing can be attributed.
+## 5. Indexing
 
-Pick from the top of the `rank` output, then decide the lever by where the page ranks:
+* Any sitemap URL not indexed → (a) add 2–3 contextual links to it from indexed, high-traffic
+  pages; (b) if a browser tool for Ivan's Chrome is available, open Search Console → URL Inspection
+  → *Request indexing* for it (≤ 10 URLs per day, new and changed pages first); (c) list the rest
+  in the report so Ivan can click it.
+* Resubmit the sitemap after every deploy (`submit_sitemap`).
 
-| Situation | Lever |
-|---|---|
-| Position ≤ 10, CTR well below the curve (`snippet_gap` dominates) | Title + meta description + H1/intro rewrite. Match the exact words of the top 3 queries; promise what the SERP answer can't give (step-by-step, current fee table, official link, “what if” cases). Keep a number or a year where it is a true differentiator. |
-| Position 4–20 (`rank_gain` dominates) | Content depth for the queries the page half-answers: a section or FAQ per uncovered sub-intent, a comparison table, internal links **into** the page from the 2 strongest pages with descriptive anchors. |
-| Query cluster ≥ 100 impressions/28d landing on a page that doesn't target it | Either add a dedicated section with an `id` anchor on the closest page, or (max **1 new page per run**) a new guide — only if the intent is genuinely different. Follow README *“When adding a page”* exactly (slug list, sitemap, `PAGES` in tests, `dateModified`). |
-| Page has facts older than ~3 months on fees, timings, laws | Verify and refresh first — accuracy is the site's edge and outdated numbers lose AI-overview citations. |
+## 6. Facts rule
 
-**Facts rule.** Every fee, deadline, phone number or legal reference you write must be checked in
-this same run against an official source (dewa.gov.ae, dubailand.gov.ae, rdc.gov.ae, u.ae,
-dubai.gov.ae, the law text). Record the URL and check date in the ledger. If sources disagree or
-can't be fetched, don't write the number. When you add a new figure, add or extend a test in
-`tests/test_seo.py` that pins it (see `test_dewa_fees_are_consistent_sitewide`).
+Every fee, deadline, phone number, legal article you write is checked **in this run** against an
+official source. Put the URL + date in the ledger. If sources disagree or can't be fetched, leave
+the number out. Each new figure gets a pin in `tests/test_seo.py` (pattern:
+`test_dewa_fees_are_consistent_sitewide`).
 
-**Top-page caution.** `/guide/dewa-premises-number` carries most of the traffic. Touch it only with
-a single title/description experiment at a time, never together with other changes to it.
+## 7. Boundaries
 
-## 4. Implement
+Allowed: `static/**/*.html`, slug sets + sitemap entries in `app.py` for new pages, `tests/` (add
+checks, make checks precise — never silence a real failure), `seo-agent/*`.
+Forbidden: payment/pricing/admin/redirect/robots logic in `app.py`; literal prices where README
+requires tokens; changing or deleting existing URLs; removing the non-affiliation disclaimer;
+hidden text; keyword stuffing.
 
-Allowed:
-* `static/**/*.html` — titles, meta, OG/Twitter tags, H1, intro, sections, FAQ (visible **and**
-  FAQPage JSON-LD in sync), HowTo/Article JSON-LD, internal links, related-guides blocks.
-* New guide pages + the registration points README lists for them.
-* `tests/test_seo.py` — only to add checks or to make an existing check precise (never to silence
-  a real failure).
-* `seo-agent/ledger.md`.
+## 8. Ship
 
-Forbidden:
-* `app.py` logic beyond slug lists/sitemap entries for a new page: payments, prices, Ziina,
-  admin, canonical/redirect logic, robots AI policy.
-* Prices or fees as literals where README says to use a token (`__CONTRACT_PRICE__` etc.).
-* Changing existing URLs/slugs, deleting pages, removing the non-affiliation disclaimer.
-* Bumping `dateModified` without a real content change. Fake freshness is a spam signal.
-* Doorway/near-duplicate pages, keyword stuffing, hidden text, invented reviews or statistics.
-* More than 3 page files touched per run (factual-fix sweeps across pages are the exception).
+1. `python3 -m pytest tests/ -q` green.
+2. Render every new or heavily changed page at 390 px (Playwright,
+   `executablePath: '/opt/pw-browsers/chromium'`) and look at it.
+3. Update `ledger.md` + `competitors.md`. Commit `seo-agent: <date> — N titles, N new pages, …`
+   (+ attribution), `git fetch origin master && git rebase origin/master`, push to `master`.
+4. Railway auto-deploys (project `Ejarihelper.ae`, id `5dffb740-1aef-4d33-b7fd-8c7fae4e0726`,
+   2–7 min). Wait for SUCCESS (`list-deployments`); fetch 2–3 changed URLs and confirm the new
+   titles are live. On failure: Railway rollback + revert + report.
+5. `submit_sitemap https://ejarihelper.ae/sitemap.xml`.
 
-Title ≤ 60 chars, description ≤ 155 (tests enforce). Update `dateModified` (JSON-LD Article) and the
-visible “Updated …” line together when content materially changes — the sitemap reads `lastmod`
-from it.
+## 9. Measure
 
-## 5. Ship and verify
+* Weekly KPI row in the ledger (clicks, impressions, CTR, position, indexed pages / sitemap pages).
+* Each change older than 21 days: compare the page's 28d clicks/CTR/position before vs after with
+  `opportunities.py evaluate` (control = rest of site). LOSS on a title → restore the previous title
+  (keep factual fixes). Record verdicts and turn them into *Learnings* (which title patterns win
+  here) — apply the learnings to the next audit.
 
-1. `python3 -m pytest tests/ -q` must be green.
-2. Look at each changed page rendered at 390 px wide (Playwright with
-   `executablePath: '/opt/pw-browsers/chromium'`) — tables and FAQ must read cleanly.
-3. Update `ledger.md` (new experiment rows with the baseline numbers, run log entry).
-4. Commit to `master` with message `seo-agent: EXP-NNN <page> — <change>` (+ session attribution),
-   `git fetch origin master && git rebase origin/master`, push. Railway auto-deploys `master`
-   (project `Ejarihelper.ae`, id `5dffb740-1aef-4d33-b7fd-8c7fae4e0726`, ~7 min).
-5. Wait for the deployment to reach SUCCESS (`list-deployments`), then fetch each changed URL and
-   confirm the new `<title>` is live. If the deploy fails: roll back with Railway, revert the
-   commit, report.
-6. Resubmit the sitemap: `submit_sitemap` `https://ejarihelper.ae/sitemap.xml`.
+## 10. Report (Russian, short, no ё)
 
-## 6. Report (in Russian, short)
-
-Send with SendUserMessage. Format:
+Send with SendUserMessage and PushNotification:
 
 ```
 SEO-агент · <дата>
-Клики 28д: X (±Y% к пред. 28д) · показы · CTR · позиция
-Оценка экспериментов: EXP-… WIN/LOSS/NEUTRAL (+N кликов), что откатил
-Что изменил сегодня: EXP-… страница — что и почему (ожидание: +N кликов/28д)
-Нужно от тебя: <только если есть: ссылки, Cloudflare, доступы>
+Клики 28д: X (±Y%) · показы · CTR · позиция · в индексе N/M страниц
+Изменил заголовки: N страниц (главные: …)
+Новые статьи: … (под какие запросы, ожидаемые показы)
+Итоги прошлых изменений: что выросло/упало, что откатил
+Нужно от тебя: (только если есть — индексация вручную, ссылки, доступы)
 ```
-
-No ё. Numbers over adjectives. If nothing was worth changing, say so — a run without changes is fine.
-
----
-
-## Why changes are slow to show
-
-Google re-crawls a changed guide in days, but positions and CTR settle over 2–4 weeks, so a weekly
-cadence with a 21-day evaluation keeps 2–6 experiments in flight at any time. Backlinks remain the
-ceiling for positions on head terms (`tenancy contract dubai`, `ejari`); on-site work wins CTR,
-long-tail and AI-overview citations. Off-site work is in `SEO-OFFSITE-PLAYBOOK.md` — the agent
-reminds Ivan about it, it doesn't do it.
