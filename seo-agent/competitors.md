@@ -42,3 +42,9 @@ Last full sweep: **2026-10-23**.
 | dewa transfer / move-to | GN news, joinoliva | Deposit carries over | Move-to + deposit moves |
 | homepage “ejari contract online” | All guides, no tools | — | Tool positioning in title |
 | rental lawyer dubai | Law-firm articles via Mondaq/Legal500 | — | Keep “AI rental lawyer”; consider “assistant” framing |
+
+## Cluster notes (2026-10-26)
+* **dubai shared housing law / bed space** — news (Gulf News, Khaleej Times) and law-firm explainers lead; few cite the Dubai Municipality circular or the one-category rule. Our angle: official Media Office + Circular 1-3-1/2026 facts, tenant checklist (N-004, AR A-001).
+* **is subletting legal in dubai** — Q&A pages and Bayut articles soften Art. 24; ours quotes Arts. 24/25(1)(b)/8/22/30 verbatim (N-005).
+* Not researched this run (WebSearch not used): rotation of the other 6 biggest clusters is due next run.
+

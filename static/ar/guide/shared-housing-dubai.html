@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18223357108"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-18223357108');
+  // GA4 — measurement ID injected server-side from GA4_MEASUREMENT_ID env var (see README.md).
+  var GA4_ID = '__GA4_ID__';
+  if (/^G-[A-Z0-9]+$/.test(GA4_ID)) gtag('config', GA4_ID, (location.search.indexOf('_ga_debug=1') > -1) ? {debug_mode: true} : {});
+  // GA4 key-event helper. Each event below must be marked as a Key Event in GA4 admin — see README.md.
+  function ehEvent(name, params){ try { params = params || {}; if (!params.page_path) params.page_path = location.pathname; gtag('event', name, params); } catch(e) {} }
+  // Delegated tracking: template downloads everywhere; guide/tool → product CTA clicks.
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a) return;
+    var href = a.getAttribute('href') || '';
+    if (href.indexOf('/download/') === 0){
+      ehEvent('template_downloaded', {file_name: href.split('/').pop(), source_page: location.pathname});
+    } else if (a.hasAttribute('data-cta')){
+      ehEvent('cta_click', {source_page: location.pathname, cta_target: a.getAttribute('data-cta')});
+    } else if ((location.pathname.indexOf('/guide/') === 0 || location.pathname.indexOf('/ar/guide/') === 0 || location.pathname.indexOf('/tools/') === 0) &&
+               (href === '/' || href.indexOf('/legal-chat') === 0 || href.indexOf('/ar/legal-chat') === 0 || href.indexOf('/#') === 0)){
+      ehEvent('cta_click', {source_page: location.pathname, cta_target: href});
+    }
+  }, true);
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<title>قانون السكن المشترك في دبي 2026: التصاريح والغرامات</title>
+<meta name="description" content="القانون رقم 4 لسنة 2026: تصريح السكن المشترك، المبنى كاملاً، منع تأجير الأسرّة من الباطن، غرامات 500 إلى 500,000 درهم، ومهلة سنة لتوفيق الأوضاع.">
+<link rel="canonical" href="__BASE_URL__/ar/guide/shared-housing-dubai">
+<link rel="alternate" hreflang="en" href="__BASE_URL__/guide/shared-housing-dubai">
+<link rel="alternate" hreflang="ar" href="__BASE_URL__/ar/guide/shared-housing-dubai">
+<link rel="alternate" hreflang="x-default" href="__BASE_URL__/guide/shared-housing-dubai">
+<meta property="og:type" content="article">
+<meta property="og:url" content="__BASE_URL__/ar/guide/shared-housing-dubai">
+<meta property="og:title" content="قانون السكن المشترك في دبي 2026: التصاريح والغرامات">
+<meta property="og:description" content="القانون رقم 4 لسنة 2026: تصريح السكن المشترك، المبنى كاملاً، منع تأجير الأسرّة من الباطن، غرامات 500 إلى 500,000 درهم، ومهلة سنة لتوفيق الأوضاع.">
+<meta property="og:site_name" content="Ejari Helper">
+<meta property="og:image" content="__BASE_URL__/static/og-image.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ejari Helper — Dubai tenancy contracts in minutes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="قانون السكن المشترك في دبي 2026: التصاريح والغرامات">
+<meta name="twitter:description" content="القانون رقم 4 لسنة 2026: تصريح السكن المشترك، المبنى كاملاً، منع تأجير الأسرّة من الباطن، غرامات 500 إلى 500,000 درهم، ومهلة سنة لتوفيق الأوضاع.">
+<meta name="twitter:image" content="__BASE_URL__/static/og-image.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet"></noscript>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "Article", "headline": "قانون السكن المشترك في دبي 2026: التصاريح والغرامات", "description": "القانون رقم 4 لسنة 2026: تصريح السكن المشترك، المبنى كاملاً، منع تأجير الأسرّة من الباطن، غرامات 500 إلى 500,000 درهم، ومهلة سنة لتوفيق الأوضاع.", "author": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/about"}, "publisher": {"@type": "Organization", "name": "Ejari Helper", "url": "__BASE_URL__/"}, "mainEntityOfPage": "__BASE_URL__/ar/guide/shared-housing-dubai", "datePublished": "2026-10-26", "dateModified": "2026-10-26", "isAccessibleForFree": true, "inLanguage": "ar"}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "الرئيسية", "item": "__BASE_URL__/"}, {"@type": "ListItem", "position": 2, "name": "الأدلة", "item": "__BASE_URL__/guides"}, {"@type": "ListItem", "position": 3, "name": "السكن المشترك"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "ما هو قانون السكن المشترك في دبي؟", "acceptedAnswer": {"@type": "Answer", "text": "القانون رقم (4) لسنة 2026 ينظّم إشغال وإدارة السكن المشترك في دبي. يشترط تصريحاً لأي وحدة أو مبنى مخصص للسكن المشترك، ويمنع المستأجر من التأجير من الباطن، ويفرض غرامات من 500 إلى 500,000 درهم."}}, {"@type": "Question", "name": "متى بدأ تطبيق قانون السكن المشترك؟", "acceptedAnswer": {"@type": "Answer", "text": "بحسب تعميم بلدية دبي رقم 1-3-1 لعام 2026 المؤرخ في 7 سبتمبر 2026، بدأ العمل بالقانون في 8 سبتمبر 2026، وللسكن المشترك القائم سنة من هذا التاريخ لتوفيق أوضاعه."}}, {"@type": "Question", "name": "هل تأجير سرير في دبي قانوني؟", "acceptedAnswer": {"@type": "Answer", "text": "فقط في مبنى حاصل على تصريح سكن مشترك ويؤجره المالك أو منشأة مرخّصة. أما تأجير مستأجر لسرير أو غرفة من وحدة عادية فمخالف، لأن القانون يمنع المستأجر من تأجير أي جزء من الوحدة من الباطن."}}, {"@type": "Question", "name": "ما غرامات قانون السكن المشترك؟", "acceptedAnswer": {"@type": "Answer", "text": "من 500 إلى 500,000 درهم، وتتضاعف عند التكرار خلال سنة بحد أقصى مليون درهم، ويجوز إيقاف النشاط حتى ستة أشهر أو إلغاء التصريح."}}, {"@type": "Question", "name": "هل يمكن الجمع بين العائلات والعزاب في مبنى واحد؟", "acceptedAnswer": {"@type": "Answer", "text": "لا. بحسب تعميم البلدية يقتصر مبنى السكن المشترك أو الفيلا على فئة واحدة فقط: الأفراد أو العائلات."}}, {"@type": "Question", "name": "هل أحصل على شهادة إيجاري لسرير مشترك؟", "acceptedAnswer": {"@type": "Answer", "text": "تفيد الأسئلة الشائعة لدائرة الأراضي والأملاك بعدم وجود شهادة إيجاري للمقيم المشارك وعدم إمكان تسجيل إيجاري بإسمَي مستأجرَين. وفي السكن المشترك المرخّص تتيح بيانات التصريح إصدار عقود إيجار للقاطنين."}}, {"@type": "Question", "name": "أين تُنظر منازعات السكن المشترك؟", "acceptedAnswer": {"@type": "Answer", "text": "لمركز فض المنازعات الإيجارية في دبي الاختصاص الحصري بالمنازعات الناشئة عن القانون والقرارات المرتبطة به."}}]}
+</script>
+<style>
+:root{--bg:#fbfaf7;--white:#fff;--text:#1a1a1a;--sub:#55554f;--muted:#86867e;--border:#e7e6df;--accent:#16423c;--accent-bright:#2fd18d;--grad:linear-gradient(135deg,#1f8f66,#16423c);--grad-bright:linear-gradient(135deg,#2fd18d,#1f8f66);--accent-bg:#eaf2ec;--accent-mid:#1f8f66;--red:#c0392b;--red-bg:#fdf2f2;--blue:#1a4f8a;--blue-bg:#eef3fa;--gold:#b8860b;--gold-bg:#fdfaf0;--r:10px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans','Segoe UI',Tahoma,Arial,sans-serif;font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased}
+nav{background:rgba(251,250,247,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border);min-height:62px;display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:780px;width:100%;margin:0 auto;display:flex;align-items:center;gap:16px}
+.brand-name{display:inline-flex;align-items:center;gap:10px;font-size:17px;font-weight:700;color:var(--accent);letter-spacing:-.01em;text-decoration:none}.brand-name::before{content:'';width:32px;height:32px;border-radius:9px;flex-shrink:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none'%3E%3Cpath d='M4 11l8-6 8 6' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M6 10v9h12v-9' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M9.4 14.3l1.9 2 3.4-3.5' stroke='%235be0a8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/19px no-repeat,linear-gradient(135deg,#1f8f66,#16423c);box-shadow:0 4px 14px rgba(22,66,60,.28)}
+.nav-sep{color:var(--border)}
+.nav-cur{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+main{max-width:720px;margin:0 auto;padding:32px 20px 80px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.bc{font-size:12px;color:var(--muted);margin-bottom:20px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.bc a{color:var(--muted)}
+.bc a:hover{color:var(--accent);text-decoration:none}
+.bc-sep{color:var(--border)}
+.guide-badge{font-size:11px;font-weight:600;color:var(--accent-mid);letter-spacing:0;margin-bottom:8px}
+.guide-title{font-family:'IBM Plex Sans','Segoe UI',Tahoma,Arial,sans-serif;font-size:30px;font-weight:700;color:var(--accent);letter-spacing:0;line-height:1.35;margin-bottom:8px}
+.guide-meta{font-size:12px;color:var(--muted);margin-bottom:12px}
+.guide-intro{font-size:14px;color:var(--sub);margin-bottom:28px;line-height:1.8}
+.fc{display:flex;flex-direction:column}
+.fc-conn{display:flex;flex-direction:column;align-items:center;gap:0;padding:2px 0}
+.fc-conn-line{width:2px;height:16px;background:var(--border)}
+.fc-conn-arr{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--border)}
+.fc-conn-label{font-size:10px;font-weight:700;letter-spacing:0;color:var(--muted);padding:2px 0}
+.fc-node{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:16px 18px}
+.fc-node-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.fc-title{font-size:14px;font-weight:600;color:var(--text)}
+.fc-body{font-size:13px;color:var(--sub);line-height:1.7;padding-right:32px}
+.fc-body ul{padding-right:16px;margin-top:4px}
+.fc-body li{margin-bottom:3px}
+.fc-node.step{border-right:4px solid var(--accent)}
+.fc-num{width:22px;height:22px;background:var(--accent);color:white;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-node.decision{border-right:4px solid var(--gold);background:var(--gold-bg)}
+.fc-dicon{width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-branch{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fc-branch-item{border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;background:var(--white)}
+.fc-branch-item.yes{border-color:#a5c8a5;background:#f6fbf6}
+.fc-branch-item.no{border-color:#e8bebe;background:#fdf5f5}
+.fc-branch-tag{font-size:10px;font-weight:700;letter-spacing:0;margin-bottom:5px}
+.fc-branch-tag.yes{color:#2e7d32}
+.fc-branch-tag.no{color:var(--red)}
+.fc-branch-title{font-size:13px;font-weight:600;color:var(--text)}
+.fc-branch-desc{font-size:12px;color:var(--sub);margin-top:4px;line-height:1.6}
+.fc-node.success{border-right:4px solid #2e7d32;background:#f1f8f1}
+.fc-sicon{width:22px;height:22px;background:#2e7d32;color:white;border-radius:50%;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-node.warn{border-right:4px solid var(--red);background:var(--red-bg)}
+.fc-wicon{width:22px;height:22px;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-note{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:10px 12px;font-size:12px;color:var(--sub);margin-top:10px;line-height:1.7}
+.fc-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+.fc-table td{padding:6px 8px;border-bottom:1px solid var(--bg);color:var(--sub);vertical-align:top;text-align:right}
+.fc-table td:first-child{font-weight:500;color:var(--text);width:55%}
+.fc-table tr:last-child td{border-bottom:none}
+/* Dispute type grid */
+.dispute-types{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px;margin-top:8px}
+.dt{border:1px solid var(--border);border-radius:7px;padding:9px 11px;background:var(--bg)}
+.dt-icon{font-size:15px;margin-bottom:4px}
+.dt-label{font-size:12px;font-weight:500;color:var(--text)}
+/* Timeline */
+.timeline{display:flex;flex-direction:column;gap:0;margin-top:8px}
+.tl-item{display:flex;gap:12px;align-items:flex-start}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px}
+.tl-line-wrap{display:flex;flex-direction:column;align-items:center;gap:0;flex-shrink:0}
+.tl-line{width:2px;height:24px;background:var(--border);margin:0 auto}
+.tl-body{padding-bottom:14px}
+.tl-label{font-size:12px;font-weight:600;color:var(--text)}
+.tl-desc{font-size:12px;color:var(--sub);margin-top:1px}
+.guide-cta{background:linear-gradient(120deg,#16423c,#0f322c);color:white;border-radius:18px;padding:30px 28px;margin-top:36px;text-align:center;box-shadow:0 16px 40px rgba(22,66,60,.18)}
+.guide-cta-title{font-size:16px;font-weight:600;margin-bottom:6px}
+.guide-cta-desc{font-size:13px;opacity:.85;margin-bottom:16px;line-height:1.6}
+.guide-cta-btn{display:inline-block;background:linear-gradient(135deg,#2fd18d,#1f8f66);color:#04140d;font-size:13.5px;font-weight:700;padding:12px 26px;border-radius:10px;text-decoration:none;box-shadow:0 6px 20px rgba(46,200,140,.35)}
+.related{margin-top:32px}
+.related-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.rc{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px;text-decoration:none;display:block;box-shadow:0 2px 10px rgba(22,66,60,.05);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.rc:hover{border-color:#cfe6d8;text-decoration:none;transform:translateY(-3px);box-shadow:0 14px 34px rgba(22,66,60,.12)}
+.rc-icon{font-size:18px;margin-bottom:6px}
+.rc-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.rc-desc{font-size:11px;color:var(--muted)}
+.site-footer{background:var(--white);border-top:1px solid var(--border);padding:24px;margin-top:48px}
+.site-footer-inner{max-width:780px;margin:0 auto;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.footer-copy{font-size:11px;color:var(--muted)}
+.footer-copy a{color:var(--muted)}
+.faq{margin-top:36px}
+.faq-title{font-size:18px;font-weight:700;color:var(--accent);letter-spacing:0;margin-bottom:12px}
+.faq-item{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:10px}
+.faq-q{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
+.faq-a{font-size:13px;color:var(--sub);line-height:1.75;margin:0}
+@media(max-width:540px){
+  .fc-branch{grid-template-columns:1fr}
+  .guide-title{font-size:22px}
+}
+
+.lang-sw{margin-inline-start:auto;display:inline-flex;border:1.5px solid var(--border);border-radius:999px;overflow:hidden;flex-shrink:0;background:var(--white)}
+.lang-sw a{padding:5px 12px;font-size:12px;font-weight:700;color:var(--sub);text-decoration:none;line-height:1.4}
+.lang-sw a.on{background:var(--accent);color:#fff}
+.lang-sw a:hover{text-decoration:none}
+@media(max-width:540px){.lang-sw a{padding:4px 9px;font-size:11px}}
+</style>
+<link rel="stylesheet" href="/static/css/base.css">
+</head>
+<body>
+<nav class="eh-nav" aria-label="التنقل الرئيسي">
+  <div class="eh-nav-in">
+    <a href="/" class="eh-brand"><span class="eh-logo" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 11l8-6 8 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9h12v-9" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.4 14.3l1.9 2 3.4-3.5" stroke="#5be0a8" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="eh-brand-name">Ejari Helper</span></a>
+    <div class="eh-links">
+      <span class="eh-lang"><a href="/guide/shared-housing-dubai" hreflang="en" lang="en" dir="ltr">EN</a><a href="/ar/guide/shared-housing-dubai" class="on" hreflang="ar">عربي</a></span>
+      <a class="eh-cta" href="/ar/legal-chat" data-cta="ask-ai-lawyer">اسأل المحامي الذكي ←</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <nav class="bc" aria-label="مسار التنقل">
+    <a href="/">الرئيسية</a><span class="bc-sep">‹</span>
+    <a href="/#guides">الأدلة</a><span class="bc-sep">‹</span>
+    <span>السكن المشترك</span>
+  </nav>
+
+  <div class="guide-badge">المنازعات والحقوق · دبي</div>
+  <h1 class="guide-title">قانون السكن المشترك في دبي 2026:<br>التصاريح والغرامات وما يهم المستأجر</h1>
+  <div class="guide-meta">آخر تحديث: أكتوبر 2026 · القانون رقم 4 لسنة 2026 · <a href="/guide/shared-housing-dubai" lang="en">English</a></div>
+  <p class="guide-intro"><strong>هل تأجير الأسرّة والغرف المشتركة ما زال قانونياً في دبي؟</strong> فقط في المباني الحاصلة على تصريح سكن مشترك. فالقانون رقم 4 لسنة 2026 — الساري منذ <strong>8 سبتمبر 2026</strong> — يشترط تصريحاً، ويمنع المستأجر من تأجير أي جزء من الوحدة من الباطن، ويفرض غرامات من <strong>500 إلى 500,000 درهم</strong>. يلخّص هذا الدليل أحكام الإعلان الرسمي وتعميم البلدية.</p>
+
+  <div class="fc">
+
+    <div class="fc-node info" id="short-answer">
+      <div class="fc-node-head">
+        <div class="fc-iicon">i</div>
+        <h2 class="fc-title">الخلاصة: القانون رقم 4 لسنة 2026 ساري منذ 8 سبتمبر 2026</h2>
+      </div>
+      <div class="fc-body">
+        ينظّم <a href="https://www.mediaoffice.ae/en/news/2026/march/11-03/mohammed-bin-rashid-issues-law-regulating-the-management" target="_blank" rel="noopener">القانون رقم (4) لسنة 2026</a> إشغال وإدارة السكن المشترك في دبي، وقد أكّد <a href="https://dmpmedia.dm.gov.ae/uploads/2026/09/1-3-1-Document.pdf" target="_blank" rel="noopener">تعميم بلدية دبي رقم 1-3-1 لعام 2026</a> (المؤرخ في 7 سبتمبر 2026) بدء العمل به في <strong>8 سبتمبر 2026</strong>. لا يجوز تخصيص وحدة أو مبنى للسكن المشترك دون <strong>تصريح</strong>، ويشمل التصريح <strong>المبنى أو الفيلا بالكامل</strong>، ولا يحق للمستأجر <strong>تأجير أي جزء</strong> من الوحدة من الباطن.
+        <table class="fc-table">
+          <tr><td>من يحتاج إلى تصريح</td><td>الملاك والمنشآت التي تؤجر أو تدير وحدات للسكن المشترك. يُستثنى سكن العمال الجماعي.</td></tr>
+          <tr><td>مدة التصريح</td><td>سنة واحدة قابلة للتجديد لمدد مماثلة، ويجوز للمالك طلب سنتين. يُقدَّم طلب التجديد قبل 30 يوماً على الأقل من الانتهاء.</td></tr>
+          <tr><td>الغرامات</td><td>من 500 إلى 500,000 درهم، وتتضاعف عند التكرار خلال سنة بحد أقصى مليون درهم.</td></tr>
+          <tr><td>السكن المشترك القائم</td><td>سنة من 8 سبتمبر 2026 لتوفيق الأوضاع (لا تشمل المهلة المخالفات البنائية ومخالفات تغيير الاستعمال).</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+    <div class="fc-node step" id="permit">
+      <div class="fc-node-head">
+        <div class="fc-num">1</div>
+        <h2 class="fc-title">شروط التصريح: المبنى كاملاً وفئة واحدة</h2>
+      </div>
+      <div class="fc-body">
+        بحسب تعميم البلدية:
+        <ul>
+          <li>يُخصَّص <strong>المبنى السكني أو الفيلا بالكامل</strong> للسكن المشترك، ولا يجوز تخصيص جزء منه فقط.</li>
+          <li>يقتصر المبنى على <strong>فئة واحدة</strong>: إما <strong>الأفراد</strong> أو <strong>العائلات</strong>، ولا يُسمح بالجمع بينهما.</li>
+          <li>يقدّم المالك الطلب عبر مكتب هندسي على <strong>منصة البناء في دبي</strong>، ويصدر التصريح فور صدور شهادة الإنجاز وتُرسل بياناته إلى دائرة الأراضي والأملاك لإصدار عقود الإيجار للقاطنين.</li>
+          <li>يُسمح بالسكن المشترك في <strong>المناطق المصرّح بها</strong> فقط.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+    <div class="fc-node step" id="sublease">
+      <div class="fc-node-head">
+        <div class="fc-num">2</div>
+        <h2 class="fc-title">تأجير الأسرّة والغرف من الباطن ممنوع</h2>
+      </div>
+      <div class="fc-body">
+        يجيز القانون تأجير الوحدة مباشرة من المالك، أو عبر منشأة تديرها لصالحه، أو عبر منشأة تستأجرها منه لتأجيرها. وفي جميع الحالات لا يؤجر الوحدة إلا <strong>المالك أو المنشأة المرخّصة</strong>، ولا يجوز للمستأجر أو غيره تأجير أي جزء منها من الباطن. لقواعد التأجير من الباطن العامة راجع <a href="/guide/subletting-dubai" lang="en">Subletting in Dubai (EN)</a>.
+      </div>
+    </div>
+
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+    <div class="fc-node warn" id="penalties">
+      <div class="fc-node-head">
+        <div class="fc-wicon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4.5"/><path d="M12 17.4h.01" stroke-width="2.4"/></svg></div>
+        <h2 class="fc-title">العقوبات على الملاك والمشغّلين</h2>
+      </div>
+      <div class="fc-body">
+        <ul>
+          <li><strong>غرامات</strong> من 500 إلى 500,000 درهم، تتضاعف عند التكرار خلال سنة بحد أقصى مليون درهم.</li>
+          <li>يجوز لدائرة الأراضي والأملاك <strong>إيقاف النشاط حتى ستة أشهر</strong>، وإلغاء التصريح، وسحب الرخصة التجارية، وفصل الخدمات العامة إلى حين إزالة المخالفة، أو إخلاء الوحدات المخالفة.</li>
+          <li>الاختصاص الحصري في المنازعات الناشئة عن القانون لـ<a href="/ar/guide/rental-dispute">مركز فض المنازعات الإيجارية</a>.</li>
+          <li>أمام الملاك والمنشآت القائمة <strong>سنة</strong> لتوفيق أوضاعهم، ويجوز لمدير عام بلدية دبي منح تمديد لمرة واحدة.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fc-conn"><div class="fc-conn-line"></div><div class="fc-conn-arr"></div></div>
+    <div class="fc-node info" id="tenant-checklist">
+      <div class="fc-node-head">
+        <div class="fc-iicon">i</div>
+        <h2 class="fc-title">قائمة تحقق للمستأجر قبل دفع أي مبلغ</h2>
+      </div>
+      <div class="fc-body">
+        <ul>
+          <li>اطلب <strong>تصريح السكن المشترك</strong> للمبنى، وتأكد أن المؤجر هو المالك أو منشأة مرخّصة وليس مستأجراً آخر.</li>
+          <li>اطلب <strong>عقد إيجار رسمياً</strong>؛ فبيانات التصريح تُرسل لدائرة الأراضي والأملاك لإصدار العقود للقاطنين. الإيصال النقدي من مستأجر رئيسي لا يحميك.</li>
+          <li>تذكّر أن الأسئلة الشائعة لدى الدائرة تفيد بأنه <strong>لا توجد شهادة إيجاري للمقيم المشارك</strong> (يمكن إضافته في تطبيق Dubai REST)، ولا يمكن تسجيل إيجاري بإسمَي مستأجرَين. راجع <a href="/ar/guide/ejari-registration">تسجيل إيجاري</a>.</li>
+          <li>احتفظ بإثبات كل دفعة، واطلب شروط مبلغ التأمين كتابةً.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- /fc -->
+
+  <section class="faq">
+    <h2 class="faq-title">الأسئلة الشائعة</h2>
+    <div class="faq-item">
+      <h3 class="faq-q">ما هو قانون السكن المشترك في دبي؟</h3>
+      <p class="faq-a">القانون رقم (4) لسنة 2026 ينظّم إشغال وإدارة السكن المشترك في دبي. يشترط تصريحاً لأي وحدة أو مبنى مخصص للسكن المشترك، ويمنع المستأجر من التأجير من الباطن، ويفرض غرامات من 500 إلى 500,000 درهم.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">متى بدأ تطبيق قانون السكن المشترك؟</h3>
+      <p class="faq-a">بحسب تعميم بلدية دبي رقم 1-3-1 لعام 2026 المؤرخ في 7 سبتمبر 2026، بدأ العمل بالقانون في 8 سبتمبر 2026، وللسكن المشترك القائم سنة من هذا التاريخ لتوفيق أوضاعه.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">هل تأجير سرير في دبي قانوني؟</h3>
+      <p class="faq-a">فقط في مبنى حاصل على تصريح سكن مشترك ويؤجره المالك أو منشأة مرخّصة. أما تأجير مستأجر لسرير أو غرفة من وحدة عادية فمخالف، لأن القانون يمنع المستأجر من تأجير أي جزء من الوحدة من الباطن.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">ما غرامات قانون السكن المشترك؟</h3>
+      <p class="faq-a">من 500 إلى 500,000 درهم، وتتضاعف عند التكرار خلال سنة بحد أقصى مليون درهم، ويجوز إيقاف النشاط حتى ستة أشهر أو إلغاء التصريح.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">هل يمكن الجمع بين العائلات والعزاب في مبنى واحد؟</h3>
+      <p class="faq-a">لا. بحسب تعميم البلدية يقتصر مبنى السكن المشترك أو الفيلا على فئة واحدة فقط: الأفراد أو العائلات.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">هل أحصل على شهادة إيجاري لسرير مشترك؟</h3>
+      <p class="faq-a">تفيد الأسئلة الشائعة لدائرة الأراضي والأملاك بعدم وجود شهادة إيجاري للمقيم المشارك وعدم إمكان تسجيل إيجاري بإسمَي مستأجرَين. وفي السكن المشترك المرخّص تتيح بيانات التصريح إصدار عقود إيجار للقاطنين.</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">أين تُنظر منازعات السكن المشترك؟</h3>
+      <p class="faq-a">لمركز فض المنازعات الإيجارية في دبي الاختصاص الحصري بالمنازعات الناشئة عن القانون والقرارات المرتبطة به.</p>
+    </div>
+  </section>
+
+  <div class="related">
+    <div class="related-title">أدلة ذات صلة</div>
+    <div class="related-grid">
+      <a href="/guide/subletting-dubai" class="rc">
+        <div class="rc-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg></div>
+        <div class="rc-title">التأجير من الباطن</div>
+        <div class="rc-desc">المادة 24 والمخاطر (EN)</div>
+      </a>
+      <a href="/ar/guide/rental-dispute" class="rc">
+        <div class="rc-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg></div>
+        <div class="rc-title">المنازعات الإيجارية</div>
+        <div class="rc-desc">الرسوم وخطوات الرفع</div>
+      </a>
+      <a href="/guide/eviction-notice-dubai" class="rc">
+        <div class="rc-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg></div>
+        <div class="rc-title">إخطار الإخلاء</div>
+        <div class="rc-desc">قاعدة 12 شهراً (EN)</div>
+      </a>
+      <a href="/guide/ejari-registration" class="rc">
+        <div class="rc-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg></div>
+        <div class="rc-title">تسجيل إيجاري</div>
+        <div class="rc-desc">من يمكنه التسجيل</div>
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<footer class="eh-footer">
+  <div class="eh-footer-in">
+    <div class="eh-f-col">
+      <div class="eh-f-name">Ejari Helper</div>
+      <p class="eh-f-desc">مساعد قانوني ذكي لعقود الإيجار في دبي — إجابات مدعومة بالقانون وعقود بصيغة دائرة الأراضي والأملاك.</p>
+    </div>
+    <div class="eh-f-col">
+      <div class="eh-f-h">الخدمات والأدلة</div>
+      <a href="/ar/legal-chat">المحامي الذكي للإيجارات</a>
+      <a href="/ar/guide/ejari-renewal">تجديد إيجاري</a>
+      <a href="/ar/guide/rental-dispute">المنازعات الإيجارية</a>
+      <a href="/ar/guide/dewa-premises-number">رقم المبنى ديوا</a>
+    </div>
+    <div class="eh-f-col" lang="en" dir="ltr">
+      <div class="eh-f-h">In English</div>
+      <a href="/">Generate contract</a>
+      <a href="/legal-chat">AI rental lawyer</a>
+      <a href="/tools/rent-increase-calculator">Rent calculator</a>
+    </div>
+  </div>
+  <div class="eh-f-meta">
+    <span>© 2026 Ejari Helper · دبي، الإمارات</span>
+    <a href="mailto:hello@ejarihelper.ae">hello@ejarihelper.ae</a>
+    <a href="/about" lang="en">About</a>
+    <a href="/privacy" lang="en">Privacy</a>
+    <a href="/terms" lang="en">Terms</a>
+  </div>
+  <p class="eh-f-disc">&laquo;إيجاري هيلبر&raquo; خدمة مستقلة و<strong>غير تابعة لدائرة الأراضي والأملاك في دبي أو مؤسسة التنظيم العقاري (ريرا) أو أي جهة حكومية إماراتية</strong>، وغير معتمدة منها. &laquo;إيجاري&raquo; علامة تخص دائرة الأراضي والأملاك، وتُستخدم هنا للإشارة الوصفية إلى النظام. يتم التسجيل عبر القنوات الرسمية &mdash; <a href="https://dubailand.gov.ae" rel="nofollow noopener" target="_blank">dubailand.gov.ae</a> أو تطبيق دبي ريست أو مراكز الخدمة المعتمدة. لا شيء في هذا الموقع يُعد استشارة قانونية؛ راجع <a href="/terms" lang="en">الشروط</a>.</p>
+</footer>
+<script defer src="/static/js/toc.js"></script>
+</body>
+</html>

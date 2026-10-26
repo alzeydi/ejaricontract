@@ -968,6 +968,8 @@ def sitemap_xml():
         ('/guide/early-termination-tenancy-contract-dubai', None),
         ('/guide/tenancy-contract-addendum-dubai', None),
         ('/guide/dubai-housing-fee', None),
+        ('/guide/shared-housing-dubai', guide_pair('shared-housing-dubai')),
+        ('/guide/subletting-dubai', None),
         ('/guide/dewa-activation', None),
         ('/guide/dewa-premises-number', guide_pair('dewa-premises-number')),
         ('/guide/dewa-transfer', None),
@@ -975,6 +977,7 @@ def sitemap_xml():
         ('/ar/guide/rental-dispute', guide_pair('rental-dispute')),
         ('/ar/guide/ejari-renewal', guide_pair('ejari-renewal')),
         ('/ar/guide/dewa-premises-number', guide_pair('dewa-premises-number')),
+        ('/ar/guide/shared-housing-dubai', guide_pair('shared-housing-dubai')),
         ('/legal-chat', ('/legal-chat', '/ar/legal-chat')),
         ('/ar/legal-chat', ('/legal-chat', '/ar/legal-chat')),
         ('/how-it-works', None),
@@ -1001,7 +1004,8 @@ _GUIDE_SLUGS = {'ejari-registration', 'dewa-activation', 'rental-dispute',
                 'eviction-notice-dubai', 'ejari-fine',
                 'ejari-check', 'ejari-cost', 'ejari-number',
                 'early-termination-tenancy-contract-dubai',
-                'tenancy-contract-addendum-dubai', 'dubai-housing-fee'}
+                'tenancy-contract-addendum-dubai', 'dubai-housing-fee',
+                'shared-housing-dubai', 'subletting-dubai'}
 
 _TOOL_SLUGS = {'rent-increase-calculator'}
 
@@ -1013,7 +1017,8 @@ def tool(slug):
     return render_page('tools', f'{slug}.html')
 
 # Guides that also exist in Arabic under /ar/guide/<slug>
-_AR_GUIDE_SLUGS = {'rental-dispute', 'ejari-renewal', 'dewa-premises-number'}
+_AR_GUIDE_SLUGS = {'rental-dispute', 'ejari-renewal', 'dewa-premises-number',
+                   'shared-housing-dubai'}
 
 @app.route('/guide/<slug>')
 def guide(slug):

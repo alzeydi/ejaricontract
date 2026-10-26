@@ -7,6 +7,7 @@ Read first, update last (see `AGENT.md`). Metrics: Google Search Console, `sc-do
 | Window end | Clicks | Impressions | CTR | Avg pos | Indexed / sitemap | Note |
 |---|---|---|---|---|---|---|
 | 2026-10-22 | 456 | 24,584 | 1.85% | 9.1 | ≥ 20 / 29 (eviction-notice, security-deposit, ejari-number, rent calculator, about not indexed) | agent baseline |
+| 2026-10-23 (GSC lag) | 459 (+4.6%) | 24,866 (−3.2%) | 1.85% | 9.1 (was 11.5) | 28 / 32 indexed (not indexed: ejari-number, eviction-notice, about, terms — 'Discovered, currently not indexed') | run 2026-10-26; data ends 23 Oct, i.e. before the 10-23 title rewrites show effect |
 
 ## Changes
 
@@ -33,8 +34,21 @@ Baseline = page's last 28 days before the change (clicks / impressions / CTR / p
 | N-001 | 2026-10-23 | /guide/early-termination-tenancy-contract-dubai | **New article** — breaking a lease (Art. 7, no statutory penalty, termination agreement, cheques, Ejari, RDC fee, Art. 27 heirs). Corrects Bayut's “90 days, no penalty” claim | new | 2026-11-20 | |
 | N-002 | 2026-10-23 | /guide/tenancy-contract-addendum-dubai | **New article** — addendum: 5 Additional Terms lines, common clauses vs legal defaults, void clauses, signing + Ejari | new | 2026-11-20 | |
 | N-003 | 2026-10-23 | /guide/dubai-housing-fee | **New article** with inline calculator — 5% of Ejari rent, owners on RERA rental value, fixing a wrong fee via DM | new | 2026-11-20 | |
+| N-004 | 2026-10-26 | /guide/shared-housing-dubai | **New article** — Law 4/2026: in force 8 Sep 2026 (DM Circular 1-3-1 of 7 Sep), permit, whole-building + one-category rule, no tenant subletting, fines AED 500–500k/1M, 1-year grace, tenant checklist | new | 2026-11-23 | |
+| N-005 | 2026-10-26 | /guide/subletting-dubai | **New article** — Art. 24 (written consent), 8, 22, 25(1)(b), 30 quoted from dlp.dubai.gov.ae; DLD FAQ on co-occupants/no two-name Ejari | new | 2026-11-23 | |
+| A-001 | 2026-10-26 | /ar/guide/shared-housing-dubai | **Arabic version** of N-004 (hreflang pair, sitemap, tests) | new | 2026-11-23 | |
+| D-001 | 2026-10-26 | /guide/ejari-renewal | Depth: “Who pays for Ejari renewal?” (#who-pays-for-ejari-renewal, Art. 22 as general rule) + FAQ | 0 / 427 / 0% / 39.3 | 2026-11-16 | |
+| D-002 | 2026-10-26 | /guide/dewa-transfer | Depth: FAQ for PAA query “how do i move my dewa connection when changing apartments” | 8 / 1,108 / 0.72% / 6.6 | 2026-11-16 | |
+| F-001 | 2026-10-26 | /guide/dewa-premises-number, / | Fact fix: DEWA “within 24 hours” → “15 working hours” (as verified 2026-10-23 on DEWA pages; DEWA site returned 403 this run); dateModified bumped on premises-number | 257 / 14,076 / — / 5.0 | 2026-11-16 | |
 
 Internal links added: hub `/guides` cards for N-001..003; related cards from rental-dispute, eviction-notice, security-deposit, ejari-cancellation (→ N-001), tenancy-contract, ejari-registration, rent-increase (→ N-002), dewa-activation, dewa-transfer, ejari-renewal (→ N-003); contextual links in tenancy-contract, ejari-cancellation, dewa-activation.
+
+Internal links added 2026-10-26: hub `/guides` cards for N-004/N-005; related cards from eviction-notice, rental-dispute (→ both), tenancy-contract, ejari-registration, ejari-check (→ N-004), addendum, early-termination (→ N-005); EN↔AR link for A-001.
+
+### Sources checked 2026-10-26
+* Shared housing: [Dubai Media Office, 11 Mar 2026](https://www.mediaoffice.ae/en/news/2026/march/11-03/mohammed-bin-rashid-issues-law-regulating-the-management) (permit, fines, 6-month suspension, RDC jurisdiction, 1-year compliance, no tenant sublease); [DM Circular 1-3-1/2026 PDF](https://dmpmedia.dm.gov.ae/uploads/2026/09/1-3-1-Document.pdf) (read via pdftotext: dated 7 Sep 2026, in force 8 Sep 2026, whole building, one category, Building Platform). Space-per-occupant figures NOT stated — not verified from an official source.
+* Subletting: [Law 26/2007](https://dlp.dubai.gov.ae/Legislation%20Reference/2007/Law%20No.%20%2826%29%20of%202007%20Regarding%20regulation%20between%20the%20lessor%20and%20the%20lessee.html) Arts. 8, 22, 24, 25, 30; [DLD FAQ](https://dubailand.gov.ae/en/frequently-asked-questions/) (co-occupant: no Ejari certificate; no two-name Ejari; facility-management companies may not sub-lease).
+* u.ae family visa page: salary AED 4,000 or 3,000 + accommodation (28 Sep 2026 page) — GDRFA pages returned 403, so the family-visa article was NOT written.
 
 ### Sources checked 2026-10-23
 * DEWA [Move-to](https://www.dewa.gov.ae/en/consumer/supply-management/transfer-of-electricity-water-move-to), [Move-in](https://www.dewa.gov.ae/en/consumer/supply-management/activation-of-electricity-water-move-in), [Move-out](https://www.dewa.gov.ae/en/consumer/supply-management/deactivation-of-electricity-water-move-out); [DEWA–Ejari integration release, Feb 2024](https://www.dewa.gov.ae/en/about-us/media-publications/latest-news/2024/02/dewa-electronically-received-data-of-over)
@@ -43,13 +57,11 @@ Internal links added: hub `/guides` cards for N-001..003; related cards from ren
 * [RDC first-instance fees](https://rdc.gov.ae/en/eservices/register-first-instance-lawsuit-rental/) — 3.5% of annual rent, AED 500–20,000; monetary claims cap AED 15,000; [DLD amicable settlement](https://dubailand.gov.ae/en/eservices/dispute-lawsuit-for-amicable-settlement) — half fee refunded on settlement
 * Housing fee: no DM page states the rate; 5% from DM officials quoted by Gulf News (2018) and consistent portal guides (Bayut Sep 2026); [DM refund service](https://www.dm.gov.ae/easy-payments/refund-of-fines-or-already-paid-fees/)
 
-## Content backlog (from 2026-10-23 gap research — highest first)
+## Content backlog (from 2026-10-23 gap research — highest first; N-004/N-005 shipped 2026-10-26)
 
 | Slug | Main query | Feeds | Notes / must-verify |
 |---|---|---|---|
-| /guide/shared-housing-dubai | dubai shared housing law, bed space dubai rules | AI lawyer | Law No. 4 of 2026 (Media Office 11 Mar 2026); find DM Circular 1-3-1/2026 original (5 sqm/occupant). Arabic version worth it |
 | /guide/ejari-family-visa | ejari for family visa, attested tenancy contract gdrfa | Generator (strongest buying intent) | GDRFA page; salary thresholds via u.ae/ICP |
-| /guide/subletting-dubai | is subletting legal in dubai | AI lawyer + generator | Art. 24, 25(1)(b), Art. 8; Ejari won't register tenant-to-tenant sublease |
 | /guide/maintenance-landlord-tenant-dubai | who pays maintenance dubai rental, landlord not fixing ac | AI lawyer | Arts. 16, 17, 19, 21; RDC FAQ remedies |
 | /guide/bounced-rent-cheque-dubai | bounced rent cheque dubai | AI lawyer | Decriminalised 2022; Decree-Law 50/2022; RDC payment-writ; DLD news on penalty clause cut to AED 5,000 |
 | /guide/tenant-not-paying-rent-dubai | tenant not paying rent dubai | AI lawyer (landlords) | Art. 25(1)(a) 30-day notice, Art. 31, Art. 34; deposit-and-offer |
@@ -77,3 +89,4 @@ Arabic candidates: shared housing, tenant-rights hub, bounced cheque / non-payme
 * 2026-10-23 (setup) — baseline pulled; C-001, C-002 shipped; DEWA fee consistency test added.
 * 2026-10-23 — indexing requested via Search Console (Chrome): dubai-housing-fee, early-termination, tenancy-contract-addendum, security-deposit-refund. Eviction-notice failed (GSC error); ejari-number, rent calculator, about not yet requested (Chrome disconnected).
 * 2026-10-23 (growth mode) — full competitor sweep (18 clusters), titles rewritten on 14 pages (C-003..C-016), 3 new articles (N-001..003), indexing gaps found (5 URLs), playbook switched to growth mode.
+* 2026-10-26 — GSC 28d (to 23 Oct): 459 clicks (+4.6%) / 24,866 impr (−3.2%) / 1.85% / pos 9.1 (28/32 indexed). BLOCKED: handoff patch from 10-26 could not be restored byte-exact from Drive (Drive text export is markdown-escaped, base64 too large to transcribe) — skipped, gsc.py rewritten from its text, N-004/N-005/A-001 and depth work redone from primary sources. Family-visa article skipped (GDRFA 403). No titles changed: all 14 are inside the 21-day cool-down (until 2026-11-13). No evaluations due. Indexing cannot be requested via API: ejari-number, eviction-notice, about, terms still 'Discovered – not indexed' → more internal links + sitemap resubmit. Next run: evaluate C-001..C-016 from 2026-11-13, write ejari-family-visa only if GDRFA/ICP sources are reachable, then maintenance-landlord / bounced-cheque from the backlog.

@@ -27,8 +27,10 @@ PAGES = [
     '/guide/dewa-activation', '/guide/dewa-transfer',
     '/guide/early-termination-tenancy-contract-dubai',
     '/guide/tenancy-contract-addendum-dubai', '/guide/dubai-housing-fee',
+    '/guide/shared-housing-dubai', '/guide/subletting-dubai',
     '/tools/rent-increase-calculator',
     '/ar/guide/rental-dispute', '/ar/guide/ejari-renewal', '/ar/guide/dewa-premises-number',
+    '/ar/guide/shared-housing-dubai',
 ]
 
 # Pages that exist in both languages: en-path -> ar-path.
@@ -36,6 +38,7 @@ HREFLANG_PAIRS = {
     '/guide/rental-dispute': '/ar/guide/rental-dispute',
     '/guide/ejari-renewal': '/ar/guide/ejari-renewal',
     '/guide/dewa-premises-number': '/ar/guide/dewa-premises-number',
+    '/guide/shared-housing-dubai': '/ar/guide/shared-housing-dubai',
     '/legal-chat': '/ar/legal-chat',
 }
 
@@ -148,6 +151,7 @@ def test_json_ld_parses(client, path):
     '/tools/rent-increase-calculator', '/ar/legal-chat', '/how-it-works',
     '/guide/early-termination-tenancy-contract-dubai',
     '/guide/tenancy-contract-addendum-dubai', '/guide/dubai-housing-fee',
+    '/guide/shared-housing-dubai', '/guide/subletting-dubai',
 ])
 def test_faq_schema_present(client, path):
     body = get(client, path, headers={'X-Forwarded-Proto': 'https'}).get_data(as_text=True)
@@ -544,3 +548,14 @@ def test_live_citation_crawlers_are_not_blocked_at_the_edge(bot, ua):
             assert r.status == 200, f'{bot}: HTTP {r.status}'
     except urllib.error.HTTPError as e:
         raise AssertionError(f'{bot} blocked at the edge: HTTP {e.code}') from None
+
+
+def test_shared_housing_and_subletting_fact_pins(client):
+    """Facts verified 2026-10-26 (Dubai Media Office 11 Mar 2026, DM Circular 1-3-1/2026, Law 26/2007)."""
+    sh = client.get('/guide/shared-housing-dubai').get_data(as_text=True)
+    assert 'Law No. (4) of 2026' in sh and '8 September 2026' in sh
+    assert 'AED 500 to AED 500,000' in sh and 'AED 1 million' in sh
+    sub = client.get('/guide/subletting-dubai').get_data(as_text=True)
+    assert 'Article 24' in sub and 'Article 25(1)(b)' in sub and 'written consent' in sub
+    for p in ('/guide/dewa-premises-number', '/'):
+        assert '24 hours' not in client.get(p).get_data(as_text=True)
