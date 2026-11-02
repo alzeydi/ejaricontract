@@ -28,6 +28,7 @@ PAGES = [
     '/guide/early-termination-tenancy-contract-dubai',
     '/guide/tenancy-contract-addendum-dubai', '/guide/dubai-housing-fee',
     '/guide/shared-housing-dubai', '/guide/subletting-dubai',
+    '/guide/maintenance-landlord-tenant-dubai', '/guide/tenant-not-paying-rent-dubai',
     '/tools/rent-increase-calculator',
     '/ar/guide/rental-dispute', '/ar/guide/ejari-renewal', '/ar/guide/dewa-premises-number',
     '/ar/guide/shared-housing-dubai',
@@ -152,6 +153,7 @@ def test_json_ld_parses(client, path):
     '/guide/early-termination-tenancy-contract-dubai',
     '/guide/tenancy-contract-addendum-dubai', '/guide/dubai-housing-fee',
     '/guide/shared-housing-dubai', '/guide/subletting-dubai',
+    '/guide/maintenance-landlord-tenant-dubai', '/guide/tenant-not-paying-rent-dubai',
 ])
 def test_faq_schema_present(client, path):
     body = get(client, path, headers={'X-Forwarded-Proto': 'https'}).get_data(as_text=True)
@@ -559,3 +561,15 @@ def test_shared_housing_and_subletting_fact_pins(client):
     assert 'Article 24' in sub and 'Article 25(1)(b)' in sub and 'written consent' in sub
     for p in ('/guide/dewa-premises-number', '/'):
         assert '24 hours' not in client.get(p).get_data(as_text=True)
+
+
+def test_maintenance_and_nonpayment_fact_pins(client):
+    """Facts verified 2026-11-02 against Law 26/2007 text (dlp.dubai.gov.ae) and the RDC fee page."""
+    m = client.get('/guide/maintenance-landlord-tenant-dubai').get_data(as_text=True)
+    assert 'Article 16' in m and 'Unless otherwise agreed by the parties' in m
+    assert 'Article 17' in m and 'Article 19' in m and 'Article 34' in m
+    n = client.get('/guide/tenant-not-paying-rent-dubai').get_data(as_text=True)
+    assert 'Article 25(1)(a)' in n and 'thirty (30) days from the date of service' in n
+    assert 'Article 31' in n and 'Article 34' in n
+    for page in (m, n):
+        assert 'AED 15,000' in page and '20,000' in page

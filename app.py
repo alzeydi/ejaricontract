@@ -970,6 +970,8 @@ def sitemap_xml():
         ('/guide/dubai-housing-fee', None),
         ('/guide/shared-housing-dubai', guide_pair('shared-housing-dubai')),
         ('/guide/subletting-dubai', None),
+        ('/guide/maintenance-landlord-tenant-dubai', None),
+        ('/guide/tenant-not-paying-rent-dubai', None),
         ('/guide/dewa-activation', None),
         ('/guide/dewa-premises-number', guide_pair('dewa-premises-number')),
         ('/guide/dewa-transfer', None),
@@ -1005,7 +1007,8 @@ _GUIDE_SLUGS = {'ejari-registration', 'dewa-activation', 'rental-dispute',
                 'ejari-check', 'ejari-cost', 'ejari-number',
                 'early-termination-tenancy-contract-dubai',
                 'tenancy-contract-addendum-dubai', 'dubai-housing-fee',
-                'shared-housing-dubai', 'subletting-dubai'}
+                'shared-housing-dubai', 'subletting-dubai',
+                'maintenance-landlord-tenant-dubai', 'tenant-not-paying-rent-dubai'}
 
 _TOOL_SLUGS = {'rent-increase-calculator'}
 
