@@ -8,6 +8,7 @@ Read first, update last (see `AGENT.md`). Metrics: Google Search Console, `sc-do
 |---|---|---|---|---|---|---|
 | 2026-10-22 | 456 | 24,584 | 1.85% | 9.1 | ≥ 20 / 29 (eviction-notice, security-deposit, ejari-number, rent calculator, about not indexed) | agent baseline |
 | 2026-10-23 (GSC lag) | 459 (+4.6%) | 24,866 (−3.2%) | 1.85% | 9.1 (was 11.5) | 28 / 32 indexed (not indexed: ejari-number, eviction-notice, about, terms — 'Discovered, currently not indexed') | run 2026-10-26; data ends 23 Oct, i.e. before the 10-23 title rewrites show effect |
+| 2026-10-30 (GSC lag) | 432 (−1.8% vs prev 28d 440; −5% vs baseline 456) | 26,415 (+6.2%) | 1.64% | 9.2 (prev 10.8) | 30 / 35 indexed (not indexed: ejari-number, eviction-notice, shared-housing, about, terms — all 'Discovered, currently not indexed') | run 2026-11-02 |
 
 ## Changes
 
@@ -40,10 +41,20 @@ Baseline = page's last 28 days before the change (clicks / impressions / CTR / p
 | D-001 | 2026-10-26 | /guide/ejari-renewal | Depth: “Who pays for Ejari renewal?” (#who-pays-for-ejari-renewal, Art. 22 as general rule) + FAQ | 0 / 427 / 0% / 39.3 | 2026-11-16 | |
 | D-002 | 2026-10-26 | /guide/dewa-transfer | Depth: FAQ for PAA query “how do i move my dewa connection when changing apartments” | 8 / 1,108 / 0.72% / 6.6 | 2026-11-16 | |
 | F-001 | 2026-10-26 | /guide/dewa-premises-number, / | Fact fix: DEWA “within 24 hours” → “15 working hours” (as verified 2026-10-23 on DEWA pages; DEWA site returned 403 this run); dateModified bumped on premises-number | 257 / 14,076 / — / 5.0 | 2026-11-16 | |
+| N-006 | 2026-11-02 | /guide/maintenance-landlord-tenant-dubai | **New article** — Arts. 16, 17, 18, 19, 20, 21, 34 quoted from dlp.dubai.gov.ae; RDC fees; no AED repair threshold in law | new | 2026-11-30 | |
+| N-007 | 2026-11-02 | /guide/tenant-not-paying-rent-dubai | **New article** — Art. 25(1)(a) 30-day notice to pay from service, Arts. 7, 31, 34, 35; RDC fees | new | 2026-11-30 | |
+| D-003 | 2026-11-02 | /guide/security-deposit-refund-dubai | Depth: RDC monetary-claim fee box (3.5%, AED 500–15,000) + Arts. 20/21; dateModified bumped | 0 / 80 / 0% / 45.1 | 2026-11-23 | |
+
+Internal links added 2026-11-02: hub `/guides` cards for N-006/N-007; related cards into N-006/N-007 from security-deposit, addendum, tenancy-contract, early-termination, eviction-notice, rental-dispute, rent-increase, subletting; deposit page contextual link.
 
 Internal links added: hub `/guides` cards for N-001..003; related cards from rental-dispute, eviction-notice, security-deposit, ejari-cancellation (→ N-001), tenancy-contract, ejari-registration, rent-increase (→ N-002), dewa-activation, dewa-transfer, ejari-renewal (→ N-003); contextual links in tenancy-contract, ejari-cancellation, dewa-activation.
 
 Internal links added 2026-10-26: hub `/guides` cards for N-004/N-005; related cards from eviction-notice, rental-dispute (→ both), tenancy-contract, ejari-registration, ejari-check (→ N-004), addendum, early-termination (→ N-005); EN↔AR link for A-001.
+
+### Sources checked 2026-11-02
+* [Law 26/2007 full text](https://dlp.dubai.gov.ae/Legislation%20Reference/2007/Law%20No.%20%2826%29%20of%202007%20Regarding%20regulation%20between%20the%20lessor%20and%20the%20lessee.html) fetched: Arts. 7, 16–21, 24, 25, 31, 34, 35 quoted/paraphrased.
+* [RDC first-instance fee page](https://rdc.gov.ae/en/eservices/register-first-instance-lawsuit-rental/) fetched: 3.5% of annual rent (AED 500–20,000) for eviction/renewal/rent/termination; 3.5% of claimed amount (AED 500–15,000) for monetary claims; process service AED 100.
+* Competitor SERPs for maintenance and bounced cheques are law-firm/portal blogs; no official rule found for an AED repair threshold — omitted.
 
 ### Sources checked 2026-10-26
 * Shared housing: [Dubai Media Office, 11 Mar 2026](https://www.mediaoffice.ae/en/news/2026/march/11-03/mohammed-bin-rashid-issues-law-regulating-the-management) (permit, fines, 6-month suspension, RDC jurisdiction, 1-year compliance, no tenant sublease); [DM Circular 1-3-1/2026 PDF](https://dmpmedia.dm.gov.ae/uploads/2026/09/1-3-1-Document.pdf) (read via pdftotext: dated 7 Sep 2026, in force 8 Sep 2026, whole building, one category, Building Platform). Space-per-occupant figures NOT stated — not verified from an official source.
@@ -57,7 +68,7 @@ Internal links added 2026-10-26: hub `/guides` cards for N-004/N-005; related ca
 * [RDC first-instance fees](https://rdc.gov.ae/en/eservices/register-first-instance-lawsuit-rental/) — 3.5% of annual rent, AED 500–20,000; monetary claims cap AED 15,000; [DLD amicable settlement](https://dubailand.gov.ae/en/eservices/dispute-lawsuit-for-amicable-settlement) — half fee refunded on settlement
 * Housing fee: no DM page states the rate; 5% from DM officials quoted by Gulf News (2018) and consistent portal guides (Bayut Sep 2026); [DM refund service](https://www.dm.gov.ae/easy-payments/refund-of-fines-or-already-paid-fees/)
 
-## Content backlog (from 2026-10-23 gap research — highest first; N-004/N-005 shipped 2026-10-26)
+## Content backlog (from 2026-10-23 gap research — highest first; N-004/N-005 shipped 2026-10-26, N-006 maintenance + N-007 non-payment shipped 2026-11-02)
 
 | Slug | Main query | Feeds | Notes / must-verify |
 |---|---|---|---|
@@ -90,3 +101,4 @@ Arabic candidates: shared housing, tenant-rights hub, bounced cheque / non-payme
 * 2026-10-23 — indexing requested via Search Console (Chrome): dubai-housing-fee, early-termination, tenancy-contract-addendum, security-deposit-refund. Eviction-notice failed (GSC error); ejari-number, rent calculator, about not yet requested (Chrome disconnected).
 * 2026-10-23 (growth mode) — full competitor sweep (18 clusters), titles rewritten on 14 pages (C-003..C-016), 3 new articles (N-001..003), indexing gaps found (5 URLs), playbook switched to growth mode.
 * 2026-10-26 — GSC 28d (to 23 Oct): 459 clicks (+4.6%) / 24,866 impr (−3.2%) / 1.85% / pos 9.1 (28/32 indexed). BLOCKED: handoff patch from 10-26 could not be restored byte-exact from Drive (Drive text export is markdown-escaped, base64 too large to transcribe) — skipped, gsc.py rewritten from its text, N-004/N-005/A-001 and depth work redone from primary sources. Family-visa article skipped (GDRFA 403). No titles changed: all 14 are inside the 21-day cool-down (until 2026-11-13). No evaluations due. Indexing cannot be requested via API: ejari-number, eviction-notice, about, terms still 'Discovered – not indexed' → more internal links + sitemap resubmit. Next run: evaluate C-001..C-016 from 2026-11-13, write ejari-family-visa only if GDRFA/ICP sources are reachable, then maintenance-landlord / bounced-cheque from the backlog.
+* 2026-11-02 — GSC 28d (3–30 Oct): 432 clicks (−1.8%) / 26,415 impr (+6.2%) / 1.64% / pos 9.2 (was 10.8); 30/35 indexed. Titles NOT changed: all inside 21-day cool-down until 2026-11-13 (no page lost >30% clicks with a significant base). Shipped N-006, N-007, D-003 + links. SKIPPED this run: Arabic page, 2nd depth upgrade, competitor SERP rotation (only maintenance + bounced-cheque queries checked) — do next run. Watch: /ar/guide/rental-dispute 8→1 clicks (not retitled yet), tenancy-contract-dubai clicks 136→110 (position improved 9.8→8.2, CTR fell; evaluate 11-13). Next run: evaluate C-001..C-016 (due 11-13), request-less indexing push for ejari-number/eviction-notice/shared-housing/about/terms via links, AR version of maintenance or tenant-rights, bounced-cheque article (need Decree-Law 50/2022 source).
