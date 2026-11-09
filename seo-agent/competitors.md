@@ -48,3 +48,12 @@ Last full sweep: **2026-10-23**.
 * **is subletting legal in dubai** — Q&A pages and Bayut articles soften Art. 24; ours quotes Arts. 24/25(1)(b)/8/22/30 verbatim (N-005).
 * Not researched this run (WebSearch not used): rotation of the other 6 biggest clusters is due next run.
 
+
+## Cluster notes (2026-11-09)
+
+| Cluster | Winner pattern | What winners give / miss | Our angle |
+|---|---|---|---|
+| landlord selling property / tenant rights | Khaleej Times Q&A, The National Homefront, law-firm blogs (BSA, Mondaq), realestateclubdubai “Selling Dubai Property While a Tenant Is Renting 2026: RERA Rules & 12-Month Notice” | Mixed accounts of whether notice must be notarised; nobody states Art. 28 + amended Art. 25(2)(d) side by side with a notice checklist | N-008: statute-quoted, checklist, open question flagged (buyer relying on previous owner's notice) |
+| bounced rent cheque | dubizzle, Bayut, bhomes, FAM, old National/Gulf News Q&A | Pre-2022 criminal-law advice still circulating; sources disagree on current position | Backlog — write only once Decree-Law 50/2022 verified |
+| rdc case status | dubizzle “Track your case”, Engel & Völkers, rdc.gov.ae track page itself | Official page: mobile or case number, free, instant, no phone listed | D-004 aligned our page to the official page |
+| ejari co-occupants | dubizzle, Khaleej Times, DLD service page | DLD page lists no fee; third-party says free | N-009 sticks to DLD wording |

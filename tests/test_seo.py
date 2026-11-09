@@ -29,9 +29,10 @@ PAGES = [
     '/guide/tenancy-contract-addendum-dubai', '/guide/dubai-housing-fee',
     '/guide/shared-housing-dubai', '/guide/subletting-dubai',
     '/guide/maintenance-landlord-tenant-dubai', '/guide/tenant-not-paying-rent-dubai',
+    '/guide/landlord-selling-property-tenant-rights', '/guide/ejari-co-occupants',
     '/tools/rent-increase-calculator',
     '/ar/guide/rental-dispute', '/ar/guide/ejari-renewal', '/ar/guide/dewa-premises-number',
-    '/ar/guide/shared-housing-dubai',
+    '/ar/guide/shared-housing-dubai', '/ar/guide/landlord-selling-property-tenant-rights',
 ]
 
 # Pages that exist in both languages: en-path -> ar-path.
@@ -40,6 +41,7 @@ HREFLANG_PAIRS = {
     '/guide/ejari-renewal': '/ar/guide/ejari-renewal',
     '/guide/dewa-premises-number': '/ar/guide/dewa-premises-number',
     '/guide/shared-housing-dubai': '/ar/guide/shared-housing-dubai',
+    '/guide/landlord-selling-property-tenant-rights': '/ar/guide/landlord-selling-property-tenant-rights',
     '/legal-chat': '/ar/legal-chat',
 }
 
@@ -154,6 +156,7 @@ def test_json_ld_parses(client, path):
     '/guide/tenancy-contract-addendum-dubai', '/guide/dubai-housing-fee',
     '/guide/shared-housing-dubai', '/guide/subletting-dubai',
     '/guide/maintenance-landlord-tenant-dubai', '/guide/tenant-not-paying-rent-dubai',
+    '/guide/landlord-selling-property-tenant-rights', '/guide/ejari-co-occupants',
 ])
 def test_faq_schema_present(client, path):
     body = get(client, path, headers={'X-Forwarded-Proto': 'https'}).get_data(as_text=True)
@@ -573,3 +576,13 @@ def test_maintenance_and_nonpayment_fact_pins(client):
     assert 'Article 31' in n and 'Article 34' in n
     for page in (m, n):
         assert 'AED 15,000' in page and '20,000' in page
+
+
+def test_sale_and_cooccupant_fact_pins(client):
+    """Facts verified 2026-11-09: Law 26/2007 Art. 28; Law 33/2008 amended Art. 25(2)(d) and notice; DLD occupants service page."""
+    n = client.get('/guide/landlord-selling-property-tenant-rights').get_data(as_text=True)
+    assert 'Article 28' in n and 'fixed term' in n and '12 months' in n
+    assert 'Notary Public or by registered mail' in n and 'Article 34' in n
+    c = client.get('/guide/ejari-co-occupants').get_data(as_text=True)
+    assert 'Manage Occupants Data' in c and 'Emirates ID and date of birth' in c and '800 4488' in c
+    assert 'Article 24' in c
