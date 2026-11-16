@@ -30,9 +30,11 @@ PAGES = [
     '/guide/shared-housing-dubai', '/guide/subletting-dubai',
     '/guide/maintenance-landlord-tenant-dubai', '/guide/tenant-not-paying-rent-dubai',
     '/guide/landlord-selling-property-tenant-rights', '/guide/ejari-co-occupants',
+    '/guide/tenant-rights-dubai', '/guide/verify-landlord-title-deed',
     '/tools/rent-increase-calculator',
     '/ar/guide/rental-dispute', '/ar/guide/ejari-renewal', '/ar/guide/dewa-premises-number',
     '/ar/guide/shared-housing-dubai', '/ar/guide/landlord-selling-property-tenant-rights',
+    '/ar/guide/maintenance-landlord-tenant-dubai',
 ]
 
 # Pages that exist in both languages: en-path -> ar-path.
@@ -42,6 +44,7 @@ HREFLANG_PAIRS = {
     '/guide/dewa-premises-number': '/ar/guide/dewa-premises-number',
     '/guide/shared-housing-dubai': '/ar/guide/shared-housing-dubai',
     '/guide/landlord-selling-property-tenant-rights': '/ar/guide/landlord-selling-property-tenant-rights',
+    '/guide/maintenance-landlord-tenant-dubai': '/ar/guide/maintenance-landlord-tenant-dubai',
     '/legal-chat': '/ar/legal-chat',
 }
 
@@ -157,6 +160,8 @@ def test_json_ld_parses(client, path):
     '/guide/shared-housing-dubai', '/guide/subletting-dubai',
     '/guide/maintenance-landlord-tenant-dubai', '/guide/tenant-not-paying-rent-dubai',
     '/guide/landlord-selling-property-tenant-rights', '/guide/ejari-co-occupants',
+    '/guide/tenant-rights-dubai', '/guide/verify-landlord-title-deed',
+    '/ar/guide/maintenance-landlord-tenant-dubai',
 ])
 def test_faq_schema_present(client, path):
     body = get(client, path, headers={'X-Forwarded-Proto': 'https'}).get_data(as_text=True)
@@ -586,3 +591,18 @@ def test_sale_and_cooccupant_fact_pins(client):
     c = client.get('/guide/ejari-co-occupants').get_data(as_text=True)
     assert 'Manage Occupants Data' in c and 'Emirates ID and date of birth' in c and '800 4488' in c
     assert 'Article 24' in c
+
+
+def test_tenant_rights_and_title_deed_fact_pins(client):
+    """Facts verified 2026-11-16: Law 26/2007 + Law 33/2008 text (dlp.dubai.gov.ae), RDC fee page,
+    DLD Verify Title Deed + Property Status Enquiry service pages (no fees, immediate, website + Dubai REST)."""
+    r = client.get('/guide/tenant-rights-dubai').get_data(as_text=True)
+    for art in ('Art. 7', 'Art. 15', 'Arts. 16–17', 'Art. 28', 'Art. 34', 'Art. 6'):
+        assert art in r, art
+    assert '12 months' in r and 'AED 20,000' in r and '15,000' in r
+    assert '90 days' in r
+    d = client.get('/guide/verify-landlord-title-deed').get_data(as_text=True)
+    assert 'No fees' in d and 'Immediate' in d and 'Dubai REST' in d and '800 4488' in d
+    assert 'Validate Owner and Property' in d and 'AED 177.75' in d
+    a = client.get('/ar/guide/maintenance-landlord-tenant-dubai').get_data(as_text=True)
+    assert 'المادة 16' in a and 'المادة 34' in a and '15,000' in a and '20,000' in a

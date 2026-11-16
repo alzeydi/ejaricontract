@@ -970,10 +970,12 @@ def sitemap_xml():
         ('/guide/dubai-housing-fee', None),
         ('/guide/shared-housing-dubai', guide_pair('shared-housing-dubai')),
         ('/guide/subletting-dubai', None),
-        ('/guide/maintenance-landlord-tenant-dubai', None),
+        ('/guide/maintenance-landlord-tenant-dubai', guide_pair('maintenance-landlord-tenant-dubai')),
         ('/guide/tenant-not-paying-rent-dubai', None),
         ('/guide/landlord-selling-property-tenant-rights', guide_pair('landlord-selling-property-tenant-rights')),
         ('/guide/ejari-co-occupants', None),
+        ('/guide/tenant-rights-dubai', None),
+        ('/guide/verify-landlord-title-deed', None),
         ('/guide/dewa-activation', None),
         ('/guide/dewa-premises-number', guide_pair('dewa-premises-number')),
         ('/guide/dewa-transfer', None),
@@ -983,6 +985,7 @@ def sitemap_xml():
         ('/ar/guide/dewa-premises-number', guide_pair('dewa-premises-number')),
         ('/ar/guide/shared-housing-dubai', guide_pair('shared-housing-dubai')),
         ('/ar/guide/landlord-selling-property-tenant-rights', guide_pair('landlord-selling-property-tenant-rights')),
+        ('/ar/guide/maintenance-landlord-tenant-dubai', guide_pair('maintenance-landlord-tenant-dubai')),
         ('/legal-chat', ('/legal-chat', '/ar/legal-chat')),
         ('/ar/legal-chat', ('/legal-chat', '/ar/legal-chat')),
         ('/how-it-works', None),
@@ -1012,7 +1015,8 @@ _GUIDE_SLUGS = {'ejari-registration', 'dewa-activation', 'rental-dispute',
                 'tenancy-contract-addendum-dubai', 'dubai-housing-fee',
                 'shared-housing-dubai', 'subletting-dubai',
                 'maintenance-landlord-tenant-dubai', 'tenant-not-paying-rent-dubai',
-                'landlord-selling-property-tenant-rights', 'ejari-co-occupants'}
+                'landlord-selling-property-tenant-rights', 'ejari-co-occupants',
+                'tenant-rights-dubai', 'verify-landlord-title-deed'}
 
 _TOOL_SLUGS = {'rent-increase-calculator'}
 
@@ -1025,7 +1029,8 @@ def tool(slug):
 
 # Guides that also exist in Arabic under /ar/guide/<slug>
 _AR_GUIDE_SLUGS = {'rental-dispute', 'ejari-renewal', 'dewa-premises-number',
-                   'shared-housing-dubai', 'landlord-selling-property-tenant-rights'}
+                   'shared-housing-dubai', 'landlord-selling-property-tenant-rights',
+                   'maintenance-landlord-tenant-dubai'}
 
 @app.route('/guide/<slug>')
 def guide(slug):
