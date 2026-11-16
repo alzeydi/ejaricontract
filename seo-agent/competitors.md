@@ -1,7 +1,7 @@
 # Competitor SERP notes
 
 Refresh ~6 clusters per run (see AGENT.md §2). WebSearch runs on a US backend — order is approximate.
-Last full sweep: **2026-10-23**.
+Last full sweep: **2026-10-23**. Rotation: 2026-11-16 (6 clusters).
 
 ## Who dominates the niche
 * **MyBayut** — everywhere, very fresh (Oct 2026 updates on renewal, cancellation, DEWA, tenancy contract). Fees in bullets, “Process, Fees & More” titles, often no official links.
@@ -57,3 +57,14 @@ Last full sweep: **2026-10-23**.
 | bounced rent cheque | dubizzle, Bayut, bhomes, FAM, old National/Gulf News Q&A | Pre-2022 criminal-law advice still circulating; sources disagree on current position | Backlog — write only once Decree-Law 50/2022 verified |
 | rdc case status | dubizzle “Track your case”, Engel & Völkers, rdc.gov.ae track page itself | Official page: mobile or case number, free, instant, no phone listed | D-004 aligned our page to the official page |
 | ejari co-occupants | dubizzle, Khaleej Times, DLD service page | DLD page lists no fee; third-party says free | N-009 sticks to DLD wording |
+
+## Cluster notes (2026-11-16)
+
+| Cluster | Winner pattern | What winners give / miss | Our angle |
+|---|---|---|---|
+| tenant rights dubai | Bayut “Tenant rights in Dubai: All your essential questions answered”, FAM, dubizzle FAQs, Gulf News judge Q&A, law firms (Mondaq/BSA), REC + aigentsrealty “2026” guides | Few cite the *amended* 2008 articles (Art. 4 owner name, Art. 14 90 days, Art. 25 grounds); no article-per-right table | N-010: 12 rights each with article + link to our deep guide; myths box |
+| verify title deed dubai | dubizzle, Property Finder, Bayut (Dubai REST), many agency blogs | Guides disagree on fee (free vs “verification fee”) and menu path; nobody frames it as a tenant anti-scam step | N-011: DLD page facts (no fees, immediate, all residency), Validate Owner and Property, tenant red flags |
+| dewa registration for new tenant | Property Finder “create DEWA account”, dubizzle, emirates247, u.ae; DEWA pages | Fees vary across sources | C-018 retitle to the exact query |
+| how to cancel ejari on dubai rest app | Property Finder, bhomes, dubizzle, Bayut, emirates247, DLD cancel page | Documents lists disagree | C-022 retitle (we already rank 1–1.2 for long-tail) |
+| rera calculator | DLD/Dubai REST official tool, PF help centre, wasl, Khaleej Times, Bayut | Official tool wins; portals explain | C-020 exact “RERA Calculator” first |
+| tenancy contract download pdf | DLD Ejari templates + direct PDF, scribd, PF, Bayut | DLD v3 PDF URL in SERP returns 404 | C-019 adds filled-sample hook |
