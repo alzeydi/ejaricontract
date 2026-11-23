@@ -978,6 +978,7 @@ def sitemap_xml():
         ('/guide/verify-landlord-title-deed', None),
         ('/guide/landlord-cut-utilities-dubai', None),
         ('/guide/rent-out-property-dubai-without-agent', None),
+        ('/guide/ejari-family-visa', None),
         ('/guide/dewa-activation', None),
         ('/guide/dewa-premises-number', guide_pair('dewa-premises-number')),
         ('/guide/dewa-transfer', None),
@@ -1020,7 +1021,8 @@ _GUIDE_SLUGS = {'ejari-registration', 'dewa-activation', 'rental-dispute',
                 'maintenance-landlord-tenant-dubai', 'tenant-not-paying-rent-dubai',
                 'landlord-selling-property-tenant-rights', 'ejari-co-occupants',
                 'tenant-rights-dubai', 'verify-landlord-title-deed',
-                'landlord-cut-utilities-dubai', 'rent-out-property-dubai-without-agent'}
+                'landlord-cut-utilities-dubai', 'rent-out-property-dubai-without-agent',
+                'ejari-family-visa'}
 
 _TOOL_SLUGS = {'rent-increase-calculator'}
 

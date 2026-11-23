@@ -32,6 +32,7 @@ PAGES = [
     '/guide/landlord-selling-property-tenant-rights', '/guide/ejari-co-occupants',
     '/guide/tenant-rights-dubai', '/guide/verify-landlord-title-deed',
     '/guide/landlord-cut-utilities-dubai', '/guide/rent-out-property-dubai-without-agent',
+    '/guide/ejari-family-visa',
     '/tools/rent-increase-calculator',
     '/ar/guide/rental-dispute', '/ar/guide/ejari-renewal', '/ar/guide/dewa-premises-number',
     '/ar/guide/shared-housing-dubai', '/ar/guide/landlord-selling-property-tenant-rights',
@@ -164,6 +165,7 @@ def test_json_ld_parses(client, path):
     '/guide/landlord-selling-property-tenant-rights', '/guide/ejari-co-occupants',
     '/guide/tenant-rights-dubai', '/guide/verify-landlord-title-deed',
     '/guide/landlord-cut-utilities-dubai', '/guide/rent-out-property-dubai-without-agent',
+    '/guide/ejari-family-visa',
     '/ar/guide/maintenance-landlord-tenant-dubai', '/ar/guide/tenant-not-paying-rent-dubai',
 ])
 def test_faq_schema_present(client, path):
@@ -572,6 +574,20 @@ def test_shared_housing_and_subletting_fact_pins(client):
     assert 'Article 24' in sub and 'Article 25(1)(b)' in sub and 'written consent' in sub
     for p in ('/guide/dewa-premises-number', '/'):
         assert '24 hours' not in client.get(p).get_data(as_text=True)
+
+
+def test_family_visa_and_dewa_deposit_fact_pins(client):
+    """Facts verified 2026-11-23 in Chrome (cloud gets 403): GDRFA Dubai services
+    d551ce7b (family entry permit) and bf409606 / 95222a46 (family residence issue /
+    renewal), u.ae family residence page (27 Feb 2026), DEWA Move-in and Move-out pages.
+    GDRFA does NOT name Ejari as a required document — the page must not claim it does."""
+    v = client.get('/guide/ejari-family-visa').get_data(as_text=True)
+    for fact in ('AED 4,000 a month, or AED 3,000', 'AED 200 + 5% VAT', '+ AED 500',
+                 '48 hours', '60 days', 'Under 25', 'AED 20'):
+        assert fact in v, fact
+    assert 'Ejari is required for' not in v and 'GDRFA requires an Ejari' not in v
+    d = client.get('/guide/security-deposit-refund-dubai').get_data(as_text=True)
+    assert 'AED 2,000' in d and 'AED 4,000' in d and '24 working hours' in d
 
 
 def test_maintenance_and_nonpayment_fact_pins(client):
