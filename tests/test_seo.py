@@ -31,10 +31,11 @@ PAGES = [
     '/guide/maintenance-landlord-tenant-dubai', '/guide/tenant-not-paying-rent-dubai',
     '/guide/landlord-selling-property-tenant-rights', '/guide/ejari-co-occupants',
     '/guide/tenant-rights-dubai', '/guide/verify-landlord-title-deed',
+    '/guide/landlord-cut-utilities-dubai', '/guide/rent-out-property-dubai-without-agent',
     '/tools/rent-increase-calculator',
     '/ar/guide/rental-dispute', '/ar/guide/ejari-renewal', '/ar/guide/dewa-premises-number',
     '/ar/guide/shared-housing-dubai', '/ar/guide/landlord-selling-property-tenant-rights',
-    '/ar/guide/maintenance-landlord-tenant-dubai',
+    '/ar/guide/maintenance-landlord-tenant-dubai', '/ar/guide/tenant-not-paying-rent-dubai',
 ]
 
 # Pages that exist in both languages: en-path -> ar-path.
@@ -45,6 +46,7 @@ HREFLANG_PAIRS = {
     '/guide/shared-housing-dubai': '/ar/guide/shared-housing-dubai',
     '/guide/landlord-selling-property-tenant-rights': '/ar/guide/landlord-selling-property-tenant-rights',
     '/guide/maintenance-landlord-tenant-dubai': '/ar/guide/maintenance-landlord-tenant-dubai',
+    '/guide/tenant-not-paying-rent-dubai': '/ar/guide/tenant-not-paying-rent-dubai',
     '/legal-chat': '/ar/legal-chat',
 }
 
@@ -161,7 +163,8 @@ def test_json_ld_parses(client, path):
     '/guide/maintenance-landlord-tenant-dubai', '/guide/tenant-not-paying-rent-dubai',
     '/guide/landlord-selling-property-tenant-rights', '/guide/ejari-co-occupants',
     '/guide/tenant-rights-dubai', '/guide/verify-landlord-title-deed',
-    '/ar/guide/maintenance-landlord-tenant-dubai',
+    '/guide/landlord-cut-utilities-dubai', '/guide/rent-out-property-dubai-without-agent',
+    '/ar/guide/maintenance-landlord-tenant-dubai', '/ar/guide/tenant-not-paying-rent-dubai',
 ])
 def test_faq_schema_present(client, path):
     body = get(client, path, headers={'X-Forwarded-Proto': 'https'}).get_data(as_text=True)
@@ -606,3 +609,20 @@ def test_tenant_rights_and_title_deed_fact_pins(client):
     assert 'Validate Owner and Property' in d and 'AED 177.75' in d
     a = client.get('/ar/guide/maintenance-landlord-tenant-dubai').get_data(as_text=True)
     assert 'المادة 16' in a and 'المادة 34' in a and '15,000' in a and '20,000' in a
+
+
+def test_utilities_landlord_diy_and_rdc_addon_fee_pins(client):
+    """Facts verified 2026-11-23: Law 26/2007 Arts. 12, 16, 20, 22, 31, 34 and Law 33/2008 amended
+    Arts. 4, 9, 14 (dlp.dubai.gov.ae); RDC first-instance page: process service AED 100, knowledge
+    AED 10, innovation AED 10, PoA AED 25, trustee centre partner fee AED 130 + VAT."""
+    u = client.get('/guide/landlord-cut-utilities-dubai').get_data(as_text=True)
+    assert 'Article 34' in u and 'police station' in u and 'Article 31' in u and 'Article 16' in u
+    assert 'AED 15,000' in u and 'AED 20,000' in u and 'AED 130 + VAT' in u
+    n = client.get('/guide/rent-out-property-dubai-without-agent').get_data(as_text=True)
+    assert 'four equal instalments in advance' in n and 'Art. 20' in n and 'amended Art. 14' in n
+    assert 'AED 177.75' in n and 'AED 219.75' in n
+    assert 'two years' not in n  # the 2-year freeze in original Art. 9 was replaced by Law 33/2008
+    r = client.get('/guide/rental-dispute').get_data(as_text=True)
+    assert 'AED 130 partner fee' in r and 'AED 10 + AED 10' in r and 'AED 25' in r
+    a = client.get('/ar/guide/tenant-not-paying-rent-dubai').get_data(as_text=True)
+    assert 'المادة 25(1)(أ)' in a and 'المادة 34' in a and '20,000' in a and '15,000' in a and '30 يوماً' in a

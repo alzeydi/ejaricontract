@@ -1,7 +1,7 @@
 # Competitor SERP notes
 
 Refresh ~6 clusters per run (see AGENT.md §2). WebSearch runs on a US backend — order is approximate.
-Last full sweep: **2026-10-23**. Rotation: 2026-11-16 (6 clusters).
+Last full sweep: **2026-10-23**. Rotation: 2026-11-23 (6 clusters).
 
 ## Who dominates the niche
 * **MyBayut** — everywhere, very fresh (Oct 2026 updates on renewal, cancellation, DEWA, tenancy contract). Fees in bullets, “Process, Fees & More” titles, often no official links.
@@ -68,3 +68,14 @@ Last full sweep: **2026-10-23**. Rotation: 2026-11-16 (6 clusters).
 | how to cancel ejari on dubai rest app | Property Finder, bhomes, dubizzle, Bayut, emirates247, DLD cancel page | Documents lists disagree | C-022 retitle (we already rank 1–1.2 for long-tail) |
 | rera calculator | DLD/Dubai REST official tool, PF help centre, wasl, Khaleej Times, Bayut | Official tool wins; portals explain | C-020 exact “RERA Calculator” first |
 | tenancy contract download pdf | DLD Ejari templates + direct PDF, scribd, PF, Bayut | DLD v3 PDF URL in SERP returns 404 | C-019 adds filled-sample hook |
+
+## Cluster notes (2026-11-23)
+
+| Cluster | Winner pattern | What winners give / miss | Our angle |
+|---|---|---|---|
+| landlord cut electricity / AC dubai | Gulf News Q&A (many, incl. “Can landlords cut AC … during a dispute?”), dubizzle “Can a landlord cut off electricity … unpaid rent?”, DLD/RDC news (now 404), Khaleej Times | Portals add unverified “RDC decides in 24 hours” and “imprisonment” claims; few quote Art. 34 in full or give the RDC fee | N-012: Art. 34 verbatim, police → RDC steps, fee table, “is it really the landlord” check, landlord's lawful alternatives |
+| rent out property dubai without agent | Khaleej Times legal Q&A (“no obligation to use an agent”), FAM, Engel & Völkers, PF, bhomes, REC “Complete Landlord Guide 2026” | REC/PF quote Ejari “~AED 220”; nobody lists the amended Art. 4 contents or the Art. 12 four-instalment default | N-013: 5-step DIY flow, exact Ejari 177.75/219.75, generator CTA |
+| tenancy contract dubai | DLD PDFs (unified contract, UAE-nationals housing variant, tenancy guide) take top spots; Bayut “ultimate guide”, E&V, PF, Mondaq, dubizzle | Official PDFs now dominate the head term | R-001 rollback to the long-standing “Free … DLD Template Word & PDF” title; consider a DIY/generator angle rather than another retitle |
+| dewa premise number | Bayut FAQ + DEWA guide, kredium, PF, bhomes, dubizzle, emirates247 | Sources disagree 9 vs 10 digits; door-frame/meter location tip common | Our page ranks 4–5; add “on the door frame / meter box” only if verifiable |
+| dubai housing fee | Bayut, PF, E&V, FAM 2025, westgate, Gulf News Q&A; u.ae page says **3%** | Rate conflict (u.ae 3% vs everyone 5%) — needs a DM primary source | Depth candidate; do not change the rate without DM source |
+| (news) Google November 2026 core update | SEJ, SERoundtable: started 10 Nov 2026, up to 2 weeks | — | explains part of the last-week drop; re-measure after rollout |

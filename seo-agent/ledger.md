@@ -11,6 +11,7 @@ Read first, update last (see `AGENT.md`). Metrics: Google Search Console, `sc-do
 | 2026-10-30 (GSC lag) | 432 (−1.8% vs prev 28d 440; −5% vs baseline 456) | 26,415 (+6.2%) | 1.64% | 9.2 (prev 10.8) | 30 / 35 indexed (not indexed: ejari-number, eviction-notice, shared-housing, about, terms — all 'Discovered, currently not indexed') | run 2026-11-02 |
 | 2026-11-06 (GSC lag) | 650 (+44.4% vs prev 28d 450) | 26,784 (+8.6%) | 2.43% | 9.5 (prev 9.9) | 31 / 37 indexed (not indexed: ejari-number, eviction-notice, maintenance, tenant-not-paying-rent, about, terms — all 'Discovered, currently not indexed') | run 2026-11-09; window 10 Oct–6 Nov already includes the 10-23 title rewrites |
 | 2026-11-13 (GSC lag) | 714 (+54.2% vs prev 28d 463; +57% vs baseline 456) | 27,115 (+11.6%) | 2.63% | 10.0 (prev 9.3) | 32 / 40 indexed (not indexed: ejari-number, eviction-notice, maintenance, landlord-selling, ejari-co-occupants, about, terms 'Discovered, not indexed'; tenant-not-paying + AR selling 'unknown to Google') | run 2026-11-16; NB 4 Nov = one-day spike 131 clicks across 8 pages (housing-fee 22, rental-dispute 22, tenancy-contract 20) — excluding it ≈ 583 (+26%) |
+| 2026-11-20 (GSC lag) | 668 raw (+45.5% vs 459) — **CLEAN ≈ 13 clicks/day vs 16.6 before the agent (−22%)**; last 7 days 61 clicks vs ~113/week in Sep–Oct (−46%) | 25,790 (+3.7%); last 7 days 7,078 vs ~9,000/week | 2.59% raw | 10.7 (prev 9.1) | not re-inspected per URL this run (see run log) | run 2026-11-23. **Artificial clicks found:** 2026-11-02 (119 desktop of 122) and 2026-11-04 (122 of 131) — UAE desktop, spread over 8 pages; 2026-11-09..11 elevated desktop (+~55). ≈ 275 of 668 clicks are not organic. Google November 2026 core update rolling out since 10 Nov |
 
 ## Changes
 
@@ -62,6 +63,28 @@ Baseline = page's last 28 days before the change (clicks / impressions / CTR / p
 | N-011 | 2026-11-16 | /guide/verify-landlord-title-deed | **New article** — DLD Verify Title Deed (no fees, immediate, website + Dubai REST, all residency statuses, Validate Property / Owner and Property), Property Status Enquiry, amended Art. 4 owner-name rule, scam red flags | new | 2026-12-14 | |
 | A-003 | 2026-11-16 | /ar/guide/maintenance-landlord-tenant-dubai | **Arabic version** of N-006 (hreflang pair, sitemap, tests, sitewide AR footer link) | new | 2026-12-14 | |
 | D-005 | 2026-11-16 | /guide/ejari-check | Depth: “Before the Ejari: check the landlord’s title deed” section (#check-landlord-title-deed) + FAQ; dateModified 2026-11-16 | 34 / 853 / 3.99% / 12.5 | 2026-12-07 | |
+| R-001 | 2026-11-23 | /guide/tenancy-contract-dubai | **Rollback** of C-003/C-019 title → pre-agent “Free Tenancy Contract Dubai: DLD Template Word & PDF 2026” | 61 / 7,218 / 0.8% / 9.0 (clean 28d) | 2026-12-14 | |
+| R-002 | 2026-11-23 | /guide/rental-dispute | **Rollback** of C-005 title → “RDC Dubai: Check Case Status, Fees & How to File (2026)”; description (D-004 facts) kept | 12 / 4,020 / 0.3% / 11.2 (clean 28d) | 2026-12-14 | |
+| D-006 | 2026-11-23 | /guide/rental-dispute | Depth: “Online vs trustee centre” fee table (#rdc-fee-online-vs-centre): AED 100 process service, AED 10 knowledge + AED 10 innovation, AED 25 PoA, AED 130 + VAT trustee partner fee; dateModified 2026-11-23 | same as R-002 | 2026-12-14 | |
+| N-012 | 2026-11-23 | /guide/landlord-cut-utilities-dubai | **New article** — landlord cut electricity/water/AC: Art. 34 quoted, police + RDC damages, Arts. 16, 22, 25(1)(a), 31; RDC fees incl. trustee AED 130 + VAT | new | 2026-12-21 | |
+| N-013 | 2026-11-23 | /guide/rent-out-property-dubai-without-agent | **New article** — landlord DIY letting: amended Arts. 4, 9, 14; Arts. 7, 12 (4 instalments default), 15, 16, 20, 21, 24, 34; DLD unified contract; Ejari 177.75/219.75 | new | 2026-12-21 | |
+| A-004 | 2026-11-23 | /ar/guide/tenant-not-paying-rent-dubai | **Arabic version** of N-007 (hreflang pair, sitemap guide_pair, `_AR_GUIDE_SLUGS`, HREFLANG_PAIRS, EN lang switch) | new | 2026-12-21 | |
+
+### Re-evaluation 2026-11-23 (clean control: spike days 11-02, 11-04, 11-09..11 excluded)
+Per-page 28d-equivalent, 26 Sep–22 Oct vs 24 Oct–20 Nov (spike days removed). Earlier verdicts for C-005, C-006, C-007, C-011 and the N-003 “56 clicks” were driven by the artificial desktop spikes and are **withdrawn**.
+
+| ID | Page | Clean before → after | Verdict 2026-11-23 |
+|---|---|---|---|
+| C-001 | dewa-transfer | 8c 0.7% → 17c 1.9% | WIN (only real win of the 10-23 batch) — keep |
+| C-003/C-019 | tenancy-contract-dubai | 116c 1.1% p8.6 → 61c 0.8% p9.0; “tenancy contract dubai” p7.7→21.8 | LOSS → **R-001 rollback** to pre-agent title |
+| C-004 | dewa-premises-number | 259c 1.8% p5.0 → 217c 1.8% p4.7 (pre-update window CTR 2.0%) | NEUTRAL — keep |
+| C-005 | rental-dispute | 20c 0.5% p12.0 → 12c 0.3% p11.2 (CTR fell while position improved) | LOSS → **R-002 rollback** title (keep D-004 facts + description) |
+| C-006 | ejari-check | 17c 1.8% → 9c 1.0% (pre-update window CTR 1.7%) | NEUTRAL/LOSS, update-confounded — keep, recheck 12-14 |
+| C-007 | ejari-renewal | 0 → 0 (pos 39) | INCONCLUSIVE (16 clicks were spike) |
+| C-009/C-022 | ejari-cancellation | 7c → 0c, pos 16.6→26.4 | C-022 inside cool-down — recheck 12-07 |
+| C-011 | what-is-ejari | 1 → 1 | INCONCLUSIVE (21 clicks were spike) |
+| N-003 | dubai-housing-fee | 0 organic clicks, 513 impr, pos 22 | page ranks too low; depth candidate |
+| C-017 | ar/rental-dispute | 4c p7.0 → 0c p17.0 | cool-down until 11-30 — watch |
 
 Internal links added 2026-11-09: hub `/guides` cards for N-008/N-009; related cards into N-008 from eviction-notice, rent-increase, early-termination, tenancy-contract, security-deposit; into N-009 from subletting, shared-housing, ejari-registration, ejari-check, addendum; EN↔AR link for A-002.
 
@@ -70,6 +93,14 @@ Internal links added 2026-11-02: hub `/guides` cards for N-006/N-007; related ca
 Internal links added: hub `/guides` cards for N-001..003; related cards from rental-dispute, eviction-notice, security-deposit, ejari-cancellation (→ N-001), tenancy-contract, ejari-registration, rent-increase (→ N-002), dewa-activation, dewa-transfer, ejari-renewal (→ N-003); contextual links in tenancy-contract, ejari-cancellation, dewa-activation.
 
 Internal links added 2026-10-26: hub `/guides` cards for N-004/N-005; related cards from eviction-notice, rental-dispute (→ both), tenancy-contract, ejari-registration, ejari-check (→ N-004), addendum, early-termination (→ N-005); EN↔AR link for A-001.
+
+Internal links added 2026-11-23: hub `/guides` cards for N-012/N-013 + AR footer-column link for A-004; related cards into N-012 from tenant-rights, maintenance, tenant-not-paying (+ contextual “cut water, electricity or AC”), rental-dispute, eviction-notice; into N-013 from tenancy-contract, ejari-registration, verify-title-deed, landlord-selling, addendum; into A-004 from AR maintenance and AR selling; EN↔AR switch on tenant-not-paying.
+
+### Sources checked 2026-11-23
+* [Law 26/2007](https://dlp.dubai.gov.ae/Legislation%20Reference/2007/Law%20No.%20%2826%29%20of%202007%20Regarding%20regulation%20between%20the%20lessor%20and%20the%20lessee.html) fetched: Arts. 4, 6–8, 11–13, 16, 17, 19–22, 24, 31, 34, 35. [Law 33/2008](https://dlp.dubai.gov.ae/Legislation%20Reference/2009/Law%20No.%20%2833%29%20of%202008%20Amending%20Law%20No.%20%2826%29%20of%202007.html) fetched: amended Art. 4 (contents + owner name; registration with RERA — the old “courts won't hear unregistered leases” sentence is NOT in the amended text, so not claimed), amended Art. 9 (no two-year freeze any more — pinned in test), Art. 14 (90 days).
+* [RDC first-instance page](https://rdc.gov.ae/en/eservices/register-first-instance-lawsuit-rental/) fetched: 3.5% (500–20,000), monetary 3.5% (500–15,000), PoA AED 25, process service AED 100, knowledge AED 10, innovation AED 10, trustee centre partner fee AED 130 + VAT.
+* DLD news pages on RDC urgent petitions for disconnected services and on DEWA clearance return 404 → “RDC decides in 24 h” and “imprisonment” claims seen in portals NOT used.
+* DLD unified tenancy contract PDF `media/4cglen5i/...` still 200.
 
 Internal links added 2026-11-16: sitewide footer “Tenant rights” (EN pages) + “صيانة العقار المؤجر” (AR column); hub `/guides` cards for N-010/N-011; related cards into N-010 from eviction-notice, maintenance, security-deposit, rental-dispute, rent-increase, tenant-not-paying, landlord-selling, early-termination; into N-011 from tenancy-contract, ejari-registration, subletting (+ contextual from ejari-check). N-010 itself links to every not-indexed rights page. Fixed co-occupants CTA (said “generate contract” but linked the lawyer at lawyer price → now generator at contract price).
 
@@ -103,7 +134,7 @@ Internal links added 2026-11-16: sitewide footer “Tenant rights” (EN pages) 
 * [RDC first-instance fees](https://rdc.gov.ae/en/eservices/register-first-instance-lawsuit-rental/) — 3.5% of annual rent, AED 500–20,000; monetary claims cap AED 15,000; [DLD amicable settlement](https://dubailand.gov.ae/en/eservices/dispute-lawsuit-for-amicable-settlement) — half fee refunded on settlement
 * Housing fee: no DM page states the rate; 5% from DM officials quoted by Gulf News (2018) and consistent portal guides (Bayut Sep 2026); [DM refund service](https://www.dm.gov.ae/easy-payments/refund-of-fines-or-already-paid-fees/)
 
-## Content backlog (from 2026-10-23 gap research — highest first; shipped: N-004/N-005, N-006/N-007, N-008 selling + N-009 co-occupants on 2026-11-09, N-010 tenant-rights + N-011 title-deed on 2026-11-16)
+## Content backlog (from 2026-10-23 gap research — highest first; shipped: N-012 utilities + N-013 no-agent on 2026-11-23; N-004/N-005, N-006/N-007, N-008 selling + N-009 co-occupants on 2026-11-09, N-010 tenant-rights + N-011 title-deed on 2026-11-16)
 
 | Slug | Main query | Feeds | Notes / must-verify |
 |---|---|---|---|
@@ -113,10 +144,10 @@ Internal links added 2026-11-16: sitewide footer “Tenant rights” (EN pages) 
 | /guide/tenant-not-paying-rent-dubai | tenant not paying rent dubai | AI lawyer (landlords) | Art. 25(1)(a) 30-day notice, Art. 31, Art. 34; deposit-and-offer |
 | /guide/ejari-co-occupants | add family to ejari | Traffic | DLD Manage Occupants service |
 | /guide/landlord-selling-property-tenant-rights | landlord selling property dubai tenant rights | AI lawyer | Art. 28, Art. 25(2)(d) |
-| /guide/rent-out-property-dubai-without-agent | rent out property dubai without agent | Generator | Landlord DIY Ejari; Art. 4 |
-| /guide/landlord-cut-utilities-dubai | landlord cut electricity dubai | AI lawyer | Art. 34; RDC urgent petition (DLD news) |
+| /guide/dubai-housing-fee depth | dubai housing fee calculation | Traffic | page at pos 22 with 0 organic clicks — add refund/adjustment + DEWA bill line; u.ae still says 3% — needs an official DM source before touching the rate |
+| /guide/tenant-rights-dubai (AR) | حقوق المستأجر في دبي | AI lawyer | next Arabic candidate |
 
-Arabic candidates: tenant-rights hub (حقوق المستأجر في دبي), tenant-not-paying, early-termination. Done: shared housing, selling, maintenance.
+Arabic candidates: tenant-rights hub (حقوق المستأجر في دبي), early-termination. Done: shared housing, selling, maintenance, tenant-not-paying.
 
 ## Backlog — existing pages
 * **Indexing:** requested 2026-10-23 for dubai-housing-fee, early-termination, tenancy-contract-addendum, security-deposit-refund, ejari-number, rent calculator. **Still to request next run:** /guide/eviction-notice-dubai (GSC error twice, likely daily quota), /about. Check whether requested pages got crawled.
@@ -127,6 +158,8 @@ Arabic candidates: tenant-rights hub (حقوق المستأجر في دبي), te
 * Early-termination: Art. 738 of Federal Decree-Law 25/2025 (single source) — add only once verified.
 
 ## Learnings
+* (2026-11-23) **Always clean the data before judging.** Look at clicks by date × device first: 2026-11-02 and 11-04 had ~120 desktop clicks each from the UAE (normal day 10–20), plus a smaller bump 11-09..11. Those spikes created every “WIN” of 11-16 except DEWA transfer. Evaluate with spike days excluded (clean control) and report the clean number next to the raw one.
+* (2026-11-23) Clean result of the 10-23 title batch: only the factual DEWA transfer rewrite won; head-query-first titles with “2026: Free PDF & Word” (tenancy contract) and “Case Status, Contact Number & Filing Fee” (RDC) lowered CTR. Treat the 11-16 learning below as superseded.
 * (2026-11-16, first evaluation of the 10-23 batch, 22-day windows 1–22 Oct vs 23 Oct–13 Nov) Titles that open with the exact head query + a concrete official hook won: RDC “Case Status, Contact Number & Filing Fee” (+200%), “What Is Ejari? Meaning, Cost…” (0→21), “Ejari Renewal Online…Documents Required” (0→16), DEWA “Deposit Moves With You” (+169%). Generic “2026: Free PDF & Word Download” on tenancy-contract did not lift clicks.
 * Control in `opportunities.py evaluate` = whole site minus page; with fast-growing new pages and the 4 Nov one-day spike the control overstates the trend (+70%) — a page can be “LOSS” while its own CTR rose significantly. Next evaluations: exclude pages published after the baseline window and 2026-11-04 from the control.
 * English queries land on AR pages (/ar/guide/ejari-renewal gets “how much is ejari renewal fee”, CTR 0.5%) — hreflang works but Google still serves AR; watch.
@@ -140,3 +173,4 @@ Arabic candidates: tenant-rights hub (حقوق المستأجر في دبي), te
 * 2026-11-09 — GSC 28d (10 Oct–6 Nov): 650 clicks (+44.4%) / 26,784 impr (+8.6%) / 2.43% / pos 9.5; 31/37 indexed. Titles NOT changed on the 16 pages from 10-23 (cool-down until 11-13; no page lost >30% with a real base); only /ar/guide/rental-dispute retitled (never in the 10-23 batch). Early signals on rewrites: rental-dispute 13→62 clicks, ejari-check 12→31, dewa-transfer 5→17, ejari-cost 0→13, what-is-ejari 2→21; tenancy-contract-dubai 137→120 (pos 9.2→8.1, CTR 1.24%) — formal evaluation 11-13+. dubai-housing-fee: 56 clicks / 366 impr in first weeks. Shipped N-008, N-009, A-002, D-004, C-017 + links. Competitor SERPs checked: selling/tenant rights, bounced cheque, RDC case status (sources are portals/law-firm blogs; realestateclubdubai has a 2026 selling guide). SKIPPED: 2nd depth upgrade, bounced-cheque (no official source). Env note: unpinned `pypdf` in requirements.txt — pypdf>=6.17 raises DeprecationError in generator (`replace_contents`), 4 generator tests fail on fresh install; passed with pypdf 5.9.0. Production risk if Railway rebuilds with latest pypdf — payment-funnel code not touched by agent. Next run: evaluate C-001..C-016 (due 11-13), request-less indexing push for the 6 unindexed URLs, bounced-cheque only with Decree-Law 50/2022 source, AR for maintenance/non-payment.
 * 2026-11-09 (post-deploy) — Railway deploy of 3865491 live (titles verified on 4 URLs); sitemap resubmitted (204). New URLs just discovered by Google: ejari-co-occupants unknown, selling EN/AR 'Discovered, not indexed' — recheck next run.
 * 2026-11-16 — GSC 28d (17 Oct–13 Nov): 714 clicks (+54.2%) / 27,115 impr (+11.6%) / 2.63% / pos 10.0; 32/40 indexed (via API URL Inspection). First evaluation of C-001..C-016: 5 WIN, 1 LOSS-by-formula kept (premises-number, control artefact), rest neutral/inconclusive, no rollbacks. Shipped 6 titles (C-018..C-023), N-010 tenant-rights hub, N-011 verify title deed, A-003 AR maintenance, D-005 ejari-check depth, sitewide footer links. Competitor SERPs checked: tenant rights, title deed verification, dewa registration new tenant, cancel ejari dubai rest, rera calculator, tenancy contract download. BLOCKED: request-indexing has no API and Chrome not available in cloud → relied on internal links + sitemap; DEWA 403. Env: test env needed `pip install --ignore-installed blinker pillow cffi cryptography` + pypdf<6.
+* 2026-11-23 — GSC 28d (24 Oct–20 Nov): 668 raw (+45.5%) but ≈ 275 clicks are artificial desktop spikes (11-02, 11-04, 11-09..11); clean ≈ 13/day vs 16.6 pre-agent (−22%), last week 61 clicks (−46% vs Sep–Oct weekly). Impressions 25,790 (+3.7%), last week −22%. Google November 2026 core update rolling since 10 Nov — confounds the last 10 days. tenancy-contract-dubai lost rankings (head query p7.7→21.8). Re-evaluated all changes on clean data (table above): rollbacks R-001 tenancy-contract, R-002 rental-dispute titles. Shipped N-012 landlord-cut-utilities, N-013 rent-out-without-agent, A-004 AR tenant-not-paying, D-006 RDC add-on fees + links. Competitor SERPs: landlord cut electricity, rent out without agent, tenancy contract dubai, dewa premise number, dubai housing fee, core-update news. BLOCKED: request-indexing (no API, no Chrome in cloud); DLD news pages 404. Next run: confirm whether core update finished, recheck ejari-check / premises-number, housing-fee depth, AR tenant-rights.
